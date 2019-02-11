@@ -1,0 +1,14 @@
+*.so
+*.pyc
+*.txt
+*.png
+.DS_Store
+*.out
+/output/*
+/projects/*
+/o18_data/*
+/o18_temps/*
+*.bak
+*#
+*~
+conversioncommand
