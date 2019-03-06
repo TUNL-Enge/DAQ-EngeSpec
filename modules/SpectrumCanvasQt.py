@@ -7,7 +7,7 @@ import matplotlib.colors as colors
 import matplotlib.cm as cm
 import copy
 
-import Events
+##import Events
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
