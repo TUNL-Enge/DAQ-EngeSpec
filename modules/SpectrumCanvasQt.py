@@ -36,7 +36,7 @@ class SpectrumCanvas(FigureCanvas):
                                    QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        
+
         self.FillTestData()
         ##self.fig.canvas.draw()
         
@@ -57,7 +57,7 @@ class SpectrumCanvas(FigureCanvas):
         ##        line.remove()
         ##    line=None
         x = np.array([x for x in range(0,4096)],dtype=int)
-        y = x
+        y = SpectrumObject.spec[:,1]
         x = np.ravel(list(zip(x,x+1)))
         y = np.ravel(list(zip(y,y)))
         ##Template.LineGraphics.append(self.a.plot(x,y,'k')[0])
@@ -128,9 +128,9 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     
-class NormalSpectrumCanvas(SpectrumCanvas):
-    """Simple canvas with a sine plot."""
-    def compute_initial_figure(self):
-        t = np.arange(0.0, 4095, 1)
-        s = 200+100*np.sin(2*np.pi*t/1000.0)
-        self.a.plot(t, s)
+##class NormalSpectrumCanvas(SpectrumCanvas):
+##    """Simple canvas with a sine plot."""
+##    def compute_initial_figure(self):
+##        t = np.arange(0.0, 4095, 1)
+##        s = 200+100*np.sin(2*np.pi*t/1000.0)
+##        self.a.plot(t, s)
