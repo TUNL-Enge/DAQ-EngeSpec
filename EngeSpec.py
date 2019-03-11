@@ -21,7 +21,7 @@ Spec.initialize()
 SpecCanvas = SpectrumCanvas(Spec=Spec)
 
 ## Draw everything!
-ui = Ui_MainWindow(Spec,SpecCanvas)  ## Pass the spectrum to the GUI
+ui = Ui_MainWindow(SpecCanvas)  ## Pass the spectrum to the GUI
 ui.show()
 
 app.exit(app.exec_())

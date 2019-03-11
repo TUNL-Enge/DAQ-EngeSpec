@@ -7,13 +7,13 @@ from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayo
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 class Ui_MainWindow(QMainWindow):
-    def __init__(self, Spec, SpecCanvas):
+    def __init__(self, SpecCanvas):
 
         ## super().__init__ allows us to have all properties of
         ## QMainWindw available
         super().__init__()
 
-        self.Spec = Spec
+        ##self.Spec = Spec
         self.SpecCanvas = SpecCanvas 
         
         ## The main window
