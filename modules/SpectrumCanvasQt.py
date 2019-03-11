@@ -1,7 +1,8 @@
 import matplotlib
 import numpy as np
 from PySide2.QtWidgets import QSizePolicy
-from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, \
+                                                NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 import matplotlib.cm as cm
@@ -11,15 +12,18 @@ import copy
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, Spec=None, parent=None, width=5, height=4, dpi=100):
+
+        self.Spec = Spec
+
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
         self.a = self.fig.add_subplot(111)
-        
+
         ##self.compute_initial_figure()
         
         self.a.set_xlim([0,4095])
-        self.a.set_ylim([0,800])
+        #self.a.set_ylim([0,800])
         self.a.set_xlabel("channel")
         self.a.set_ylabel("counts")
 
@@ -37,7 +41,14 @@ class SpectrumCanvas(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-        self.FillTestData()
+        ## This shouldn't happen, but check that we don't have a zeros spectrum
+        if not self.Spec.spec.any():
+            print("WARNING: Spectrum hasn't been initialized!")
+            self.FillTestData()
+        else:
+            print("Filling default data")
+            self.PlotData()
+
         ##self.fig.canvas.draw()
         
     def compute_initial_figure(self):
@@ -50,6 +61,10 @@ class SpectrumCanvas(FigureCanvas):
         y = np.ravel(list(zip(y,y)))
         self.a.plot(x,y,'k')
 
+    def LoadData(self):
+        self.Spec.LoadData()
+        self.UpdatePlot()
+        
     def PlotData(self):
         ##Template = self.fitObject.dataSpectrum
         ##for line in Template.LineGraphics: 
@@ -57,10 +72,20 @@ class SpectrumCanvas(FigureCanvas):
         ##        line.remove()
         ##    line=None
         x = np.array([x for x in range(0,4096)],dtype=int)
-        y = SpectrumObject.spec[:,1]
+        y = self.Spec.spec
         x = np.ravel(list(zip(x,x+1)))
         y = np.ravel(list(zip(y,y)))
         ##Template.LineGraphics.append(self.a.plot(x,y,'k')[0])
+        self.a.plot(x,y,'k')
+
+    ## TODO: Clean this up. It's not very efficient currently
+    def UpdatePlot(self):
+        x = np.array([x for x in range(0,4096)],dtype=int)
+        y = self.Spec.spec
+        x = np.ravel(list(zip(x,x+1)))
+        y = np.ravel(list(zip(y,y)))
+        self.a.clear()
+        self.a.plot(x,y,'k')
         self.fig.canvas.draw()
     
 

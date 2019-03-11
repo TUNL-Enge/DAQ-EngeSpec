@@ -13,8 +13,15 @@ from SpectrumHandlers import *
 ##spec =
 app = QApplication([])
 
-SpecCanvas = SpectrumCanvas
-ui = Ui_MainWindow(SpecCanvas)  ## Pass the spectrum to the GUI
+## Load and initialize a spectrum 
+Spec = SpectrumObject(0)
+Spec.initialize()
+
+## Load the spectrum drawing routines
+SpecCanvas = SpectrumCanvas(Spec=Spec)
+
+## Draw everything!
+ui = Ui_MainWindow(Spec,SpecCanvas)  ## Pass the spectrum to the GUI
 ui.show()
 
 app.exit(app.exec_())

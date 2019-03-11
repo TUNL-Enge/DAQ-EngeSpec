@@ -7,11 +7,14 @@ from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayo
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 class Ui_MainWindow(QMainWindow):
-    def __init__(self, SpectrumCanvas):
+    def __init__(self, Spec, SpecCanvas):
 
         ## super().__init__ allows us to have all properties of
         ## QMainWindw available
         super().__init__()
+
+        self.Spec = Spec
+        self.SpecCanvas = SpecCanvas 
         
         ## The main window
         self.setObjectName("MainWindow")
@@ -46,7 +49,7 @@ class Ui_MainWindow(QMainWindow):
         self.loadButton.setGeometry(QtCore.QRect(10, 10, 240, 25))
         self.loadButton.setObjectName("loadButton")
         self.loadButton.setText("Load Data File (ascii)")
-        ##self.loadButton.clicked.connect(spectrumObject.LoadData)
+        self.loadButton.clicked.connect(SpecCanvas.LoadData)
         self.testButton = QPushButton(self.LHMenuFrame)
         self.testButton.setGeometry(QtCore.QRect(10, 60, 240, 25))
         self.testButton.setObjectName("testButton")
@@ -72,10 +75,9 @@ class Ui_MainWindow(QMainWindow):
         self.Matplotlib.setGeometry(QtCore.QRect(10, 10, 880, 580))
         self.Matplotlib.setObjectName("Matplotlib")
         l = QVBoxLayout(self.Matplotlib)
-        self.mpcanvas = SpectrumCanvas(self.Matplotlib)
-        toolbar=NavigationToolbar(self.mpcanvas, self)
+        toolbar=NavigationToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
-        l.addWidget(self.mpcanvas)
+        l.addWidget(self.SpecCanvas)
 
         ## Second tab (nothing here!)
         self.tabWidget.addTab(self.tab, "")
