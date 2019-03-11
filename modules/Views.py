@@ -3,7 +3,7 @@ import matplotlib
 from PySide2 import QtCore
 from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayout, \
     QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
-    QMenuBar, QStatusBar
+    QMenuBar, QStatusBar, QTextEdit
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 class Ui_MainWindow(QMainWindow):
@@ -88,6 +88,11 @@ class Ui_MainWindow(QMainWindow):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), "Spectrum Inspector")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), "Empty Tab")
 
+        ## textedit below
+        self.TextEdit = QTextEdit(self.frame)
+        self.TextEdit.setGeometry(QtCore.QRect(280, 620, 900, 100))
+        self.TextEdit.setText("This will eventually become a terminal!")
+        
         ## Finally get everything laid out and set up
         self.horizontalLayout.addWidget(self.frame)
         self.setCentralWidget(self.centralwidget)
@@ -100,3 +105,4 @@ class Ui_MainWindow(QMainWindow):
 
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
+
