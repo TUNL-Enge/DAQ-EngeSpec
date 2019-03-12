@@ -93,11 +93,12 @@ class SpectrumCanvas(FigureCanvas):
         binlow = int(self.a.get_xlim()[0])
         binhigh= int(self.a.get_xlim()[1])
         maxarray=[100] #default value
+        maxarray=self.Spec.spec[binlow:binhigh]
         return max(maxarray)
 
     def Autosize(self):
         if self.isLogPlot == True:
-            self.a.set_ylim([1,1.20*self.GetMax()])
+            self.a.set_ylim([0.1,1.20*self.GetMax()])
         else:
             self.a.set_ylim([0,1.20*self.GetMax()])
         # JACK TEST
@@ -114,7 +115,7 @@ class SpectrumCanvas(FigureCanvas):
     def ToggleLog(self):
         if self.isLogPlot == False:
             if self.a.get_ylim()[0] < 1:
-                self.a.set_ylim([1,self.a.get_ylim()[1]])
+                self.a.set_ylim([0.1,self.a.get_ylim()[1]])
             self.a.set_yscale('log')
             self.isLogPlot=True
         else:
