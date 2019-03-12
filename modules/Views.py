@@ -1,6 +1,8 @@
+import sys
 import matplotlib
 ##matplotlib.use("Qt5Agg")
 from PySide2 import QtCore
+from PySide2 import QtGui
 from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayout, \
     QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
     QMenuBar, QStatusBar, QTextEdit
@@ -23,6 +25,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.centralwidget = QWidget()
         self.centralwidget.setObjectName("centralwidget")
+
 
         self.horizontalLayoutWidget = QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 1190, 730))
@@ -65,7 +68,6 @@ class Ui_MainWindow(QMainWindow):
 
         ##----------------------------------------------------------------------
         ## The Right-hand plotting area
-        
         self.tabWidget = QTabWidget(self.frame)
         self.tabWidget.setGeometry(QtCore.QRect(280, 10, 900, 600))
         self.tab = QWidget()
@@ -88,10 +90,14 @@ class Ui_MainWindow(QMainWindow):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), "Spectrum Inspector")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), "Empty Tab")
 
-        ## textedit below
+        ## textedit below plotting window
         self.TextEdit = QTextEdit(self.frame)
+        ## Add the output streams to the text editor
+        sys.stdout = OutLog(self.TextEdit, sys.stdout)
+        sys.stderr = OutLog(self.TextEdit, sys.stderr, QtGui.QColor(255,0,0) )
+
         self.TextEdit.setGeometry(QtCore.QRect(280, 620, 900, 100))
-        self.TextEdit.setText("This will eventually become a terminal!")
+        self.TextEdit.setText("Welcome to EngeSpec!\n")
         
         ## Finally get everything laid out and set up
         self.horizontalLayout.addWidget(self.frame)
@@ -106,3 +112,29 @@ class Ui_MainWindow(QMainWindow):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
 
+## Class to write stdout to the GUI rather than the terminal
+class OutLog:
+    def __init__(self, edit, out=None, color=None):
+        """(edit, out=None, color=None) -> can write stdout, stderr to a
+        QTextEdit.
+        edit = QTextEdit
+        out = alternate stream ( can be the original sys.stdout )
+        color = alternate color (i.e. color stderr a different color)
+        """
+        self.edit = edit
+        self.out = None
+        self.color = color
+
+    def write(self, m):
+        if self.color:
+            tc = self.edit.textColor()
+            self.edit.setTextColor(self.color)
+
+        self.edit.moveCursor(QtGui.QTextCursor.End)
+        self.edit.insertPlainText( m )
+
+        if self.color:
+            self.edit.setTextColor(tc)
+
+        if self.out:
+            self.out.write(m)
