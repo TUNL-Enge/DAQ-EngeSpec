@@ -153,7 +153,48 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_ylim(ylow,newhigh)
         self.fig.canvas.draw()
 
-    
+    def onClick(self, event):
+        print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+              ('double' if event.dblclick else 'single', event.button,
+               event.x, event.y, event.xdata, event.ydata))        
+
+    def getClicks(self,n=1):
+        print("Click ",n, "times\n")
+        ##cid = self.fig.canvas.mpl_connect('button_press_event', self.onClick)
+        ## Make a click-getter
+        cg = ClickGetter(self.fig,5)
+        dat = cg.get_data()
+        print("after call")
+        print(dat)
+        #        self.fig.canvas.mpl_disconnect(cid)
+
+class ClickGetter:
+    def __init__(self, fig, npoints):
+        self.npoints = npoints
+        self.fig = fig
+        print("ClickGetter is collecting ",npoints," points")
+        self.xs = [0]#list(points.get_xdata())
+        self.ys = [0]#list(points.get_ydata())
+        self.np = 0
+        self.cid = self.fig.canvas.mpl_connect('button_press_event', self)
+
+    def __call__(self, event):
+        #print('click', event)
+        #if event.inaxes!=self.points.axes: return
+        self.xs.append(event.xdata)
+        self.ys.append(event.ydata)
+        self.np += 1
+        if(self.np == self.npoints):
+            self.fig.canvas.mpl_disconnect(self.cid)
+        print(event.xdata,event.ydata)
+        ##return(self.xs,self.ys)
+
+    def get_data(self):
+        print(self.xs,self.ys)
+        return(self.xs,self.ys)
+            ##self.line.set_data(self.xs, self.ys)
+            ##self.line.figure.canvas.draw()
+
 ##class NormalSpectrumCanvas(SpectrumCanvas):
 ##    """Simple canvas with a sine plot."""
 ##    def compute_initial_figure(self):

@@ -68,6 +68,11 @@ class Ui_MainWindow(QMainWindow):
         self.testButton.setObjectName("testButton")
         self.testButton.setText("This button does nothing!")
         self.testButton.clicked.connect(SpecCanvas.xZoomIn)
+        self.clicksButton = QPushButton(self.LHMenuFrame)
+        self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
+        self.clicksButton.setObjectName("clicksButton")
+        self.clicksButton.setText("Test some clicks!")
+        self.clicksButton.clicked.connect(SpecCanvas.getClicks)
 
         ## Some text
         self.label = QLabel(self.LHMenuFrame)
