@@ -4,6 +4,7 @@ from PySide2.QtWidgets import QSizePolicy
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, \
                                                 NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
+from matplotlib.widgets import SpanSelector
 import matplotlib.colors as colors
 import matplotlib.cm as cm
 import copy
@@ -153,6 +154,24 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_ylim(ylow,newhigh)
         self.fig.canvas.draw()
 
+    def xZoomRange(self, minx, maxx):
+        self.a.set_xlim(minx,maxx)
+        self.fig.canvas.draw()
+        self.span.set_visible(False)
+            
+    def xInteractiveZoom(self):
+        self.span = SpanSelector(self.a, self.xZoomRange, 'horizontal', useblit=False,
+                    rectprops=dict(alpha=0.5, facecolor='red'))
+        
+    def yZoomRange(self, miny, maxy):
+        self.a.set_ylim(miny,maxy)
+        self.fig.canvas.draw()
+        self.span.set_visible(False)
+            
+    def yInteractiveZoom(self):
+        self.span = SpanSelector(self.a, self.yZoomRange, 'vertical', useblit=False,
+                    rectprops=dict(alpha=0.5, facecolor='red'))
+        
     def getClicks(self,n=1):
         print("Click ",n," times\n")
         x = self.fig.ginput(n)

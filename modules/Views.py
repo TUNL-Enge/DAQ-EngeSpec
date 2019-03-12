@@ -48,31 +48,48 @@ class Ui_MainWindow(QMainWindow):
         self.LHMenuFrame.setObjectName("LHMenuFrame")
 
         ## A couple of buttons
+        ## Load a file
         self.loadButton = QPushButton(self.LHMenuFrame)
         self.loadButton.setGeometry(QtCore.QRect(10, 10, 240, 25))
         self.loadButton.setObjectName("loadButton")
         self.loadButton.setText("Load Data File (ascii)")
         self.loadButton.clicked.connect(SpecCanvas.LoadData)
+        ## Set log scale
         self.logButton = QPushButton(self.LHMenuFrame)
         self.logButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
         self.logButton.setObjectName("logButton")
         self.logButton.setText("Log Scale")
         self.logButton.clicked.connect(SpecCanvas.ToggleLog)
+        ## Auto scale
         self.autoscaleButton = QPushButton(self.LHMenuFrame)
         self.autoscaleButton.setGeometry(QtCore.QRect(10, 70, 240, 25))
         self.autoscaleButton.setObjectName("autoscaleButton")
         self.autoscaleButton.setText("Auto Scale")
         self.autoscaleButton.clicked.connect(SpecCanvas.Autosize)
+        ## Zoom in X-direction
         self.testButton = QPushButton(self.LHMenuFrame)
         self.testButton.setGeometry(QtCore.QRect(10, 100, 240, 25))
         self.testButton.setObjectName("testButton")
-        self.testButton.setText("This button does nothing!")
+        self.testButton.setText("X zoom in")
         self.testButton.clicked.connect(SpecCanvas.xZoomIn)
+        ## Collect some clicks
         self.clicksButton = QPushButton(self.LHMenuFrame)
         self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
         self.clicksButton.setObjectName("clicksButton")
         self.clicksButton.setText("Test some clicks!")
         self.clicksButton.clicked.connect(SpecCanvas.getClicks)
+        ## Zoom slider x
+        self.zoomxButton = QPushButton(self.LHMenuFrame)
+        self.zoomxButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
+        self.zoomxButton.setObjectName("zoomxButton")
+        self.zoomxButton.setText("Zoom x-range!")
+        self.zoomxButton.clicked.connect(SpecCanvas.xInteractiveZoom)
+        ## Zoom slider y
+        self.zoomyButton = QPushButton(self.LHMenuFrame)
+        self.zoomyButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
+        self.zoomyButton.setObjectName("zoomyButton")
+        self.zoomyButton.setText("Zoom y-range!")
+        self.zoomyButton.clicked.connect(SpecCanvas.yInteractiveZoom)
 
         ## Some text
         self.label = QLabel(self.LHMenuFrame)
