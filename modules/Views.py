@@ -7,6 +7,7 @@ from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayo
     QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
     QMenuBar, QStatusBar, QTextEdit
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backend_tools import ToolBase
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, SpecCanvas):
@@ -110,7 +111,8 @@ class Ui_MainWindow(QMainWindow):
         self.Matplotlib.setGeometry(QtCore.QRect(10, 10, 880, 580))
         self.Matplotlib.setObjectName("Matplotlib")
         l = QVBoxLayout(self.Matplotlib)
-        toolbar=NavigationToolbar(self.SpecCanvas, self)
+        toolbar = MyCustomToolbar(self.SpecCanvas, self)
+        ##toolbar = NavigationToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
         l.addWidget(self.SpecCanvas)
 
@@ -171,3 +173,30 @@ class OutLog:
 
         if self.out:
             self.out.write(m)
+
+class MyCustomToolbar(NavigationToolbar): 
+    def __init__(self, plotCanvas, parent=None):
+        ##self.remove_tool('forward')
+        # remove the unwanted button
+        #POSITION_OF_CONFIGURE_SUBPLOTS_BTN = 6
+        #self.DeleteToolByPos(POSITION_OF_CONFIGURE_SUBPLOTS_BTN) 
+        self.toolitems = (('Home', 'Lorem ipsum dolor sit amet', 'home', 'home'),
+                          ('Back', 'consectetuer adipiscing elit', 'back', 'back'),
+                          ('Forward', 'sed diam nonummy nibh euismod', 'forward', 'forward'),
+                          (None, None, None, None),
+                          ('Pan', 'tincidunt ut laoreet', 'move', 'pan'),
+                          ('Zoom', 'dolore magna aliquam', 'zoom_to_rect', 'zoom'),
+                          (None, None, None, None),
+                          ('Subplots', 'putamus parum claram', 'subplots', 'configure_subplots'),
+                          ('Save', 'sollemnes in futurum', 'filesave', 'save_figure'),
+                          ('Port', 'Select', "select", 'select_tool'),
+        )
+        # create the default toolbar
+        NavigationToolbar.__init__(self, plotCanvas, parent)
+        #NavigationToolbar.add_tool("test",NewTool)
+
+    def select_tool(self):
+        print("You clicked the selection tool")
+
+class NewTool(ToolBase):
+        image = r"/home/longland/project/Logos-Photos/FENRISLogo.png"

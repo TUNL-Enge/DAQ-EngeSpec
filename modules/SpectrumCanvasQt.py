@@ -3,8 +3,11 @@ import numpy as np
 from PySide2.QtWidgets import QSizePolicy
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, \
                                                 NavigationToolbar2QT as NavigationToolbar)
+matplotlib.rcParams['toolbar'] = 'toolmanager'
+#matplotlib.rcParams['toolbar'] = 'toolmanager'
 from matplotlib.figure import Figure
 from matplotlib.widgets import SpanSelector
+from matplotlib.backend_tools import ToolBase, ToolToggleBase
 import matplotlib.colors as colors
 import matplotlib.cm as cm
 import copy
@@ -21,7 +24,6 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
         self.a = self.fig.add_subplot(111)
 
-        ##self.compute_initial_figure()
         
         self.a.set_xlim([0,4095])
         #self.a.set_ylim([0,800])
@@ -50,6 +52,11 @@ class SpectrumCanvas(FigureCanvas):
             print("Filling default data")
             self.PlotData()
 
+        ## Add extra tools
+        ##self.addTools()
+        ##self.fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
+        ##self.compute_initial_figure()
+        
         ##self.fig.canvas.draw()
         
     def compute_initial_figure(self):
@@ -177,3 +184,39 @@ class SpectrumCanvas(FigureCanvas):
         x = self.fig.ginput(n)
         print(x)
 
+    def addTools(self):
+        # Add the custom tools that we created
+        #self.fig.canvas.manager.toolmanager.add_tool('Hide', GroupHideTool, gid='mygroup')
+        
+        # Add an existing tool to new group `foo`.
+        # It can be added as many times as we want
+        self.fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
+
+        # Remove the forward button
+        self.fig.canvas.manager.toolmanager.remove_tool('forward')
+
+
+
+
+class GroupHideTool(ToolToggleBase):
+    '''Hide lines with a given gid'''
+    default_keymap = 'G'
+    description = 'Hide by gid'
+
+    def __init__(self, *args, **kwargs):
+        self.gid = kwargs.pop('gid')
+        ToolToggleBase.__init__(self, *args, **kwargs)
+
+    def enable(self, *args):
+        self.set_lines_visibility(False)
+
+    def disable(self, *args):
+        self.set_lines_visibility(True)
+
+    def set_lines_visibility(self, state):
+        gr_lines = []
+        for ax in self.figure.get_axes():
+            for line in ax.get_lines():
+                if line.get_gid() == self.gid:
+                    line.set_visible(state)
+        self.figure.canvas.draw()
