@@ -1,11 +1,11 @@
-import sys
+import sys, os
 import matplotlib
 ##matplotlib.use("Qt5Agg")
 from PySide2 import QtCore
 from PySide2 import QtGui
 from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayout, \
     QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
-    QMenuBar, QStatusBar, QTextEdit
+    QMenuBar, QStatusBar, QTextEdit, QSplitter
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 
@@ -55,18 +55,6 @@ class Ui_MainWindow(QMainWindow):
         self.loadButton.setObjectName("loadButton")
         self.loadButton.setText("Load Data File (ascii)")
         self.loadButton.clicked.connect(SpecCanvas.LoadData)
-        ## Set log scale
-        self.logButton = QPushButton(self.LHMenuFrame)
-        self.logButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
-        self.logButton.setObjectName("logButton")
-        self.logButton.setText("Log Scale")
-        self.logButton.clicked.connect(SpecCanvas.ToggleLog)
-        ## Auto scale
-        self.autoscaleButton = QPushButton(self.LHMenuFrame)
-        self.autoscaleButton.setGeometry(QtCore.QRect(10, 70, 240, 25))
-        self.autoscaleButton.setObjectName("autoscaleButton")
-        self.autoscaleButton.setText("Auto Scale")
-        self.autoscaleButton.clicked.connect(SpecCanvas.Autosize)
         ## Zoom in X-direction
         self.testButton = QPushButton(self.LHMenuFrame)
         self.testButton.setGeometry(QtCore.QRect(10, 100, 240, 25))
@@ -79,23 +67,11 @@ class Ui_MainWindow(QMainWindow):
         self.clicksButton.setObjectName("clicksButton")
         self.clicksButton.setText("Test some clicks!")
         self.clicksButton.clicked.connect(SpecCanvas.getClicks)
-        ## Zoom slider x
-        self.zoomxButton = QPushButton(self.LHMenuFrame)
-        self.zoomxButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
-        self.zoomxButton.setObjectName("zoomxButton")
-        self.zoomxButton.setText("Zoom x-range!")
-        self.zoomxButton.clicked.connect(SpecCanvas.xInteractiveZoom)
-        ## Zoom slider y
-        self.zoomyButton = QPushButton(self.LHMenuFrame)
-        self.zoomyButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
-        self.zoomyButton.setObjectName("zoomyButton")
-        self.zoomyButton.setText("Zoom y-range!")
-        self.zoomyButton.clicked.connect(SpecCanvas.yInteractiveZoom)
 
         ## Some text
         self.label = QLabel(self.LHMenuFrame)
         self.label.setGeometry(QtCore.QRect(10, 360, 58, 18))
-        self.label.setText("Channel")
+        self.label.setText("EngeSpec")
         self.label_2 = QLabel(self.LHMenuFrame)
         self.label_2.setGeometry(QtCore.QRect(190, 360, 58, 18))
         self.label_2.setText("---")
@@ -176,27 +152,80 @@ class OutLog:
 
 class MyCustomToolbar(NavigationToolbar): 
     def __init__(self, plotCanvas, parent=None):
-        ##self.remove_tool('forward')
-        # remove the unwanted button
-        #POSITION_OF_CONFIGURE_SUBPLOTS_BTN = 6
-        #self.DeleteToolByPos(POSITION_OF_CONFIGURE_SUBPLOTS_BTN) 
-        self.toolitems = (('Home', 'Lorem ipsum dolor sit amet', 'home', 'home'),
-                          ('Back', 'consectetuer adipiscing elit', 'back', 'back'),
-                          ('Forward', 'sed diam nonummy nibh euismod', 'forward', 'forward'),
-                          (None, None, None, None),
-                          ('Pan', 'tincidunt ut laoreet', 'move', 'pan'),
-                          ('Zoom', 'dolore magna aliquam', 'zoom_to_rect', 'zoom'),
-                          (None, None, None, None),
-                          ('Subplots', 'putamus parum claram', 'subplots', 'configure_subplots'),
-                          ('Save', 'sollemnes in futurum', 'filesave', 'save_figure'),
-                          ('Port', 'Select', "select", 'select_tool'),
+        self.toolitems = (
+            ##('Home', 'Lorem ipsum dolor sit amet', 'home', 'home'),
+            ## ('Back', 'consectetuer adipiscing elit', 'back', 'back'),
+            ## ('Forward', 'sed diam nonummy nibh euismod', 'forward', 'forward'),
+            ## (None, None, None, None),
+            ##('Pan', 'Pan the spectrum', 'move', 'pan'),
+            ## ('Zoom', 'dolore magna aliquam', 'zoom_to_rect', 'zoom'),
+            ## (None, None, None, None),
+            ## ('Subplots', 'putamus parum claram', 'subplots', 'configure_subplots'),
+            ##('Save', 'Save the figure', 'filesave', 'save_figure'),
+            ##                  #('Port', 'Select', "select", 'select_tool'),
         )
         # create the default toolbar
         NavigationToolbar.__init__(self, plotCanvas, parent)
-        #NavigationToolbar.add_tool("test",NewTool)
 
+        ## --------------------------------------------------
+        ## Custom items
+        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                    "..", "images", "icons", "")
+
+        ## Update
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ReloadIcon.ico"),
+                                "Reload", plotCanvas.UpdatePlot)
+        self.a.setToolTip("Update the plot")
+        self._actions['update'] = self.a
+
+        ## LogLin
+        self.a = self.addAction(QtGui.QIcon(iconDir + "LogLinIcon.ico"),
+                                "LogLin", plotCanvas.ToggleLog)
+        self.a.setToolTip("Change to Log or Linear Scale")
+        self._actions['loglin'] = self.a
+
+        ## Scale-all
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ScaleAllIcon.ico"),
+                                "Auto Scale", plotCanvas.Resize)
+        self.a.setToolTip("Resize to all")
+        self._actions['scaleall'] = self.a
+        
+        ## Auto y-scale
+        self.a = self.addAction(QtGui.QIcon(iconDir + "AutoScaleIcon.ico"),
+                                "Auto Scale", plotCanvas.Autosize)
+        self.a.setToolTip("Auto-scale the y-direction")
+        self._actions['autoscale'] = self.a
+
+        ## XRange
+        self.a = self.addAction(QtGui.QIcon(iconDir + "XRangeIcon.ico"),
+                                "X Range", plotCanvas.xInteractiveZoom)
+        self.a.setToolTip("Adjust the x-range")
+        self._actions['xrange'] = self.a
+
+        ## YRange
+        self.a = self.addAction(QtGui.QIcon(iconDir + "YRangeIcon.ico"),
+                                "Y Range", plotCanvas.yInteractiveZoom)
+        self.a.setToolTip("Adjust the y-range")
+        self._actions['yrange'] = self.a
+
+        ## Add a Splitter
+        self.a = self.addWidget(QSplitter())
+
+        ## net area
+        self.a = self.addAction(QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
+                                "Net Area", self.select_tool)
+        self.a.setToolTip("Calculate the net area under a peak")
+        self._actions['netarea'] = self.a
+
+        ## gross area
+        self.a = self.addAction(QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
+                                "Gross Area", self.select_tool)
+        self.a.setToolTip("Calculate the gross, background-subtracted area under a peak")
+        self._actions['grossarea'] = self.a
+        
+        ## Add a Splitter
+        self.a = self.addWidget(QSplitter())
+        
     def select_tool(self):
         print("You clicked the selection tool")
 
-class NewTool(ToolBase):
-        image = r"/home/longland/project/Logos-Photos/FENRISLogo.png"

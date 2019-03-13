@@ -104,11 +104,20 @@ class SpectrumCanvas(FigureCanvas):
         maxarray=self.Spec.spec[binlow:binhigh]
         return max(maxarray)
 
+    def GetMin(self):
+        binlow = int(self.a.get_xlim()[0])
+        binhigh= int(self.a.get_xlim()[1])
+        maxarray=[100] #default value
+        maxarray=self.Spec.spec[binlow:binhigh]
+        return min(maxarray)
+    
     def Autosize(self):
         if self.isLogPlot == True:
-            self.a.set_ylim([0.1,1.20*self.GetMax()])
+            ymin = 0.1 #max(0.1,0.9*self.GetMin())
+            self.a.set_ylim([ymin,1.10*self.GetMax()])
         else:
-            self.a.set_ylim([0,1.20*self.GetMax()])
+            ymin = 0 #max(0,0.9*self.GetMin())
+            self.a.set_ylim([ymin,1.10*self.GetMax()])
         # JACK TEST
         self.fig.canvas.draw()
 
@@ -183,40 +192,3 @@ class SpectrumCanvas(FigureCanvas):
         print("Click ",n," times\n")
         x = self.fig.ginput(n)
         print(x)
-
-    def addTools(self):
-        # Add the custom tools that we created
-        #self.fig.canvas.manager.toolmanager.add_tool('Hide', GroupHideTool, gid='mygroup')
-        
-        # Add an existing tool to new group `foo`.
-        # It can be added as many times as we want
-        self.fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
-
-        # Remove the forward button
-        self.fig.canvas.manager.toolmanager.remove_tool('forward')
-
-
-
-
-class GroupHideTool(ToolToggleBase):
-    '''Hide lines with a given gid'''
-    default_keymap = 'G'
-    description = 'Hide by gid'
-
-    def __init__(self, *args, **kwargs):
-        self.gid = kwargs.pop('gid')
-        ToolToggleBase.__init__(self, *args, **kwargs)
-
-    def enable(self, *args):
-        self.set_lines_visibility(False)
-
-    def disable(self, *args):
-        self.set_lines_visibility(True)
-
-    def set_lines_visibility(self, state):
-        gr_lines = []
-        for ax in self.figure.get_axes():
-            for line in ax.get_lines():
-                if line.get_gid() == self.gid:
-                    line.set_visible(state)
-        self.figure.canvas.draw()

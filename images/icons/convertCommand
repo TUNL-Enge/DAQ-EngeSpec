@@ -1,0 +1,1 @@
+convert FENRISLogo.svg -define icon:auto-resize FENRIS.ico
