@@ -38,6 +38,10 @@ class SpectrumObject:
     def getSpec(self):
         return self.spec
 
+    def simulate(self,center,width):
+        samp = int(np.random.normal(loc=center,scale=width))
+        self.spec[samp] += 1
+    
     def __str__(self):
         return 'Spectrum Name: {}'.format(self.Name)
 

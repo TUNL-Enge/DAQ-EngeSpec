@@ -71,7 +71,7 @@ class SpectrumCanvas(FigureCanvas):
 
     def LoadData(self):
         self.Spec.LoadData()
-        self.UpdatePlot()
+        self.PlotData()
         
     def PlotData(self):
         ##Template = self.fitObject.dataSpectrum
@@ -81,27 +81,25 @@ class SpectrumCanvas(FigureCanvas):
         ##    line=None
         x = np.array([x for x in range(0,4096)],dtype=int)
         y = self.Spec.spec
-        x = np.ravel(list(zip(x,x+1)))
-        y = np.ravel(list(zip(y,y)))
+        ##x = np.ravel(list(zip(x,x+1)))
+        ##y = np.ravel(list(zip(y,y)))
         ##Template.LineGraphics.append(self.a.plot(x,y,'k')[0])
         self.a.clear()
-        self.a.plot(x,y,'k')
+        self.a.step(x,y,'k')
         self.fig.canvas.draw()
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
         x = np.array([x for x in range(0,4096)],dtype=int)
         y = self.Spec.spec
-        #        x = np.ravel(list(zip(x,x+1)))
-        #        y = np.ravel(list(zip(y,y)))
+        xmin  = self.a.get_xlim()[0]
+        xmax  = self.a.get_xlim()[1]
+        ymin    = self.a.get_ylim()[0]
+        ymax    = self.a.get_ylim()[1]
         self.a.clear()
         self.a.step(x,y,'k')
-        if self.isLogPlot == True:
-            ymin = 0.1
-        else:
-            ymin=0
-        self.a.set_xlim(0,self.maximumX)
-        self.a.set_ylim([ymin,1.10*self.GetMax()])
+        self.a.set_xlim([xmin,xmax])
+        self.a.set_ylim([ymin,ymax])
         self.fig.canvas.draw()
     
 
@@ -179,7 +177,7 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def xZoomRange(self, minx, maxx):
-        self.a.set_xlim(minx,maxx)
+        self.a.set_xlim(int(minx),int(maxx))
         self.fig.canvas.draw()
         self.span.set_visible(False)
             
