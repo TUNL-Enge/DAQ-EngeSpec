@@ -62,13 +62,6 @@ class SpectrumCanvas(FigureCanvas):
     def compute_initial_figure(self):
         pass
 
-    def FillTestData(self):
-        x = np.array([x for x in range(0,4096)],dtype=int)
-        y = x
-        x = np.ravel(list(zip(x,x+1)))
-        y = np.ravel(list(zip(y,y)))
-        self.a.plot(x,y,'k')
-
     def LoadData(self):
         self.Spec.LoadData()
         self.PlotData()
@@ -91,7 +84,10 @@ class SpectrumCanvas(FigureCanvas):
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
         x = np.array([x for x in range(0,4096)],dtype=int)
+        ## The displayed spectrum is only updated when we hit the UpdatePlot button
+        self.Spec.spec[:] = self.Spec.spec_temp
         y = self.Spec.spec
+        
         xmin  = self.a.get_xlim()[0]
         xmax  = self.a.get_xlim()[1]
         ymin    = self.a.get_ylim()[0]
@@ -105,15 +101,13 @@ class SpectrumCanvas(FigureCanvas):
 
     def GetMax(self):
         binlow = max(0,int(self.a.get_xlim()[0]))
-        binhigh= min(4096,int(self.a.get_xlim()[1]))
-        maxarray=[100] #default value
+        binhigh= min(4095,int(self.a.get_xlim()[1]))
         maxarray=self.Spec.spec[binlow:binhigh]
         return max(maxarray)
 
     def GetMin(self):
         binlow = int(self.a.get_xlim()[0])
         binhigh= int(self.a.get_xlim()[1])
-        maxarray=[100] #default value
         maxarray=self.Spec.spec[binlow:binhigh]
         return min(maxarray)
     
@@ -198,3 +192,7 @@ class SpectrumCanvas(FigureCanvas):
         print("Click ",n," times\n")
         x = self.fig.ginput(n)
         print(x)
+
+    def simulate_a_peak(self):
+        self.Spec.simulate_a_peak()
+

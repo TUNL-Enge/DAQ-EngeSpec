@@ -67,6 +67,12 @@ class Ui_MainWindow(QMainWindow):
         self.clicksButton.setObjectName("clicksButton")
         self.clicksButton.setText("Test some clicks!")
         self.clicksButton.clicked.connect(SpecCanvas.getClicks)
+        ## Simulate some counts
+        self.simButton = QPushButton(self.LHMenuFrame)
+        self.simButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
+        self.simButton.setObjectName("simButton")
+        self.simButton.setText("Simulate some counts!")
+        self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)
 
         ## Some text
         self.label = QLabel(self.LHMenuFrame)
