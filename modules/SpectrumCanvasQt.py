@@ -68,7 +68,7 @@ class SpectrumCanvas(FigureCanvas):
         self.PlotData()
     def LoadHDFData(self):
         self.Spec2D.LoadHDFData()
-        #        self.PlotData()
+        self.PlotData2D()
         
     def PlotData(self):
         ##Template = self.fitObject.dataSpectrum
@@ -83,6 +83,16 @@ class SpectrumCanvas(FigureCanvas):
         ##Template.LineGraphics.append(self.a.plot(x,y,'k')[0])
         self.a.clear()
         self.a.step(x,y,'k')
+        self.fig.canvas.draw()
+
+    def PlotData2D(self):
+        H = self.Spec2D.spec2d.T
+        xe = self.Spec2D.xedges
+        ye = self.Spec2D.yedges
+        X, Y = np.meshgrid(xe,ye)
+        self.a.clear()
+        ##self.a.imshow(H, extent=[xe[0],xe[-1],ye[0],ye[-1]])
+        self.a.pcolormesh(X,Y,H)
         self.fig.canvas.draw()
 
     ## TODO: Clean this up. It's not very efficient currently

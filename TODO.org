@@ -1,13 +1,20 @@
+* GUI
+  - [ ] Tree to select histograms
+  - [ ] Some feedback numbers
+  - [ ] Grab stuff from MIDAS to display?
 * 2D Histograms
   - [X] Make a test data set P1 and DE
-  - [ ] Read data set
-  - [ ] Make initial histogram using np.histogram2d 
+  - [X] Read data set
+  - [X] Make initial histogram using np.histogram2d 
     - Use pre-dedined 512x512 bins 
-  - [ ] Use imshow or pcolormesh to plot
+  - [X] Use imshow or pcolormesh to plot
     - https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram2d.html
     - Apparently imshow updates better
       https://stackoverflow.com/questions/15992149/how-to-update-pcolor-in-matplotlib
   - [ ] Check updates
+    - Scaling buttons don't work well
+    - Update button doesn't work
+  - [ ] Color scheme
   
 * Interface with c++
   - [ ] Learn how to add data to arrays through c++
@@ -20,9 +27,6 @@
   - [ ] Reimplement MCMCGaus
     - Note that my R version is actually a minimization + sampling
     - Start my re-implementing that
-* GUI
-  - [ ] Some feedback numbers
-  - [ ] Grab stuff from MIDAS to display?
 * Misc
   - [ ] Data frames
     - HDF Data frames?

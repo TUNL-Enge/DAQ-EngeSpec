@@ -2,7 +2,7 @@
 from PySide2.QtWidgets import QFileDialog
 import numpy as np
 import pandas as pd
-
+import matplotlib as plt
 
 class SpectrumObject:
     def __init__(self, num):
@@ -67,8 +67,12 @@ class SpectrumObject2D:
         self.isSpectrum = True
         self.isVisible = True
 
-        self.spec = np.zeros(4096)
-        self.spec_temp = np.zeros(4096)   ## The temporary spectrum in memory
+        self.nx = 256
+        self.ny = 256
+        self.xedges = None
+        self.yedges = None
+        self.spec2d = np.zeros(shape=(self.nx,self.ny))
+        self.spec2d_temp = np.zeros(shape=(self.nx,self.ny))   ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
 
     ## Load already-made spectrum data
@@ -99,7 +103,11 @@ class SpectrumObject2D:
         print("Loading: ",filename[0])
         if filename != '':
             df = pd.read_hdf(filename[0])
-            print(df)
+            self.spec2d, self.xedges, self.yedges = np.histogram2d(
+                x=df.loc[:,"Pos1"],
+                y=df.loc[:,"DE"],
+                bins=self.nx)
+            #print(self.hist2d)
 
     def __str__(self):
         return '2D Spectrum Name: {}'.format(self.Name)
