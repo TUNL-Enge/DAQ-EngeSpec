@@ -1,6 +1,7 @@
 ## All of the stuff for opening spectra
 from PySide2.QtWidgets import QFileDialog
 import numpy as np
+import pandas as pd
 
 
 class SpectrumObject:
@@ -59,8 +60,56 @@ class SpectrumObject:
     def __str__(self):
         return 'Spectrum Name: {}'.format(self.Name)
 
+
+class SpectrumObject2D:
+    def __init__(self, num):
+        self.num = num
+        self.isSpectrum = True
+        self.isVisible = True
+
+        self.spec = np.zeros(4096)
+        self.spec_temp = np.zeros(4096)   ## The temporary spectrum in memory
+        self.Name = "2D Test Spectrum"
+
+    ## Load already-made spectrum data
+    def LoadData(self):
+        filename = QFileDialog.getOpenFileName(None,
+                                               "Open Spectrum", "./",
+                                               "Spectrum Files (*.dat)")
+        print("Loading: ",filename[0])
+        if filename != '':
+            TempHistogramArray=[]
+            input = open(filename[0],"r")
+            for line in input:
+                Bin,Content=line.split()
+                TempHistogramArray.append( float(Content) ) 
+            input.close()
+                ##return TempHistogramArray
+                ##
+            self.spec = TempHistogramArray
+            self.spec_temp[:] = self.spec
+            ##StrVar.set(filename.split("/")[-1])
+            ##self.mpcanvas.PlotData()
+
+    ## Load raw events from an HDF file
+    def LoadHDFData(self):
+        filename = QFileDialog.getOpenFileName(None,
+                                               "Open Spectrum", "./",
+                                               "Spectrum Files (*.dat, *.hdf)")
+        print("Loading: ",filename[0])
+        if filename != '':
+            df = pd.read_hdf(filename[0])
+            print(df)
+
+    def __str__(self):
+        return '2D Spectrum Name: {}'.format(self.Name)
+
+            
 if __name__ == '__main__':
-    Spec = SpectrumObject()
-    print(Spec)
-    Spec.initialize()
-    print(Spec.spec)
+    #Spec = SpectrumObject()
+    #print(Spec)
+    #Spec.initialize()
+    #print(Spec.spec)
+    Spec2D = SpectrumObject2D(0)
+    print(Spec2D)
+    Spec2D.LoadHDFData()

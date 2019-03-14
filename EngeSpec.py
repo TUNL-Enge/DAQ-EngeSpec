@@ -16,9 +16,10 @@ app = QApplication([])
 ## Load and initialize a spectrum 
 Spec = SpectrumObject(0)
 Spec.initialize()
+Spec2D = SpectrumObject2D(0)
 
 ## Load the spectrum drawing routines
-SpecCanvas = SpectrumCanvas(Spec=Spec)
+SpecCanvas = SpectrumCanvas(Spec=Spec, Spec2D=Spec2D)
 
 ## Draw everything!
 ui = Ui_MainWindow(SpecCanvas)  ## Pass the spectrum to the GUI

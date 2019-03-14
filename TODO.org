@@ -1,5 +1,5 @@
 * 2D Histograms
-  - [ ] Make a test data set P1 and DE
+  - [X] Make a test data set P1 and DE
   - [ ] Read data set
   - [ ] Make initial histogram using np.histogram2d 
     - Use pre-dedined 512x512 bins 

@@ -16,9 +16,10 @@ import copy
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, Spec=None, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, Spec=None, Spec2D=None, parent=None, width=5, height=4, dpi=100):
 
         self.Spec = Spec
+        self.Spec2D = Spec2D
 
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
@@ -65,6 +66,9 @@ class SpectrumCanvas(FigureCanvas):
     def LoadData(self):
         self.Spec.LoadData()
         self.PlotData()
+    def LoadHDFData(self):
+        self.Spec2D.LoadHDFData()
+        #        self.PlotData()
         
     def PlotData(self):
         ##Template = self.fitObject.dataSpectrum

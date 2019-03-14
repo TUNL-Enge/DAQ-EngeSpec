@@ -73,6 +73,13 @@ class Ui_MainWindow(QMainWindow):
         self.simButton.setObjectName("simButton")
         self.simButton.setText("Simulate some counts!")
         self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)
+        ## Read HDF 2D Data
+        self.load2DButton = QPushButton(self.LHMenuFrame)
+        self.load2DButton.setGeometry(QtCore.QRect(10, 220, 240, 25))
+        self.load2DButton.setObjectName("load2DButton")
+        self.load2DButton.setText("Load 2D HDF!")
+        self.load2DButton.clicked.connect(SpecCanvas.LoadHDFData)
+        
 
         ## Some text
         self.label = QLabel(self.LHMenuFrame)
