@@ -107,7 +107,6 @@ class SpectrumObject2D:
                 x=df.loc[:,"Pos1"],
                 y=df.loc[:,"DE"],
                 bins=self.nx)
-            print(list(df))
             #print(self.hist2d)
 
     def __str__(self):

@@ -59,7 +59,15 @@ class SpectrumCollection:
                 h, edges = np.histogram(df.loc[:,sObj.Name],bins=range(0,4096))
                 sObj.spec = h
                 self.spec1d.append(sObj)
-                
+
+            ## Make a 2D spectrum
+            sObj = SpectrumObject2D(0)
+            sObj.Name = list(df)[0] + "vs" + list(df)[1]
+            sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
+                x=df.loc[:,list(df)[0]],
+                y=df.loc[:,list(df)[1]],
+                bins=sObj.nx)
+            self.spec2d.append(sObj)
                 
             
 
