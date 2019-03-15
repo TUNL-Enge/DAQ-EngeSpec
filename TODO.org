@@ -1,5 +1,12 @@
+* Current
+  1) [ ] Make a new class to contain list of 1D and 2D histograms
+     - Defined simply by the HDF file for now
+  2) [ ] Upon loading HDF, make list of histograms
+  3) [ ] Add list of histograms to treeviewer
+  4) [ ] Make treeviewer switch to hists
+  5) [ ] Make 2D and 1D zooming consistent (make is2D boolean?)
 * GUI
-  - [ ] Tree to select histograms
+  - [X] Tree to select histograms
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
 * 2D Histograms
