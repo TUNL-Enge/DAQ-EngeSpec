@@ -7,19 +7,21 @@ sys.path.append('./modules')
 
 from Views import Ui_MainWindow
 from SpectrumCanvasQt import *
-from SpectrumHandlers import *
+from SpectrumCollection import *
+#from SpectrumHandlers import *
 
 ## Define the spectrum
 ##spec =
 app = QApplication([])
 
 ## Load and initialize a spectrum 
-Spec = SpectrumObject(0)
-Spec.initialize()
-Spec2D = SpectrumObject2D(0)
+#Spec = SpectrumObject(0)
+#Spec.initialize()
+#Spec2D = SpectrumObject2D(0)
+SpecColl = SpectrumCollection(0)
 
 ## Load the spectrum drawing routines
-SpecCanvas = SpectrumCanvas(Spec=Spec, Spec2D=Spec2D)
+SpecCanvas = SpectrumCanvas(SpecColl=SpecColl)
 
 ## Draw everything!
 ui = Ui_MainWindow(SpecCanvas)  ## Pass the spectrum to the GUI

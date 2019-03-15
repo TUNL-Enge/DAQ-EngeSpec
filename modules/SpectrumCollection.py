@@ -10,8 +10,9 @@ class SpectrumCollection:
     def __init__(self, num):
         self.num = num
 
-        self.spec1d = [[SpectrumObject(0)]]
-        self.spec2d = [[SpectrumObject2D(0)]]
+        self.spec1d = [SpectrumObject(0)]
+        self.spec1d[0].initialize()
+        self.spec2d = [SpectrumObject2D(0)]
         self.Name = "Test Collection of Spectra"
 
     def __str__(self):
@@ -68,9 +69,8 @@ class SpectrumCollection:
                 y=df.loc[:,list(df)[1]],
                 bins=sObj.nx)
             self.spec2d.append(sObj)
-                
-            
 
+## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     SpecColl = SpectrumCollection(0)

@@ -16,11 +16,15 @@ import copy
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, Spec=None, Spec2D=None, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, SpecColl=None, parent=None, width=5, height=4, dpi=100):
 
-        self.Spec = Spec
-        self.Spec2D = Spec2D
-
+        ## Keep track of what spectrum is currently being displayed on this canvas
+        self.sindex1d = 0
+        self.sindex2d = 0
+        
+        self.SpecColl = SpecColl
+        self.Spec = SpecColl.spec1d[self.sindex1d]
+        
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
         self.a = self.fig.add_subplot(111)
