@@ -58,7 +58,7 @@ class SpectrumObject:
         ##print(max(self.spec_temp[3900:4100]))
     
     def __str__(self):
-        return 'Spectrum Name: {}'.format(self.Name)
+        return '1D Spectrum Name: {}'.format(self.Name)
 
 
 class SpectrumObject2D:
