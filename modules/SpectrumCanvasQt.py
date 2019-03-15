@@ -71,8 +71,11 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec.LoadData()
         self.PlotData()
     def LoadHDFData(self):
-        self.Spec2D.LoadHDFData()
-        self.PlotData2D()
+        self.SpecColl.LoadHDFData()
+        self.sindex1d = 0
+        self.Spec = self.SpecColl.spec1d[self.sindex1d]
+        self.PlotData()
+        ##self.PlotData2D()
         
     def PlotData(self):
         ##Template = self.fitObject.dataSpectrum
