@@ -5,7 +5,7 @@ from PySide2 import QtCore
 from PySide2 import QtGui
 from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayout, \
     QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
-    QMenuBar, QStatusBar, QTextEdit, QSplitter
+    QMenuBar, QStatusBar, QTextEdit, QSplitter, QTreeWidget, QTreeWidgetItem
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 
@@ -78,17 +78,27 @@ class Ui_MainWindow(QMainWindow):
         self.load2DButton.setGeometry(QtCore.QRect(10, 220, 240, 25))
         self.load2DButton.setObjectName("load2DButton")
         self.load2DButton.setText("Load 2D HDF!")
-        self.load2DButton.clicked.connect(SpecCanvas.LoadHDFData)
+        self.load2DButton.clicked.connect(self.LoadHDFData)
         
 
         ## Some text
-        self.label = QLabel(self.LHMenuFrame)
-        self.label.setGeometry(QtCore.QRect(10, 360, 58, 18))
-        self.label.setText("EngeSpec")
-        self.label_2 = QLabel(self.LHMenuFrame)
-        self.label_2.setGeometry(QtCore.QRect(190, 360, 58, 18))
-        self.label_2.setText("---")
+        ##self.label = QLabel(self.LHMenuFrame)
+        ##self.label.setGeometry(QtCore.QRect(10, 360, 58, 18))
+        ##self.label.setText("EngeSpec")
+        ##self.label_2 = QLabel(self.LHMenuFrame)
+        ##self.label_2.setGeometry(QtCore.QRect(190, 360, 58, 18))
+        ##self.label_2.setText("---")
 
+        ## A selection tree
+        self.treeWidget = QTreeWidget(self.LHMenuFrame)
+        self.treeWidget.setGeometry(QtCore.QRect(10,300,240,240))
+        self.treeWidget.setColumnCount(1)
+        header = QTreeWidgetItem(["Spectra"])
+        self.treeWidget.setHeaderItem(header)
+        QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
+        ##treeWidget.insertTopLevelItems(None, items)
+
+        
         ##----------------------------------------------------------------------
         ## The Right-hand plotting area
         self.tabWidget = QTabWidget(self.frame)
@@ -136,6 +146,9 @@ class Ui_MainWindow(QMainWindow):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
 
+    def LoadHDFData(self):
+        self.SpecCanvas.LoadHDFData()
+        
 ## Class to write stdout to the GUI rather than the terminal
 class OutLog:
     def __init__(self, edit, out=None, color=None):
@@ -241,4 +254,3 @@ class MyCustomToolbar(NavigationToolbar):
         
     def select_tool(self):
         print("You clicked the selection tool")
-
