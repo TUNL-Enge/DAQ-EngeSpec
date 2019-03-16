@@ -5,7 +5,7 @@ from PySide2 import QtCore
 from PySide2 import QtGui
 from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayout, \
     QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
-    QMenuBar, QStatusBar, QTextEdit, QSplitter, QTreeWidget, QTreeWidgetItem
+    QMenuBar, QStatusBar, QTextEdit, QSplitter, QTreeWidget, QTreeWidgetItem, QSpinBox
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 
@@ -98,6 +98,13 @@ class Ui_MainWindow(QMainWindow):
         QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
         ##treeWidget.insertTopLevelItems(None, items)
 
+        self.specIndexLabel = QLabel(self.LHMenuFrame)
+        self.specIndexLabel.setGeometry(QtCore.QRect(10, 540, 240, 25))
+        self.specIndexLabel.setText("Spectrum Index")
+        self.specIndexEdit = QSpinBox(self.LHMenuFrame)
+        self.specIndexEdit.setGeometry(QtCore.QRect(10,570,240,25))
+        self.specIndexEdit.setValue(0)
+        self.specIndexEdit.valueChanged.connect(self.setSpecIndex)
         
         ##----------------------------------------------------------------------
         ## The Right-hand plotting area
@@ -148,6 +155,11 @@ class Ui_MainWindow(QMainWindow):
 
     def LoadHDFData(self):
         self.SpecCanvas.LoadHDFData()
+
+    def setSpecIndex(self):
+        i = self.specIndexEdit.value()
+        print("Spectrum index changed to",i)
+        self.SpecCanvas.setSpecIndex(i)
         
 ## Class to write stdout to the GUI rather than the terminal
 class OutLog:

@@ -2,7 +2,7 @@
   1) [X] Make a new class to contain list of 1D and 2D histograms
      - Defined simply by the HDF file for now
   2) [X] Upon loading HDF, make list of histograms
-  3) [ ] Add a numberedit to change histogram on display
+  3) [X] Add a numberedit to change histogram on display
   4) [ ] Add list of histograms to treeviewer
   5) [ ] Make treeviewer switch to hists
   6) [ ] Make 2D and 1D zooming consistent (make is2D boolean?)

@@ -64,9 +64,12 @@ class SpectrumCanvas(FigureCanvas):
         
         ##self.fig.canvas.draw()
         
-    def compute_initial_figure(self):
-        pass
-
+    def setSpecIndex(self,i):
+        self.sindex1d = i
+        self.Spec = self.SpecColl.spec1d[self.sindex1d]
+        self.PlotData()
+        
+        
     def LoadData(self):
         self.Spec.LoadData()
         self.PlotData()
