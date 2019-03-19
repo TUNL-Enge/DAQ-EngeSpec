@@ -154,7 +154,23 @@ class Ui_MainWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def LoadHDFData(self):
+        print("Loading HDF Data")
         self.SpecCanvas.LoadHDFData()
+        ## Now get the list of spectra and add them to the selection
+        ## tree
+        ## Remove the old tree first
+        self.treeWidget.clear()
+        ## Grab the spectrum collection
+        SpecColl = self.SpecCanvas.SpecColl
+        ## Fill the 1d and 2d items
+        l1d = len(SpecColl.spec1d)
+        for i in range(l1d):
+            name = SpecColl.spec1d[i].Name
+            QTreeWidgetItem(self.treeWidget, [name])
+        l2d = len(SpecColl.spec2d)
+        for i in range(l2d):
+            name = SpecColl.spec2d[i].Name
+            QTreeWidgetItem(self.treeWidget, [name])
 
     def setSpecIndex(self):
         i = self.specIndexEdit.value()
