@@ -95,7 +95,9 @@ class Ui_MainWindow(QMainWindow):
         self.treeWidget.setColumnCount(1)
         header = QTreeWidgetItem(["Spectra"])
         self.treeWidget.setHeaderItem(header)
-        QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
+        item = QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
+        item.spec = SpecCanvas.Spec
+        self.treeWidget.addTopLevelItem(item)
         self.treeWidget.itemClicked.connect(self.itemclicked)
         ##treeWidget.insertTopLevelItems(None, items)
 

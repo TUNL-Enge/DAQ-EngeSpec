@@ -6,7 +6,7 @@ import random
 sys.path.append('./modules')
 
 from Views import Ui_MainWindow
-from SpectrumCanvasQt import *
+from SpectrumCanvas import *
 from SpectrumCollection import *
 #from SpectrumHandlers import *
 
