@@ -5,7 +5,8 @@
   3) [X] Add a numberedit to change histogram on display
   4) [X] Add list of histograms to treeviewer
   5) [X] Make treeviewer switch to hists
-  6) [ ] Make 2D and 1D zooming consistent (make is2D boolean?)
+  6) [ ] Add default spectrum to the tree properly
+  8) [ ] Make 2D and 1D zooming consistent (make is2D boolean?)
 * GUI
   - [X] Tree to select histograms
   - [ ] Some feedback numbers
