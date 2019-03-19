@@ -99,13 +99,6 @@ class Ui_MainWindow(QMainWindow):
         self.treeWidget.itemClicked.connect(self.itemclicked)
         ##treeWidget.insertTopLevelItems(None, items)
 
-        self.specIndexLabel = QLabel(self.LHMenuFrame)
-        self.specIndexLabel.setGeometry(QtCore.QRect(10, 540, 240, 25))
-        self.specIndexLabel.setText("Spectrum Index")
-        self.specIndexEdit = QSpinBox(self.LHMenuFrame)
-        self.specIndexEdit.setGeometry(QtCore.QRect(10,570,240,25))
-        self.specIndexEdit.setValue(0)
-        self.specIndexEdit.valueChanged.connect(self.setSpecIndex)
         
         ##----------------------------------------------------------------------
         ## The Right-hand plotting area
@@ -180,10 +173,6 @@ class Ui_MainWindow(QMainWindow):
             item.spec = spec
             self.treeWidget.addTopLevelItem(item)
 
-    def setSpecIndex(self):
-        i = self.specIndexEdit.value()
-        print("Spectrum index changed to",i)
-        self.SpecCanvas.setSpecIndex(i)
 
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
