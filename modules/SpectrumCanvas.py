@@ -25,6 +25,7 @@ class SpectrumCanvas(FigureCanvas):
         self.SpecColl = SpecColl
         self.Spec = SpecColl.spec1d[self.sindex1d]
         self.Spec2D = SpecColl.spec2d[self.sindex2d]
+        self.is2D = False
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
@@ -74,6 +75,7 @@ class SpectrumCanvas(FigureCanvas):
             self.sindex2d = 0
         self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
+        self.is2D = is2D
         self.PlotGeneral(is2D)
 
     def PlotGeneral(self,is2D):
@@ -85,6 +87,7 @@ class SpectrumCanvas(FigureCanvas):
     def LoadData(self):
         self.Spec.LoadData()
         self.PlotData()
+        
     def LoadHDFData(self):
         self.SpecColl.LoadHDFData()
         self.sindex1d = 0
@@ -119,20 +122,21 @@ class SpectrumCanvas(FigureCanvas):
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
-        x = np.array([x for x in range(0,4096)],dtype=int)
-        ## The displayed spectrum is only updated when we hit the UpdatePlot button
-        self.Spec.spec[:] = self.Spec.spec_temp
-        y = self.Spec.spec
+        if not self.is2D:
+            x = np.array([x for x in range(0,4096)],dtype=int)
+            ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
+            self.Spec.spec[:] = self.Spec.spec_temp
+            y = self.Spec.spec
         
-        xmin  = self.a.get_xlim()[0]
-        xmax  = self.a.get_xlim()[1]
-        ymin    = self.a.get_ylim()[0]
-        ymax    = self.a.get_ylim()[1]
-        self.a.clear()
-        self.a.step(x,y,'k')
-        self.a.set_xlim([xmin,xmax])
-        self.a.set_ylim([ymin,ymax])
-        self.fig.canvas.draw()
+            xmin  = self.a.get_xlim()[0]
+            xmax  = self.a.get_xlim()[1]
+            ymin    = self.a.get_ylim()[0]
+            ymax    = self.a.get_ylim()[1]
+            self.a.clear()
+            self.a.step(x,y,'k')
+            self.a.set_xlim([xmin,xmax])
+            self.a.set_ylim([ymin,ymax])
+            self.fig.canvas.draw()
     
 
     def GetMax(self):
@@ -148,33 +152,38 @@ class SpectrumCanvas(FigureCanvas):
         return min(maxarray)
     
     def Autosize(self):
-        if self.isLogPlot == True:
-            ymin = 0.1 #max(0.1,0.9*self.GetMin())
-            self.a.set_ylim([ymin,1.10*self.GetMax()])
-        else:
-            ymin = 0 #max(0,0.9*self.GetMin())
-            self.a.set_ylim([ymin,1.10*self.GetMax()])
+        if not self.is2D:
+            if self.isLogPlot == True:
+                ymin = 0.1 #max(0.1,0.9*self.GetMin())
+                self.a.set_ylim([ymin,1.10*self.GetMax()])
+            else:
+                ymin = 0 #max(0,0.9*self.GetMin())
+                self.a.set_ylim([ymin,1.10*self.GetMax()])
         # JACK TEST
         self.fig.canvas.draw()
 
     def Resize(self):
         self.a.set_xlim(0,self.maximumX)
-        if(self.isLogPlot==True):
-            self.a.set_ylim([1,1.20*self.GetMax()])
-        else:                    
-            self.a.set_ylim([0,1.20*self.GetMax()])
+        if not self.is2D:
+            if(self.isLogPlot==True):
+                self.a.set_ylim([1,1.20*self.GetMax()])
+            else:                    
+                self.a.set_ylim([0,1.20*selfelf.GetMax()])
+        else:
+            self.a.set_ylim(0,self.maximumX)
         self.fig.canvas.draw()
 
     def ToggleLog(self):
-        if self.isLogPlot == False:
-            if self.a.get_ylim()[0] < 1:
-                self.a.set_ylim([0.1,self.a.get_ylim()[1]])
-            self.a.set_yscale('log')
-            self.isLogPlot=True
-        else:
-            self.a.set_yscale('linear')
-            self.isLogPlot=False
-        self.fig.canvas.draw()
+        if not self.is2D:
+            if self.isLogPlot == False:
+                if self.a.get_ylim()[0] < 1:
+                    self.a.set_ylim([0.1,self.a.get_ylim()[1]])
+                    self.a.set_yscale('log')
+                    self.isLogPlot=True
+            else:
+                self.a.set_yscale('linear')
+                self.isLogPlot=False
+            self.fig.canvas.draw()
 
     def xZoomIn(self):
         xlow,xhigh = self.a.get_xlim()
