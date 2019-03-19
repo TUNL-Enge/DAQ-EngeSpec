@@ -101,6 +101,14 @@ class Ui_MainWindow(QMainWindow):
         self.treeWidget.itemClicked.connect(self.itemclicked)
         ##treeWidget.insertTopLevelItems(None, items)
 
+        ## The FENRIS Logo
+        pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
+        ##pixmaps = pixmap.scaledToWidth(240)
+        label = QLabel(self.LHMenuFrame)
+        #label.setText("EngeSpec")
+        label.setGeometry(QtCore.QRect(10, 600, 240, 100))
+        label.setPixmap(pixmap)
+        
         
         ##----------------------------------------------------------------------
         ## The Right-hand plotting area
