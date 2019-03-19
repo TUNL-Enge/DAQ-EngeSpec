@@ -166,21 +166,28 @@ class Ui_MainWindow(QMainWindow):
         ## Fill the 1d and 2d items
         l1d = len(SpecColl.spec1d)
         for i in range(l1d):
-            name = SpecColl.spec1d[i].Name
-            QTreeWidgetItem(self.treeWidget, [name])
+            spec = SpecColl.spec1d[i]
+            name = spec.Name
+            item = QTreeWidgetItem(self.treeWidget, [name])
+            item.spec = spec
+            self.treeWidget.addTopLevelItem(item)
             
         l2d = len(SpecColl.spec2d)
         for i in range(l2d):
-            name = SpecColl.spec2d[i].Name
-            QTreeWidgetItem(self.treeWidget, [name])
+            spec = SpecColl.spec2d[i]
+            name = spec.Name
+            item = QTreeWidgetItem(self.treeWidget, [name])
+            item.spec = spec
+            self.treeWidget.addTopLevelItem(item)
 
     def setSpecIndex(self):
         i = self.specIndexEdit.value()
         print("Spectrum index changed to",i)
         self.SpecCanvas.setSpecIndex(i)
 
-    def itemclicked(self):
-        print("An item has been clicked")
+    def itemclicked(self,it,col):
+        self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
+       
         
 ## Class to write stdout to the GUI rather than the terminal
 class OutLog:

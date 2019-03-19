@@ -24,6 +24,7 @@ class SpectrumCanvas(FigureCanvas):
         
         self.SpecColl = SpecColl
         self.Spec = SpecColl.spec1d[self.sindex1d]
+        self.Spec2D = SpecColl.spec2d[self.sindex2d]
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
@@ -64,12 +65,23 @@ class SpectrumCanvas(FigureCanvas):
         
         ##self.fig.canvas.draw()
         
-    def setSpecIndex(self,i):
-        self.sindex1d = i
+    def setSpecIndex(self,i,is2D):
+        if is2D:
+            self.sindex1d = 0
+            self.sindex2d = i
+        else:            
+            self.sindex1d = i
+            self.sindex2d = 0
         self.Spec = self.SpecColl.spec1d[self.sindex1d]
-        self.PlotData()
-        
-        
+        self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
+        self.PlotGeneral(is2D)
+
+    def PlotGeneral(self,is2D):
+        if not is2D:
+            self.PlotData()
+        else:
+            self.PlotData2D()
+            
     def LoadData(self):
         self.Spec.LoadData()
         self.PlotData()

@@ -9,6 +9,7 @@ class SpectrumObject:
         self.num = num
         self.isSpectrum = True
         self.isVisible = True
+        self.is2D = False
 
         self.spec = np.zeros(4096)
         self.spec_temp = np.zeros(4096)   ## The temporary spectrum in memory
@@ -66,6 +67,7 @@ class SpectrumObject2D:
         self.num = num
         self.isSpectrum = True
         self.isVisible = True
+        self.is2D = True
 
         self.nx = 256
         self.ny = 256
