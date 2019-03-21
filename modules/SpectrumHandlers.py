@@ -77,6 +77,8 @@ class SpectrumObject2D:
         self.spec2d_temp = np.zeros(shape=(self.nx,self.ny))   ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
 
+        self.gate = None
+        
     ## Load already-made spectrum data
     def LoadData(self):
         filename = QFileDialog.getOpenFileName(None,
@@ -110,7 +112,7 @@ class SpectrumObject2D:
                 y=df.loc[:,"DE"],
                 bins=self.nx)
             #print(self.hist2d)
-
+          
     def __str__(self):
         return '2D Spectrum Name: {}'.format(self.Name)
 

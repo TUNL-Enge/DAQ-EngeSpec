@@ -67,9 +67,15 @@ class Ui_MainWindow(QMainWindow):
         self.clicksButton.setObjectName("clicksButton")
         self.clicksButton.setText("Test some clicks!")
         self.clicksButton.clicked.connect(SpecCanvas.getClicks)
+        ## Make a 2D Gate
+        self.gateButton = QPushButton(self.LHMenuFrame)
+        self.gateButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
+        self.gateButton.setObjectName("gateButton")
+        self.gateButton.setText("Make a gate!")
+        self.gateButton.clicked.connect(SpecCanvas.getGate)
         ## Simulate some counts
         self.simButton = QPushButton(self.LHMenuFrame)
-        self.simButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
+        self.simButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
         self.simButton.setObjectName("simButton")
         self.simButton.setText("Simulate some counts!")
         self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)

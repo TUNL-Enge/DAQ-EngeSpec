@@ -238,6 +238,16 @@ class SpectrumCanvas(FigureCanvas):
         x = self.fig.ginput(n)
         print(x)
 
+    def getGate(self):
+        tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
+        x = [i[0] for i in tup]
+        x.append(x[0])
+        y = [i[1] for i in tup]
+        y.append(y[0])
+        self.a.plot(x,y, 'r-')
+        self.fig.canvas.draw()
+        self.Spec2D.gate = [x,y]
+
     def simulate_a_peak(self):
         self.Spec.simulate_a_peak()
 
