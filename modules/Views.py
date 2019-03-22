@@ -201,7 +201,8 @@ class Ui_MainWindow(QMainWindow):
         ## Add a new 1D spectrum to collection
         SpecColl.addSpectrum("Cut Spectrum")
 
-        spec = SpecColl.spec1d[-1]
+        ## Put the new spectrum in the tree
+        spec = SpecColl.spec1d[len(SpecColl.spec1d)-1]
         item = QTreeWidgetItem(self.treeWidget, [spec.Name])
         item.spec = spec
         self.treeWidget.addTopLevelItem(item)

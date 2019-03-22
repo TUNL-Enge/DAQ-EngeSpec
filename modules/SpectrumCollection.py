@@ -42,7 +42,7 @@ class SpectrumCollection:
         ## Make a new 1D Histogram
         sObj = SpectrumObject(len(self.spec1d))
         sObj.Name = name
-        self.spec2d.append(sObj)
+        self.spec1d.append(sObj)
 
         
     ## Load raw events from an HDF file
