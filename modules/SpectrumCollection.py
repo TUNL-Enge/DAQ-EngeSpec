@@ -38,6 +38,13 @@ class SpectrumCollection:
         ##plt.plot(range(1,4096),self.spec1d[1].spec)
         ##plt.show()
 
+    def addSpectrum(self,name):
+        ## Make a new 1D Histogram
+        sObj = SpectrumObject(len(self.spec1d))
+        sObj.Name = name
+        self.spec2d.append(sObj)
+
+        
     ## Load raw events from an HDF file
     def LoadHDFData(self):
         filename = QFileDialog.getOpenFileName(None,

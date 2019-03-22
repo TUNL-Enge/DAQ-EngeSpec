@@ -85,6 +85,12 @@ class Ui_MainWindow(QMainWindow):
         self.load2DButton.setObjectName("load2DButton")
         self.load2DButton.setText("Load 2D HDF!")
         self.load2DButton.clicked.connect(self.LoadHDFData)
+        ## Resort the HDF Data
+        self.sortButton = QPushButton(self.LHMenuFrame)
+        self.sortButton.setGeometry(QtCore.QRect(10, 250, 240, 25))
+        self.sortButton.setObjectName("sortButton")
+        self.sortButton.setText("Sort!")
+        self.sortButton.clicked.connect(self.Sort)
         
 
         ## Some text
@@ -189,7 +195,17 @@ class Ui_MainWindow(QMainWindow):
             item.spec = spec
             self.treeWidget.addTopLevelItem(item)
 
+    def Sort(self):
+        ## Grab the spectrum collection
+        SpecColl = self.SpecCanvas.SpecColl
+        ## Add a new 1D spectrum to collection
+        SpecColl.addSpectrum("Cut Spectrum")
 
+        spec = SpecColl.spec1d[-1]
+        item = QTreeWidgetItem(self.treeWidget, [spec.Name])
+        item.spec = spec
+        self.treeWidget.addTopLevelItem(item)
+            
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
        
