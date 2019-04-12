@@ -17,3 +17,5 @@ conversioncommand
 modules/backup
 *.hdf
 *.pkl
+*.tar.gz
+tmp

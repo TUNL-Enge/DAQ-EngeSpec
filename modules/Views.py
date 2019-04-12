@@ -199,14 +199,17 @@ class Ui_MainWindow(QMainWindow):
         ## Grab the spectrum collection
         SpecColl = self.SpecCanvas.SpecColl
         ## Add a new 1D spectrum to collection
-        SpecColl.addSpectrum("Cut Spectrum")
+        ##SpecColl.addSpectrum("Cut Spectrum")
 
+        ## Sort the data
+        SpecColl.Sort()
+        
         ## Put the new spectrum in the tree
-        spec = SpecColl.spec1d[len(SpecColl.spec1d)-1]
-        item = QTreeWidgetItem(self.treeWidget, [spec.Name])
-        item.spec = spec
-        self.treeWidget.addTopLevelItem(item)
-            
+        #spec = SpecColl.spec1d[len(SpecColl.spec1d)-1]
+        #item = QTreeWidgetItem(self.treeWidget, [spec.Name])
+        #item.spec = spec
+        #self.treeWidget.addTopLevelItem(item)
+        
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
        

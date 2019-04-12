@@ -246,8 +246,9 @@ class SpectrumCanvas(FigureCanvas):
         y.append(y[0])
         self.a.plot(x,y, 'r-')
         self.fig.canvas.draw()
-        self.Spec2D.gate = [x,y]
-
+        self.Spec2D.gate = (x,y)
+        print(self.Spec2D.gate)
+        
     def simulate_a_peak(self):
         self.Spec.simulate_a_peak()
 

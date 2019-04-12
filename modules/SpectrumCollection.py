@@ -52,33 +52,57 @@ class SpectrumCollection:
                                                "Data Files (*.hdf)")
         print("Loading: ",filename[0])
         if filename != '':
-            df = pd.read_hdf(filename[0])
+            self.df = pd.read_hdf(filename[0])
+
+            self.Sort()
             ##self.spec2d, self.xedges, self.yedges = np.histogram2d(
             ##    x=df.loc[:,"Pos1"],
             ##    y=df.loc[:,"DE"],
             ##    bins=self.nx)
             ## first delete current sets of spectra
-            self.spec1d = []
-            self.spec2d = []
-            ## For each column in df, make a 1D spectrum
-            for i in range(len(list(df))):
-                sObj = SpectrumObject(i)
-                sObj.Name = list(df)[i]
-                h, edges = np.histogram(df.loc[:,sObj.Name],bins=range(0,4097))
-                sObj.spec = h
-                sObj.spec_temp[:] = h
-                self.spec1d.append(sObj)
 
-            ## Make a 2D spectrum
-            sObj = SpectrumObject2D(0)
-            sObj.Name = list(df)[0] + "vs" + list(df)[1]
-            sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
-                x=df.loc[:,list(df)[0]],
-                y=df.loc[:,list(df)[1]],
-                bins=sObj.nx)
-            sObj.spec2d_temp[:] = sObj.spec2d
-            self.spec2d.append(sObj)
+    def Sort(self):
+        ## First delete the old spectra
+        self.spec1d = []
+        self.spec2d = []
+        ## For each column in df, make a 1D spectrum
+        for i in range(len(list(self.df))):
+            sObj = SpectrumObject(i)
+            sObj.Name = list(self.df)[i]
+            h, edges = np.histogram(self.df.loc[:,sObj.Name],bins=range(0,4097))
+            sObj.spec = h
+            sObj.spec_temp[:] = h
+            self.spec1d.append(sObj)
 
+        ## Make a 2D spectrum
+        sObj = SpectrumObject2D(0)
+        sObj.Name = list(self.df)[0] + "vs" + list(self.df)[1]
+        sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
+            x=self.df.loc[:,list(self.df)[0]],
+            y=self.df.loc[:,list(self.df)[1]],
+            bins=sObj.nx)
+        sObj.spec2d_temp[:] = sObj.spec2d
+        self.spec2d.append(sObj)
+
+        sObj = self.spec2d[0]
+        print("is there a gate? ",sObj.gate)
+        if sObj.gate:
+            ## Make the cut spectra
+            self.addSpectrum("Cut Spectrum")
+            ## test
+            x = 0
+            y = 0
+            print("Position x:",x,"y:",y,"In gate?",inGate(x,y,sObj.gate))
+        
+
+        
+    ## Is a count at x,y in the Gate G?
+    def inGate(x,y,G):
+        rough = x>min(G[:,1]) & x<max(G[:,1]) 
+        return rough
+        
+
+        
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
