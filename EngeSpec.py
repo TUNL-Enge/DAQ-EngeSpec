@@ -1,3 +1,5 @@
+#!/opt/anaconda3/bin/python
+
 from PySide2.QtWidgets import QApplication
 import sys
 import random
