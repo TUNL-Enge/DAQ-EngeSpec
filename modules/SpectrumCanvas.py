@@ -12,8 +12,6 @@ import matplotlib.colors as colors
 import matplotlib.cm as cm
 import copy
 
-##import Events
-
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
     def __init__(self, SpecColl=None, parent=None, width=5, height=4, dpi=100):
@@ -65,6 +63,7 @@ class SpectrumCanvas(FigureCanvas):
         ##self.compute_initial_figure()
         
         ##self.fig.canvas.draw()
+
         
     def setSpecIndex(self,i,is2D):
         if is2D:
@@ -254,3 +253,5 @@ class SpectrumCanvas(FigureCanvas):
     def simulate_a_peak(self):
         self.Spec.simulate_a_peak()
 
+    def simcpp(self):
+        self.Spec.simcpp()

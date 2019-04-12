@@ -65,25 +65,25 @@ class Ui_MainWindow(QMainWindow):
         self.clicksButton = QPushButton(self.LHMenuFrame)
         self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
         self.clicksButton.setObjectName("clicksButton")
-        self.clicksButton.setText("Test some clicks!")
+        self.clicksButton.setText("Test some clicks")
         self.clicksButton.clicked.connect(SpecCanvas.getClicks)
         ## Make a 2D Gate
         self.gateButton = QPushButton(self.LHMenuFrame)
         self.gateButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
         self.gateButton.setObjectName("gateButton")
-        self.gateButton.setText("Make a gate!")
+        self.gateButton.setText("Make a gate")
         self.gateButton.clicked.connect(SpecCanvas.getGate)
         ## Simulate some counts
         self.simButton = QPushButton(self.LHMenuFrame)
         self.simButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
         self.simButton.setObjectName("simButton")
-        self.simButton.setText("Simulate some counts!")
+        self.simButton.setText("Simulate some counts")
         self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)
         ## Read HDF 2D Data
         self.load2DButton = QPushButton(self.LHMenuFrame)
         self.load2DButton.setGeometry(QtCore.QRect(10, 220, 240, 25))
         self.load2DButton.setObjectName("load2DButton")
-        self.load2DButton.setText("Load 2D HDF!")
+        self.load2DButton.setText("Load 2D HDF")
         self.load2DButton.clicked.connect(self.LoadHDFData)
         ## Resort the HDF Data
         self.sortButton = QPushButton(self.LHMenuFrame)
@@ -91,6 +91,12 @@ class Ui_MainWindow(QMainWindow):
         self.sortButton.setObjectName("sortButton")
         self.sortButton.setText("Sort!")
         self.sortButton.clicked.connect(self.Sort)
+        ## Simulate conts in c++!!!!!!!!
+        self.simcppButton = QPushButton(self.LHMenuFrame)
+        self.simcppButton.setGeometry(QtCore.QRect(10, 280, 240, 25))
+        self.simcppButton.setObjectName("simcppButton")
+        self.simcppButton.setText("Simulate in c++!!!")
+        self.simcppButton.clicked.connect(self.simcpp)
         
 
         ## Some text
@@ -103,7 +109,7 @@ class Ui_MainWindow(QMainWindow):
 
         ## A selection tree
         self.treeWidget = QTreeWidget(self.LHMenuFrame)
-        self.treeWidget.setGeometry(QtCore.QRect(10,300,240,240))
+        self.treeWidget.setGeometry(QtCore.QRect(10,330,240,240))
         self.treeWidget.setColumnCount(1)
         header = QTreeWidgetItem(["Spectra"])
         self.treeWidget.setHeaderItem(header)
@@ -209,6 +215,11 @@ class Ui_MainWindow(QMainWindow):
         #item = QTreeWidgetItem(self.treeWidget, [spec.Name])
         #item.spec = spec
         #self.treeWidget.addTopLevelItem(item)
+
+    def simcpp(self):
+        ## Load the spectrum canvas and simulate counts using c++ in
+        ## the displayed spectrum
+        self.SpecCanvas.simcpp()
         
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)

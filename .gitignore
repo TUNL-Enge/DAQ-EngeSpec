@@ -1,21 +1,28 @@
+## Libraries, backup, images
 *.so
 *.pyc
 *.txt
 *.png
+*.bak
+*#
+*~
+
+## Data
 *.hdf
 *.pkl
 .DS_Store
 *.out
-/output/*
-/projects/*
-/o18_data/*
-/o18_temps/*
-*.bak
-*#
-*~
-conversioncommand
+
+## Folders we don't need
 modules/backup
-*.hdf
-*.pkl
+
+## Random other files
+conversioncommand
 *.tar.gz
 tmp
+
+## CMake stuff
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+Makefile

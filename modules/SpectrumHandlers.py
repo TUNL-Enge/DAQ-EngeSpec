@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import matplotlib as plt
 
+## Import my own c++ library!
+import MakeDatalib
+
 class SpectrumObject:
     def __init__(self, num):
         self.num = num
@@ -15,6 +18,9 @@ class SpectrumObject:
         self.spec_temp = np.zeros(4096)   ## The temporary spectrum in memory
         self.Name = "Test Spectrum"
 
+        ## Load the data library
+        self.dm = MakeDatalib.DataMaker()
+        
     def LoadData(self):
         filename = QFileDialog.getOpenFileName(None,
                                                "Open Spectrum", "./",
@@ -57,7 +63,15 @@ class SpectrumObject:
             self.simulate(mu,sig)
         ##print(max(self.spec[3900:4100]))
         ##print(max(self.spec_temp[3900:4100]))
-    
+
+    def simcpp(self):
+        print(self.dm.sayhello())
+        self.dm.GenerateData(50)
+
+        for samp in self.dm.data():
+            self.spec_temp[samp] += 1
+        self.dm.ClearData()
+        
     def __str__(self):
         return '1D Spectrum Name: {}'.format(self.Name)
 
