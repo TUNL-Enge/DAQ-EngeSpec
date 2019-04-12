@@ -108,7 +108,8 @@ class SpectrumCanvas(FigureCanvas):
         ##Template.LineGraphics.append(self.a.plot(x,y,'k')[0])
         self.a.clear()
         self.a.step(x,y,'k')
-        self.fig.canvas.draw()
+        self.Resize()
+##        self.fig.canvas.draw()
 
     def PlotData2D(self):
         H = self.Spec2D.spec2d.T
@@ -118,7 +119,8 @@ class SpectrumCanvas(FigureCanvas):
         self.a.clear()
         ##self.a.imshow(H, extent=[xe[0],xe[-1],ye[0],ye[-1]])
         self.a.pcolormesh(X,Y,H)
-        self.fig.canvas.draw()
+        self.Resize()
+##        self.fig.canvas.draw()
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
@@ -168,7 +170,7 @@ class SpectrumCanvas(FigureCanvas):
             if(self.isLogPlot==True):
                 self.a.set_ylim([1,1.20*self.GetMax()])
             else:                    
-                self.a.set_ylim([0,1.20*selfelf.GetMax()])
+                self.a.set_ylim([0,1.20*self.GetMax()])
         else:
             self.a.set_ylim(0,self.maximumX)
         self.fig.canvas.draw()
