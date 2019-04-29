@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib as plt
 
 ## Import my own c++ library!
-import MakeDatalib
+import libMakeData
 
 class SpectrumObject:
     def __init__(self, num):
@@ -19,7 +19,7 @@ class SpectrumObject:
         self.Name = "Test Spectrum"
 
         ## Load the data library
-        self.dm = MakeDatalib.DataMaker()
+        self.dm = libMakeData.DataMaker()
         
     def LoadData(self):
         filename = QFileDialog.getOpenFileName(None,

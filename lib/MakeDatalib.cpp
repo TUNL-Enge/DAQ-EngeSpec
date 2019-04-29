@@ -1,7 +1,7 @@
 #include "MakeData.h"
 #include <boost/python.hpp>
  
-BOOST_PYTHON_MODULE(MakeDatalib)
+BOOST_PYTHON_MODULE(libMakeData)
 {
   using namespace boost::python;
   //    def( "MakeData", MakeData );
