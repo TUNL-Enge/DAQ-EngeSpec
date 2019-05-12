@@ -1,12 +1,7 @@
 * Current
-  1) [X] Make a new class to contain list of 1D and 2D histograms
-     - Defined simply by the HDF file for now
-  2) [X] Upon loading HDF, make list of histograms
-  3) [X] Add a numberedit to change histogram on display
-  4) [X] Add list of histograms to treeviewer
-  5) [X] Make treeviewer switch to hists
-  6) [X] Add default spectrum to the tree properly
-  7) [X] Make 2D and 1D zooming consistent (make is2D boolean?)
+  - [ ] Zero histograms button
+  - [ ] Run simulations in background with threads and delays
+    - Button to start and stop
 * GUI
   - [X] Tree to select histograms
   - [ ] Some feedback numbers
@@ -26,7 +21,8 @@
   - [ ] Color scheme
   
 * Interface with c++
-  - [ ] Learn how to add data to arrays through c++
+  - [X] Learn how to add data to arrays through c++
+  - [ ] 2D arrays?
   - [ ] Learn how to pass gates to c++
     - All sorting in c++ code
     - Python just plots

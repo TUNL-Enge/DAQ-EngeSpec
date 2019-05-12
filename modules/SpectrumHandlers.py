@@ -66,7 +66,7 @@ class SpectrumObject:
 
     def simcpp(self):
         print(self.dm.sayhello())
-        self.dm.GenerateData(50)
+        self.dm.GenerateData(500)
 
         for samp in self.dm.data():
             self.spec_temp[samp] += 1
