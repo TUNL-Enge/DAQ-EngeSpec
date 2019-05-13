@@ -18,6 +18,8 @@ class Ui_MainWindow(QMainWindow):
 
         ##self.Spec = Spec
         self.SpecCanvas = SpecCanvas 
+
+        self.isRunning = False
         
         ## The main window
         self.setObjectName("MainWindow")
@@ -55,6 +57,15 @@ class Ui_MainWindow(QMainWindow):
         self.loadButton.setObjectName("loadButton")
         self.loadButton.setText("Load Data File (ascii)")
         self.loadButton.clicked.connect(SpecCanvas.LoadData)
+        ## Start/stop simulation
+        self.simButton = QPushButton(self.LHMenuFrame)
+        self.simButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
+        if not self.isRunning:
+            self.simButton.setText("Start Simulation")
+        else:
+            self.simButton.setText("Stop Simulation")
+        self.simButton.clicked.connect(self.sim)
+        
         ## Zoom in X-direction
         self.testButton = QPushButton(self.LHMenuFrame)
         self.testButton.setGeometry(QtCore.QRect(10, 100, 240, 25))
@@ -74,11 +85,11 @@ class Ui_MainWindow(QMainWindow):
         self.gateButton.setText("Make a gate")
         self.gateButton.clicked.connect(SpecCanvas.getGate)
         ## Simulate some counts
-        self.simButton = QPushButton(self.LHMenuFrame)
-        self.simButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
-        self.simButton.setObjectName("simButton")
-        self.simButton.setText("Simulate some counts")
-        self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)
+        ##        self.simButton = QPushButton(self.LHMenuFrame)
+        ##        self.simButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
+        ##        self.simButton.setObjectName("simButton")
+        ##        self.simButton.selfetText("Simulate some counts")
+        ##        self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)
         ## Read HDF 2D Data
         self.load2DButton = QPushButton(self.LHMenuFrame)
         self.load2DButton.setGeometry(QtCore.QRect(10, 220, 240, 25))
@@ -221,6 +232,20 @@ class Ui_MainWindow(QMainWindow):
         ## the displayed spectrum
         self.SpecCanvas.simcpp()
         
+    def sim(self):
+        ## Start or stop a simulation, which runs in c++
+        if not self.isRunning:
+            self.simButton.setText("Stop Simulation")
+            SpecColl = self.SpecCanvas.SpecColl
+            SpecColl.startsim()
+            self.isRunning = True
+        else:
+            self.simButton.setText("Start Simulation")
+            SpecColl = self.SpecCanvas.SpecColl
+            SpecColl.stopsim()
+            self.isRunning = False
+
+
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
        

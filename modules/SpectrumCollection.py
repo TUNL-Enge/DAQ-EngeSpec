@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 from SpectrumHandlers import *
 
+## Import my own c++ library!
+import libMakeData
+
 class SpectrumCollection:
     def __init__(self, num):
         self.num = num
@@ -15,6 +18,10 @@ class SpectrumCollection:
         self.spec2d = [SpectrumObject2D(0)]
         self.Name = "Test Collection of Spectra"
 
+        ## Load the data library
+        self.dm = libMakeData.DataMaker()
+
+        
     def __str__(self):
         return 'Spectrum Collection Name: {}'.format(self.Name)
 
@@ -101,7 +108,13 @@ class SpectrumCollection:
         rough = x>min(G[:,1]) & x<max(G[:,1]) 
         return rough
         
+    ## Start a simulation of data
+    def startsim(self):
+        print(self.dm.sayhello())
+        self.dm.GenerateData(500)
 
+    def stopsim(self):
+        print(self.dm.saygoodbye())
         
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':

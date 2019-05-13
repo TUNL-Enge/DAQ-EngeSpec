@@ -2,6 +2,7 @@
   - [ ] Zero histograms button
   - [ ] Run simulations in background with threads and delays
     - Button to start and stop
+  - [ ] Better window scaling
 * GUI
   - [X] Tree to select histograms
   - [ ] Some feedback numbers

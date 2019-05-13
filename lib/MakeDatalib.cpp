@@ -8,6 +8,7 @@ BOOST_PYTHON_MODULE(libMakeData)
 
   class_<DataMaker>("DataMaker")
     .def("sayhello", &DataMaker::sayhello)          // string
+    .def("saygoodbye", &DataMaker::saygoodbye)          // string
     .def("GenerateData", &DataMaker::GenerateData)  // void
     .def("ClearData", &DataMaker::ClearData)        // void
     .def("PrintData", &DataMaker::PrintData)        // void

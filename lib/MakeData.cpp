@@ -7,6 +7,9 @@
 char const* DataMaker::sayhello( ) {
     return "Hello! This is the data maker running in c++!!!";
 }
+char const* DataMaker::saygoodbye( ) {
+    return "Goodbye! I hope I served you well";
+}
 
 void DataMaker::GenerateData(int n){
 

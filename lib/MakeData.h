@@ -10,6 +10,7 @@ class DataMaker {
   DataMaker() {}
 
   char const* sayhello( );
+  char const* saygoodbye( );
   void GenerateData(int n = 1000);
   void ClearData();
   void SimulateData();
