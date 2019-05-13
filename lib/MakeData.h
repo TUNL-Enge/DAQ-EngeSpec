@@ -28,8 +28,8 @@ class DataMaker {
 
   mat test();
   // New 2d matrix method
-  //np::ndarray GenerateDataMatrix(int n = 1000);
-  void GenerateDataMatrix(int n = 1000);
+  np::ndarray GenerateDataMatrix(int n = 1000);
+  //void GenerateDataMatrix(int n = 1000);
   
   std::vector<int>::iterator begin(){
     return Dat[0].begin();

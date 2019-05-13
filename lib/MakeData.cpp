@@ -17,8 +17,8 @@ mat DataMaker::test(){
   mat result(n, vec(n, 0.));
   return result;
 }
-//np::ndarray DataMaker::GenerateDataMatrix(int n)
-void DataMaker::GenerateDataMatrix(int n)
+np::ndarray DataMaker::GenerateDataMatrix(int n)
+//void DataMaker::GenerateDataMatrix(int n)
 {
   int nbins = 4096;
   int nspec = 2;
@@ -34,6 +34,7 @@ void DataMaker::GenerateDataMatrix(int n)
   }
   DataMatrix.push_back(tempSpec);
 
+  tempSpec.clear();
   tempSpec.resize(4096,0);
   for(int i=0; i<n; i++){
     double d2 = distribution2(generator);
@@ -41,39 +42,31 @@ void DataMaker::GenerateDataMatrix(int n)
   }
   DataMatrix.push_back(tempSpec);
 
-  //  PrintData();
-  
-  /*
-  u_int n_rows = input.shape()[0];
-  u_int n_cols = input.shape()[1];
+  // Create the matrix to return to python
+  u_int n_rows = DataMatrix.size();
+  u_int n_cols = DataMatrix[0].size();
   p::tuple shape = p::make_tuple(n_rows, n_cols);
-  p::tuple strides = p::make_tuple(input.strides()[0]*sizeof(double),
-				   input.strides()[1]*sizeof(double));
-  np::dtype dtype = np::dtype::get_builtin<double>();
+  p::tuple stride = p::make_tuple(sizeof(int));
+  np::dtype dtype = np::dtype::get_builtin<int>();
   p::object own;
-  np::ndarray converted = np::from_data(input.data(), dtype, shape, strides, own);
-  return converted;
-  */
-}
-/*
-np::ndarray DataMaker::convert_to_numpy(mat const & input)
-{
-    u_int n_rows = input.size();
-    u_int n_cols = input[0].size();
-    p::tuple shape = p::make_tuple(n_rows, n_cols);
-    np::dtype dtype = np::dtype::get_builtin<double>();
-    np::ndarray converted = np::zeros(shape, dtype);
-
-    for (u_int i = 0; i < n_rows; i++)
+  np::ndarray converted = np::zeros(shape, dtype);
+  
+  for (u_int i = 0; i < n_rows; i++)
     {
-        for (u_int j = 0; j < n_cols; j++)
-        {
-            converted[i][j] = input[i][j];
-        }
+      shape = p::make_tuple(n_cols);
+      converted[i] = np::from_data(DataMatrix[i].data(), dtype, shape, stride, own);
+      /*      int sum=0;
+      for(int j=0; j<4096; j++){
+	sum += DataMatrix[i][j];
+      }
+      std::cout << "Sum = " << sum << std::endl;
+      */
     }
-    return converted;
+
+  return converted;
+  
 }
-*/
+
 void DataMaker::GenerateData(int n){
 
   std::normal_distribution<double> distribution1(500.0,50.0);
