@@ -16,6 +16,9 @@ def timeit(function):
 dm = libMakeData.DataMaker()
 
 dat = np.transpose(dm.GenerateDataMatrix(10000))
+names = dm.SpectrumNames
+for name in names:
+    print(name)
 ##print(dat)
 ##dm.PrintData()
 #A = timeit(dm.test)()

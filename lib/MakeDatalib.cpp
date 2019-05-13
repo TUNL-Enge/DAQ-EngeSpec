@@ -15,12 +15,14 @@ BOOST_PYTHON_MODULE(libMakeData)
     .def(vector_indexing_suite<vec>());
   class_<mat>("double_mat")
     .def(vector_indexing_suite<mat>());
+  class_<StringVector>("StringVector")
+    .def(vector_indexing_suite<StringVector>());
     
   class_<DataMaker>("DataMaker")
     .def("sayhello", &DataMaker::sayhello)          // string
     .def("saygoodbye", &DataMaker::saygoodbye)          // string
     .def("GenerateDataMatrix", &DataMaker::GenerateDataMatrix)
-    .def("test", &DataMaker::test)
+    .def_readonly("SpectrumNames", &DataMaker::DataNames)
     .def("GenerateData", &DataMaker::GenerateData)  // void
     .def("ClearData", &DataMaker::ClearData)        // void
     .def("PrintData", &DataMaker::PrintData)        // void
