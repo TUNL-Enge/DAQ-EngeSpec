@@ -21,6 +21,7 @@ class SpectrumCollection:
         ## Load the data library
         self.dm = libMakeData.DataMaker()
 
+        self.isRunning = False
         
     def __str__(self):
         return 'Spectrum Collection Name: {}'.format(self.Name)
@@ -111,10 +112,13 @@ class SpectrumCollection:
     ## Start a simulation of data
     def startsim(self):
         print(self.dm.sayhello())
-        self.dm.GenerateData(500)
+        self.isRunning = True
+        while 1:
+            self.dm.GenerateData(500)
 
     def stopsim(self):
         print(self.dm.saygoodbye())
+        self.isRunning = False
         
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':

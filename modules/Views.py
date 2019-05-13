@@ -19,7 +19,8 @@ class Ui_MainWindow(QMainWindow):
         ##self.Spec = Spec
         self.SpecCanvas = SpecCanvas 
 
-        self.isRunning = False
+        ## Grab the spectrum collection
+        self.SpecColl = self.SpecCanvas.SpecColl
         
         ## The main window
         self.setObjectName("MainWindow")
@@ -60,7 +61,7 @@ class Ui_MainWindow(QMainWindow):
         ## Start/stop simulation
         self.simButton = QPushButton(self.LHMenuFrame)
         self.simButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
-        if not self.isRunning:
+        if not self.SpecColl.isRunning:
             self.simButton.setText("Start Simulation")
         else:
             self.simButton.setText("Stop Simulation")
@@ -234,17 +235,13 @@ class Ui_MainWindow(QMainWindow):
         
     def sim(self):
         ## Start or stop a simulation, which runs in c++
-        if not self.isRunning:
+        if not self.SpecColl.isRunning:
             self.simButton.setText("Stop Simulation")
-            SpecColl = self.SpecCanvas.SpecColl
-            SpecColl.startsim()
-            self.isRunning = True
+            self.SpecColl.startsim()
         else:
             self.simButton.setText("Start Simulation")
-            SpecColl = self.SpecCanvas.SpecColl
-            SpecColl.stopsim()
-            self.isRunning = False
-
+            self.SpecColl.stopsim()
+            
 
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
