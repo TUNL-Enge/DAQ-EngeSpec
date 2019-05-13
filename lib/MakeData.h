@@ -24,10 +24,9 @@ class DataMaker {
   }
   
  private:
+  bool isRunning = false;
   std::vector<int> Dat[2];
   std::default_random_engine generator;
-  //  std::normal_distribution<double> distribution1(500.0,50.0);
-  //  std::normal_distribution<double> distribution2(200.0,10.0);
 };
 
 #endif // MAKEDATA_H

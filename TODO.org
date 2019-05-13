@@ -24,6 +24,7 @@
 * Interface with c++
   - [X] Learn how to add data to arrays through c++
   - [ ] 2D arrays?
+  - [ ] Interrupt simulation once running?
   - [ ] Learn how to pass gates to c++
     - All sorting in c++ code
     - Python just plots

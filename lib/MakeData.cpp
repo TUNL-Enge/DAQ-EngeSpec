@@ -41,4 +41,9 @@ void DataMaker::ClearData(){
 // the memory
 void DataMaker::SimulateData(){
 
+  while(isRunning){
+    GenerateData(500);
+    //sleep(100);
+  }
+  
 }
