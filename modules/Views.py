@@ -231,7 +231,8 @@ class Ui_MainWindow(QMainWindow):
     def simcpp(self):
         ## Load the spectrum canvas and simulate counts using c++ in
         ## the displayed spectrum
-        self.SpecCanvas.simcpp()
+        ##self.SpecCanvas.simcpp()
+        self.SpecColl.simcpp()
         
     def sim(self):
         ## Start or stop a simulation, which runs in c++
