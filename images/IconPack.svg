@@ -23,11 +23,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="-576.97742"
-     inkscape:cy="-414.20102"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-58.68019"
+     inkscape:cy="-370.69777"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g1571"
      showgrid="false"
      inkscape:window-width="2560"
      inkscape:window-height="1363"
@@ -40,7 +40,8 @@
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:snap-global="true" />
   <defs
      id="defs2">
     <clipPath
@@ -513,13 +514,13 @@
          style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <text
          id="text1555"
-         y="339.51248"
-         x="-206.53384"
+         y="340.51578"
+         x="-207.34523"
          style="font-style:normal;font-weight:normal;font-size:8.46666622px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
          xml:space="preserve"><tspan
-           style="font-size:11.28888893px;stroke-width:0.26458332"
-           y="339.51248"
-           x="-206.53384"
+           style="font-weight:bold;font-size:14.11111069px;stroke-width:0.26458332"
+           y="340.51578"
+           x="-207.34523"
            id="tspan1553"
            sodipodi:role="line">+</tspan></text>
     </g>
@@ -539,15 +540,16 @@
          inkscape:connector-curvature="0" />
       <text
          xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:8.46666622px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         x="32.201324"
-         y="475.12766"
-         id="text1569"><tspan
+         style="font-style:normal;font-weight:normal;font-size:14.14838886px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.44213715"
+         x="29.710785"
+         y="485.62952"
+         id="text1569"
+         transform="scale(1.0152671,0.98496247)"><tspan
            sodipodi:role="line"
            id="tspan1567"
-           x="32.201324"
-           y="475.12766"
-           style="font-size:11.28888893px;stroke-width:0.26458332">-</tspan></text>
+           x="29.710785"
+           y="485.62952"
+           style="font-size:23.58064842px;stroke-width:0.44213715">-</tspan></text>
     </g>
     <text
        id="text1575"

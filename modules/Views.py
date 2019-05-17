@@ -73,12 +73,6 @@ class Ui_MainWindow(QMainWindow):
             self.simButton.setText("Stop Simulation")
         self.simButton.clicked.connect(self.sim)
         
-        ## Zoom in X-direction
-        self.testButton = QPushButton(self.LHMenuFrame)
-        self.testButton.setGeometry(QtCore.QRect(10, 100, 240, 25))
-        self.testButton.setObjectName("testButton")
-        self.testButton.setText("X zoom in")
-        self.testButton.clicked.connect(SpecCanvas.xZoomIn)
         ## Collect some clicks
         self.clicksButton = QPushButton(self.LHMenuFrame)
         self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
