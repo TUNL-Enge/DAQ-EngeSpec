@@ -49,9 +49,11 @@ void DataMaker::GenerateDataMatrix(int n)
   int nbins = 4096;
   int nspec = 2;
 
-  std::normal_distribution<double> distribution1(500.0,50.0);
-  std::normal_distribution<double> distribution2(200.0,10.0);
-
+  std::normal_distribution<double> distribution1(1500.0,200.0);
+  std::normal_distribution<double> distribution2(2000.0,100.0);
+  std::normal_distribution<double> distribution3(1700.0,200.0);
+  std::normal_distribution<double> distribution4(3000.0,100.0);
+  std::normal_distribution<double> crap(100,50); 
 
   /*
   std::cout << "Name1 = " << DataNames[0] << std::endl;
@@ -61,8 +63,13 @@ void DataMaker::GenerateDataMatrix(int n)
   // Fill the spectra
   std::vector<double> d1, d2;
   for(int i=0; i<n; i++){
-    d1.push_back(distribution1(generator));
-    d2.push_back(distribution2(generator));
+    if(crap(generator)>120){
+      d1.push_back(distribution1(generator));
+      d2.push_back(distribution2(generator));
+    } else {
+      d1.push_back(distribution3(generator));
+      d2.push_back(distribution4(generator));
+    }
     DataMatrix[0][int(d1[i])]++;
     DataMatrix[1][int(d2[i])]++;
     DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
