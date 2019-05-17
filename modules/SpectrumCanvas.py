@@ -186,22 +186,49 @@ class SpectrumCanvas(FigureCanvas):
             self.fig.canvas.draw()
 
     def xZoomIn(self):
+        ## Get the current settings
         xlow,xhigh = self.a.get_xlim()
-        numbins=xhigh-xlow
-        midbin =xlow+numbins/2
-        newlow,newhigh = (midbin-0.80*(midbin-xlow),midbin+0.80*(xhigh-midbin))
-        if( newlow >= 0 and newhigh <= 4096):
-            self.a.set_xlim(newlow,newhigh)
-            self.fig.canvas.draw()
+        ylow,yhigh = self.a.get_ylim()
+        numbinsx=xhigh-xlow
+        midbinx =xlow+numbinsx/2
+        numbinsy=yhigh-ylow
+        midbiny=ylow+numbinsy/2
+        ## Do the scaling
+        newlowx,newhighx = (midbinx-0.80*(midbinx-xlow),midbinx+0.80*(xhigh-midbinx))
+        ## Check that it's not out of bounds
+        newlowx = max(newlowx,0)
+        newhighx = min(newhighx,4096)
+        ## Same for y
+        newlowy,newhighy = (midbiny-0.80*(midbiny-ylow),midbiny+0.80*(yhigh-midbiny))
+        newlowy = max(newlowy,0)
+        newhighy = min(newhighy,4096)
+        
+        ## Apply to the spectrum
+        self.a.set_xlim(newlowx,newhighx)
+        if self.is2D:
+            self.a.set_ylim(newlowy,newhighy)
+        self.fig.canvas.draw()
      
     def xZoomOut(self):
         xlow,xhigh = self.a.get_xlim()
-        numbins=xhigh-xlow
-        midbin =xlow+numbins/2
-        newlow,newhigh = (midbin-1.20*(midbin-xlow),midbin+1.20*(xhigh-midbin))
-        if( newlow >= 0 and newhigh <= 4096):
-            self.a.set_xlim(newlow,newhigh)
-            self.fig.canvas.draw()
+        ylow,yhigh = self.a.get_ylim()
+        numbinsx=xhigh-xlow
+        midbinx =xlow+numbinsx/2
+        newlowx,newhighx = (midbinx-1.20*(midbinx-xlow),midbinx+1.20*(xhigh-midbinx))
+        newlowx = max(newlowx,0)
+        newhighx = min(newhighx,4096)
+        ## now for y
+        numbinsy=yhigh-ylow
+        midbiny =ylow+numbinsy/2
+        newlowy,newhighy = (midbiny-1.20*(midbiny-ylow),midbiny+1.20*(yhigh-midbiny))
+        newlowy = max(newlowy,0)
+        newhighy = min(newhighy,4096)
+
+        ##if( newlow >= 0 and newhigh <= 4096):
+        self.a.set_xlim(newlowx,newhighx)
+        if self.is2D:
+            self.a.set_ylim(newlowy,newhighy)
+        self.fig.canvas.draw()
 
     def yZoomIn(self):
         ylow,yhigh = self.a.get_ylim()

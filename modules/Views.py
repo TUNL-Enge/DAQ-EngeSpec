@@ -285,6 +285,18 @@ class MyCustomToolbar(NavigationToolbar):
         self.a.setToolTip("Adjust the y-range")
         self._actions['yrange'] = self.a
 
+        ## Zoom in
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ZoomInIcon.ico"),
+                                "Zoom in", plotCanvas.xZoomIn)
+        self.a.setToolTip("Zoom in")
+        self._actions['zoomin'] = self.a
+
+        ## Zoom in
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ZoomOutIcon.ico"),
+                                "Zoom out", plotCanvas.xZoomOut)
+        self.a.setToolTip("Zoom out")
+        self._actions['zoomout'] = self.a
+
         ## Zero all spectra
         self.a = self.addAction(QtGui.QIcon(iconDir + "ZeroIcon.ico"),
                                 "Zero all", plotCanvas.ZeroAll)

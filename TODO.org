@@ -1,8 +1,9 @@
 * Current
-  - [ ] Zero histograms button (A.fill(0))
+  - [X] Zero histograms button (A.fill(0))
   - [X] Run simulations in background with threads and delays
     - Button to start and stop
   - [ ] Better window scaling
+  - [ ] 2D zooming better
   - [ ] SpanSelector outside the spectrum range
   - [ ] Why do the OutLog functions crash with simulations? 
 * GUI
