@@ -16,8 +16,10 @@ void DataMaker::Initialize(){
   // Set the names of the data
   DataNames.clear();
   DataNames.push_back("Pos1");
+  is2D.push_back(false);
   DataNames.push_back("DE");
-
+  is2D.push_back(false);
+  
   // Fill some empty spectra
   std::vector<int> tempSpec;
   tempSpec.resize(4096,0);
@@ -25,11 +27,23 @@ void DataMaker::Initialize(){
   for(int i=0; i<DataNames.size(); i++)
     DataMatrix.push_back(tempSpec);
 
+  // Then make 2D spectrum
+  DataNames.push_back("DEvsPos1");
+  is2D.push_back(true);
+  std::vector<int> row;
+  row.resize(256,0);
+  std::vector<std::vector<int>> tempSpec2D;
+  for(int i=0; i<256; i++)
+    tempSpec2D.push_back(row);
+  //  tempSpec2D[0].resize(256,0);
+  DataMatrix2D.push_back(tempSpec2D);
+
+  
   std::cout << "Made " << DataNames.size() << " empty spectra" << std::endl;
   
 }
 
-np::ndarray DataMaker::GenerateDataMatrix(int n)
+void DataMaker::GenerateDataMatrix(int n)
 //void DataMaker::GenerateDataMatrix(int n)
 {
   int nbins = 4096;
@@ -44,18 +58,29 @@ np::ndarray DataMaker::GenerateDataMatrix(int n)
   std::cout << "Name2 = " << DataNames[1] << std::endl;
   */
 
-  // Fill the first spectrum
+  // Fill the spectra
+  std::vector<double> d1, d2;
   for(int i=0; i<n; i++){
-    double d1 = distribution1(generator);
-    DataMatrix[0][int(d1)]++;
+    d1.push_back(distribution1(generator));
+    d2.push_back(distribution2(generator));
+    DataMatrix[0][int(d1[i])]++;
+    DataMatrix[1][int(d2[i])]++;
+    DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
   }
 
-  // Fill the second spectrum
-  for(int i=0; i<n; i++){
-    double d2 = distribution2(generator);
-    DataMatrix[1][int(d2)]++;
+  /*
+  for(int i=0; i<50; i++){
+    for(int j=0; j<50; j++){
+      std::cout << DataMatrix2D[0][i][j] << " ";
+    }
+    std::cout << std::endl;
   }
+  */
+  
+}
 
+np::ndarray DataMaker::getData(){
+  
   // Create the matrix to return to python
   u_int n_rows = DataMatrix.size();
   u_int n_cols = DataMatrix[0].size();
@@ -76,6 +101,37 @@ np::ndarray DataMaker::GenerateDataMatrix(int n)
       std::cout << "Sum = " << sum << std::endl;
       */
     }
+
+  return converted;
+  
+}
+
+np::ndarray DataMaker::getData2D(){
+  
+  // Create the 3D matrix to return to python
+  u_int n_t = DataMatrix2D.size();
+  u_int n_rows = DataMatrix2D[0].size();
+  u_int n_cols = DataMatrix2D[0][0].size();
+  //std::cout << n_t << " " << n_rows << " " << n_cols << std::endl;
+  p::tuple shape = p::make_tuple(n_t, n_rows, n_cols);
+  p::tuple stride = p::make_tuple(sizeof(int));
+  np::dtype dtype = np::dtype::get_builtin<int>();
+  p::object own;
+  np::ndarray converted = np::zeros(shape, dtype);
+
+  for(u_int t = 0; t<n_t; t++){
+    for (u_int i = 0; i < n_rows; i++)
+      {
+	shape = p::make_tuple(n_cols);
+	converted[t][i] = np::from_data(DataMatrix2D[t][i].data(), dtype, shape, stride, own);
+	/*      int sum=0;
+		for(int j=0; j<4096; j++){
+		sum += DataMatrix[i][j];
+		}
+		std::cout << "Sum = " << sum << std::endl;
+      */
+      }
+  }
 
   return converted;
   

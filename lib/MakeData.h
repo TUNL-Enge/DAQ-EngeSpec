@@ -14,7 +14,9 @@ namespace np = boost::python::numpy;
 
 typedef std::vector<double> vec;
 typedef std::vector<vec> mat;
+typedef std::vector<mat> mat2d;
 typedef std::vector<std::string> StringVector;
+typedef std::vector<bool> BoolVector;
 
 class DataMaker {
  public:
@@ -30,8 +32,12 @@ class DataMaker {
   void PrintData();
 
   // New 2d matrix method
-  np::ndarray GenerateDataMatrix(int n = 1000);
+  void GenerateDataMatrix(int n = 1000);
+  np::ndarray getData();
+  np::ndarray getData2D();
 
+  BoolVector getis2D(){return is2D;}
+  
   // For returning the old data arrays (clean this up later)
   std::vector<int>::iterator begin(){
     return Dat[0].begin();
@@ -45,7 +51,9 @@ class DataMaker {
  private:
   bool isRunning = false;
   std::vector<int> Dat[2];
+  std::vector<bool> is2D;
   std::vector<std::vector<int>> DataMatrix;
+  std::vector<std::vector<std::vector<int>>> DataMatrix2D;
   std::default_random_engine generator;
 };
 

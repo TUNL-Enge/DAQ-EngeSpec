@@ -123,23 +123,39 @@ class SpectrumCanvas(FigureCanvas):
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
+        xmin  = self.a.get_xlim()[0]
+        xmax  = self.a.get_xlim()[1]
+        ymin    = self.a.get_ylim()[0]
+        ymax    = self.a.get_ylim()[1]
+
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
             sp.spec[:] = sp.spec_temp
+        for sp in self.SpecColl.spec2d:
+            sp.spec2d[:] = sp.spec2d_temp
+
         if not self.is2D:
             x = np.array([x for x in range(0,4096)],dtype=int)
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
-        
-            xmin  = self.a.get_xlim()[0]
-            xmax  = self.a.get_xlim()[1]
-            ymin    = self.a.get_ylim()[0]
-            ymax    = self.a.get_ylim()[1]
+
             self.a.clear()
             self.a.step(x,y,'k')
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
-            self.fig.canvas.draw()
+            
+        else:
+            H = sp.spec2d.T
+            xe = sp.xedges
+            ye = sp.yedges
+            X, Y = np.meshgrid(xe,ye)
+            self.a.clear()
+
+            self.a.set_xlim([xmin,xmax])
+            self.a.set_ylim([ymin,ymax])
+            self.a.pcolormesh(X,Y,H)
+
+        self.fig.canvas.draw()
     
 
     def GetMax(self):

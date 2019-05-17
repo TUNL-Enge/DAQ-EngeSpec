@@ -111,22 +111,23 @@ class SpectrumCollection:
         rough = x>min(G[:,1]) & x<max(G[:,1]) 
         return rough
 
-    ## Simulate a single set of counts
-    def simcpp(self):
-        n=10000
-        if(self.isRunning):
-            print("Simulating ",n," counts")
-            dat = np.transpose(self.dm.GenerateDataMatrix(10000))
-
-            ## For each column in df, make a 1D spectrum
-            for i in range(np.shape(dat)[1]):
-                sObj = self.spec1d[i]
-                ##            sObj.spec = dat[:,i]
-                sObj.spec_temp[:] = dat[:,i]
-        else:
-            print("The simulator isn't running")
-                
-            
+##    ## Simulate a single set of counts
+##    def simcpp(self):
+##        n=10000
+##        if(self.isRunning):
+##            print("Simulating ",n," counts")
+##            self.dm.GenerateDataMatrix(n)
+##            dat = np.transpose(self.dm.getData())
+##
+##            ## For each column in df, make a 1D spectrum
+##            for i in range(np.shape(dat)[1]):
+##                sObj = self.spec1d[i]
+##                ##            sObj.spec = dat[:,i]
+##                sObj.spec_temp[:] = dat[:,i]
+##        else:
+##            print("The simulator isn't running")
+##                
+##            
     
     ## Start a simulation of data
     def connectsim(self):
@@ -151,36 +152,62 @@ class SimulatorThread(QThread):
         self.specColl.dm.Initialize()
         
         ## First get the list of defined spectra in the datastream
-        names = self.specColl.dm.SpectrumNames
-        print(len(names)," Spectra have been made:")
-        for name in names:
+        self.names = self.specColl.dm.SpectrumNames
+        print(len(self.names)," Spectra have been made:")
+        for name in self.names:
             print(" - ",name)
-                
+
+        self.is2Ds = self.specColl.dm.getis2D()
+            
         ## First delete the old spectra
         self.specColl.spec1d = []
         self.specColl.spec2d = []
 
         ## Make the empty spectra
-        for i in range(len(names)):
-            sObj = SpectrumObject(i)
-            sObj.Name = names[i]
-            sObj.spec = np.zeros(4096)
-            ## TODO: FIX THIS! Just so scaling works on an empty spectrum
-            sObj.spec[0] = 1
-            sObj.spec_temp[:] = sObj.spec
-            self.specColl.spec1d.append(sObj)
-
+        for i in range(len(self.names)):
+            if not self.is2Ds[i]:
+                sObj = SpectrumObject(i)
+                sObj.Name = self.names[i]
+                sObj.spec = np.zeros(4096)
+                ## TODO: FIX THIS! Just so scaling works on an empty spectrum
+                sObj.spec[0] = 1
+                sObj.spec_temp[:] = sObj.spec
+                self.specColl.spec1d.append(sObj)
+            else:
+                sObj = SpectrumObject2D(0)
+                sObj.Name = self.names[i]
+                sObj.xedges = np.array([x for x in range(0,4096,16)])
+                sObj.yedges = np.array([y for y in range(0,4096,16)])
+                ## TODO: FIX THIS! Just so scaling works on an empty spectrum
+                sObj.spec2d[0,0] = 1
+                sObj.spec2d[255,255] = 1
+                sObj.spec2d_temp[:] = sObj.spec2d
+                self.specColl.spec2d.append(sObj)
+                
+                
     def run(self):
         while self.specColl.isRunning:
             n=1000
             print("Simulating ",n," counts")
-            dat = np.transpose(self.specColl.dm.GenerateDataMatrix(n))
-            
-            ## For each column in df, make a 1D spectrum
-            for i in range(np.shape(dat)[1]):
-                sObj = self.specColl.spec1d[i]
-                ##            sObj.spec = dat[:,i]
-                sObj.spec_temp[:] = dat[:,i]
+            self.specColl.dm.GenerateDataMatrix(n)
+            dat = np.transpose(self.specColl.dm.getData())
+            dat2d = self.specColl.dm.getData2D()
+
+            ## Go through the names and fill them for the appropriate data
+            counter1d=0
+            counter2d=0
+            for i in range(0,len(self.names)):
+                if not self.is2Ds[i]:
+                    sObj = self.specColl.spec1d[counter1d]
+                    ##            sObj.spec = dat[:,i]
+                    sObj.spec_temp[:] = dat[:,counter1d]
+                    counter1d = counter1d+1
+                else:
+                    sObj = self.specColl.spec2d[counter2d]
+                    sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
+                    ##print(sObj.spec2d_temp[25,1:50])
+                    counter2d = counter2d+1
+                    
             time.sleep(1)
         
 ## Run this if this file is run alone for debugging purposes            
