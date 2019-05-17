@@ -97,7 +97,13 @@ class SpectrumCollection:
             y = 0
             print("Position x:",x,"y:",y,"In gate?",inGate(x,y,sObj.gate))
         
-
+    def ZeroAll(self):
+        for i in self.spec1d:
+            i.spec.fill(0)
+            i.spec_temp.fill(0)
+        for i in self.spec2d:
+            i.spec2d.fill(0)
+            i.spec2d_temp.fill(0)
         
     ## Is a count at x,y in the Gate G?
     def inGate(x,y,G):

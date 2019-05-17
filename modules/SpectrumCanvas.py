@@ -238,6 +238,9 @@ class SpectrumCanvas(FigureCanvas):
         x = self.fig.ginput(n)
         print(x)
 
+    def ZeroAll(self):
+        self.SpecColl.ZeroAll()
+        
     def getGate(self):
         tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
         x = [i[0] for i in tup]

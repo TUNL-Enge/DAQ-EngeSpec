@@ -285,6 +285,13 @@ class MyCustomToolbar(NavigationToolbar):
         self.a.setToolTip("Adjust the y-range")
         self._actions['yrange'] = self.a
 
+        ## Zero all spectra
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ZeroIcon.ico"),
+                                "Zero all", plotCanvas.ZeroAll)
+        self.a.setToolTip("Zero all spectra")
+        self._actions['zeroall'] = self.a
+
+        
         ## Add a Splitter
         self.a = self.addWidget(QSplitter())
 
