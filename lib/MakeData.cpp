@@ -174,19 +174,19 @@ void DataMaker::PrintData(){
 }
 
 void DataMaker::ClearData(){
-  Dat[0].clear();
-  Dat[1].clear();
-  DataMatrix.clear();
-}
 
-// Use to simulate data slowly coming in. Need some kind of delay, but
-// also this should run in a different thread so it doesn't use all of
-// the memory
-void DataMaker::SimulateData(){
-
-  while(isRunning){
-    GenerateData(500);
-    //sleep(100);
-  }
+  // Clear the 1D data
+  std::vector<int> row;
+  row.resize(4096,0);
+  for(int k=0; k<DataMatrix.size(); k++)
+    DataMatrix[k] = row;
   
+  // Clear the 2D data
+  row.resize(256,0);
+  for(int k=0; k<DataMatrix2D.size(); k++){
+    for(int i=0; i<256; i++)
+      DataMatrix2D[k][i] = row;
+  }
+
 }
+

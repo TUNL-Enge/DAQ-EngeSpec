@@ -104,7 +104,9 @@ class SpectrumCollection:
         for i in self.spec2d:
             i.spec2d.fill(0)
             i.spec2d_temp.fill(0)
-        
+
+        self.dm.ClearData();
+            
     ## Is a count at x,y in the Gate G?
     def inGate(x,y,G):
         rough = x>min(G[:,1]) & x<max(G[:,1]) 

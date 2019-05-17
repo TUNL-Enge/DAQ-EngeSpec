@@ -240,6 +240,7 @@ class SpectrumCanvas(FigureCanvas):
 
     def ZeroAll(self):
         self.SpecColl.ZeroAll()
+        self.UpdatePlot()
         
     def getGate(self):
         tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
