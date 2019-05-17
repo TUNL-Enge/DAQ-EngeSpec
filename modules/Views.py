@@ -56,7 +56,7 @@ class Ui_MainWindow(QMainWindow):
         self.loadButton = QPushButton(self.LHMenuFrame)
         self.loadButton.setGeometry(QtCore.QRect(10, 10, 240, 25))
         self.loadButton.setObjectName("loadButton")
-        self.loadButton.setText("Load Data File (ascii)")
+        self.loadButton.setText("Load Spectrum File (ascii)")
         self.loadButton.clicked.connect(SpecCanvas.LoadData)
         ## Connect the simulation
         self.connectsimButton = QPushButton(self.LHMenuFrame)
@@ -91,39 +91,12 @@ class Ui_MainWindow(QMainWindow):
         self.gateButton.setObjectName("gateButton")
         self.gateButton.setText("Make a gate")
         self.gateButton.clicked.connect(SpecCanvas.getGate)
-        ## Simulate some counts
-        ##        self.simButton = QPushButton(self.LHMenuFrame)
-        ##        self.simButton.setGeometry(QtCore.QRect(10, 190, 240, 25))
-        ##        self.simButton.setObjectName("simButton")
-        ##        self.simButton.selfetText("Simulate some counts")
-        ##        self.simButton.clicked.connect(SpecCanvas.simulate_a_peak)
         ## Read HDF 2D Data
         self.load2DButton = QPushButton(self.LHMenuFrame)
         self.load2DButton.setGeometry(QtCore.QRect(10, 220, 240, 25))
         self.load2DButton.setObjectName("load2DButton")
         self.load2DButton.setText("Load 2D HDF")
         self.load2DButton.clicked.connect(self.LoadHDFData)
-        ## Resort the HDF Data
-        self.sortButton = QPushButton(self.LHMenuFrame)
-        self.sortButton.setGeometry(QtCore.QRect(10, 250, 240, 25))
-        self.sortButton.setObjectName("sortButton")
-        self.sortButton.setText("Sort!")
-        self.sortButton.clicked.connect(self.Sort)
-        ## Simulate conts in c++!!!!!!!!
-        self.simcppButton = QPushButton(self.LHMenuFrame)
-        self.simcppButton.setGeometry(QtCore.QRect(10, 280, 240, 25))
-        self.simcppButton.setObjectName("simcppButton")
-        self.simcppButton.setText("Simulate in c++!!!")
-        self.simcppButton.clicked.connect(self.simcpp)
-        
-
-        ## Some text
-        ##self.label = QLabel(self.LHMenuFrame)
-        ##self.label.setGeometry(QtCore.QRect(10, 360, 58, 18))
-        ##self.label.setText("EngeSpec")
-        ##self.label_2 = QLabel(self.LHMenuFrame)
-        ##self.label_2.setGeometry(QtCore.QRect(190, 360, 58, 18))
-        ##self.label_2.setText("---")
 
         ## A selection tree
         self.treeWidget = QTreeWidget(self.LHMenuFrame)
@@ -135,13 +108,10 @@ class Ui_MainWindow(QMainWindow):
         item.spec = SpecCanvas.Spec
         self.treeWidget.addTopLevelItem(item)
         self.treeWidget.itemClicked.connect(self.itemclicked)
-        ##treeWidget.insertTopLevelItems(None, items)
 
         ## The FENRIS Logo
         pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
-        ##pixmaps = pixmap.scaledToWidth(240)
         label = QLabel(self.LHMenuFrame)
-        #label.setText("EngeSpec")
         label.setGeometry(QtCore.QRect(10, 600, 240, 100))
         label.setPixmap(pixmap)
         
@@ -158,7 +128,6 @@ class Ui_MainWindow(QMainWindow):
         self.Matplotlib.setObjectName("Matplotlib")
         l = QVBoxLayout(self.Matplotlib)
         toolbar = MyCustomToolbar(self.SpecCanvas, self)
-        ##toolbar = NavigationToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
         l.addWidget(self.SpecCanvas)
 
@@ -174,8 +143,8 @@ class Ui_MainWindow(QMainWindow):
         ## textedit below plotting window
         self.TextEdit = QTextEdit(self.frame)
         ## Add the output streams to the text editor
-        #sys.stdout = OutLog(self.TextEdit, sys.stdout)
-        #sys.stderr = OutLog(self.TextEdit, sys.stderr, QtGui.QColor(255,0,0) )
+        ##sys.stdout = OutLog(self.TextEdit, sys.stdout)
+        ##sys.stderr = OutLog(self.TextEdit, sys.stderr, QtGui.QColor(255,0,0) )
 
         self.TextEdit.setGeometry(QtCore.QRect(280, 620, 900, 100))
         self.TextEdit.setText("Welcome to EngeSpec!\n")
@@ -223,28 +192,6 @@ class Ui_MainWindow(QMainWindow):
             self.treeWidget.addTopLevelItem(item)
 
         
-    def Sort(self):
-        ## Grab the spectrum collection
-        SpecColl = self.SpecCanvas.SpecColl
-        ## Add a new 1D spectrum to collection
-        ##SpecColl.addSpectrum("Cut Spectrum")
-
-        ## Sort the data
-        SpecColl.Sort()
-        
-        ## Put the new spectrum in the tree
-        #spec = SpecColl.spec1d[len(SpecColl.spec1d)-1]
-        #item = QTreeWidgetItem(self.treeWidget, [spec.Name])
-        #item.spec = spec
-        #self.treeWidget.addTopLevelItem(item)
-
-    def simcpp(self):
-        ## Load the spectrum canvas and simulate counts using c++ in
-        ## the displayed spectrum
-        ##self.SpecCanvas.simcpp()
-        self.SpecColl.simcpp()
-        
-
     def connectsim(self):
         self.SpecColl.connectsim()
         self.PopulateTree()
@@ -293,18 +240,7 @@ class OutLog:
 
 class MyCustomToolbar(NavigationToolbar): 
     def __init__(self, plotCanvas, parent=None):
-        self.toolitems = (
-            ##('Home', 'Lorem ipsum dolor sit amet', 'home', 'home'),
-            ## ('Back', 'consectetuer adipiscing elit', 'back', 'back'),
-            ## ('Forward', 'sed diam nonummy nibh euismod', 'forward', 'forward'),
-            ## (None, None, None, None),
-            ##('Pan', 'Pan the spectrum', 'move', 'pan'),
-            ## ('Zoom', 'dolore magna aliquam', 'zoom_to_rect', 'zoom'),
-            ## (None, None, None, None),
-            ## ('Subplots', 'putamus parum claram', 'subplots', 'configure_subplots'),
-            ##('Save', 'Save the figure', 'filesave', 'save_figure'),
-            ##                  #('Port', 'Select', "select", 'select_tool'),
-        )
+        self.toolitems = ()
         # create the default toolbar
         NavigationToolbar.__init__(self, plotCanvas, parent)
 

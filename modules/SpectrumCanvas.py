@@ -56,14 +56,6 @@ class SpectrumCanvas(FigureCanvas):
         else:
             print("Filling default data")
             self.PlotData()
-
-        ## Add extra tools
-        ##self.addTools()
-        ##self.fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
-        ##self.compute_initial_figure()
-        
-        ##self.fig.canvas.draw()
-
         
     def setSpecIndex(self,i,is2D):
         if is2D:
@@ -95,20 +87,11 @@ class SpectrumCanvas(FigureCanvas):
         ##self.PlotData2D()
         
     def PlotData(self):
-        ##Template = self.fitObject.dataSpectrum
-        ##for line in Template.LineGraphics: 
-        ##    if (line in self.a.lines):
-        ##        line.remove()
-        ##    line=None
         x = np.array([x for x in range(0,4096)],dtype=int)
         y = self.Spec.spec
-        ##x = np.ravel(list(zip(x,x+1)))
-        ##y = np.ravel(list(zip(y,y)))
-        ##Template.LineGraphics.append(self.a.plot(x,y,'k')[0])
         self.a.clear()
         self.a.step(x,y,'k')
         self.Resize()
-##        self.fig.canvas.draw()
 
     def PlotData2D(self):
         H = self.Spec2D.spec2d.T
@@ -116,10 +99,8 @@ class SpectrumCanvas(FigureCanvas):
         ye = self.Spec2D.yedges
         X, Y = np.meshgrid(xe,ye)
         self.a.clear()
-        ##self.a.imshow(H, extent=[xe[0],xe[-1],ye[0],ye[-1]])
         self.a.pcolormesh(X,Y,H)
         self.Resize()
-##        self.fig.canvas.draw()
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
@@ -268,8 +249,3 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec2D.gate = (x,y)
         print(self.Spec2D.gate)
         
-    def simulate_a_peak(self):
-        self.Spec.simulate_a_peak()
-
-    def simcpp(self):
-        self.Spec.simcpp()

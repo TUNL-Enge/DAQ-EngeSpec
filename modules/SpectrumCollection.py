@@ -45,8 +45,6 @@ class SpectrumCollection:
             sObj = self.spec2d[i]
             print(sObj)
 
-        ##plt.plot(range(1,4096),self.spec1d[1].spec)
-        ##plt.show()
 
     def addSpectrum(self,name):
         ## Make a new 1D Histogram
@@ -65,11 +63,6 @@ class SpectrumCollection:
             self.df = pd.read_hdf(filename[0])
 
             self.Sort()
-            ##self.spec2d, self.xedges, self.yedges = np.histogram2d(
-            ##    x=df.loc[:,"Pos1"],
-            ##    y=df.loc[:,"DE"],
-            ##    bins=self.nx)
-            ## first delete current sets of spectra
 
     def Sort(self):
         ## First delete the old spectra
@@ -110,24 +103,6 @@ class SpectrumCollection:
     def inGate(x,y,G):
         rough = x>min(G[:,1]) & x<max(G[:,1]) 
         return rough
-
-##    ## Simulate a single set of counts
-##    def simcpp(self):
-##        n=10000
-##        if(self.isRunning):
-##            print("Simulating ",n," counts")
-##            self.dm.GenerateDataMatrix(n)
-##            dat = np.transpose(self.dm.getData())
-##
-##            ## For each column in df, make a 1D spectrum
-##            for i in range(np.shape(dat)[1]):
-##                sObj = self.spec1d[i]
-##                ##            sObj.spec = dat[:,i]
-##                sObj.spec_temp[:] = dat[:,i]
-##        else:
-##            print("The simulator isn't running")
-##                
-##            
     
     ## Start a simulation of data
     def connectsim(self):
@@ -141,6 +116,7 @@ class SpectrumCollection:
         self.isRunning = False
         print(self.dm.saygoodbye())
 
+## Run the simulator in a separate thread so it doesn't lock up the GUI
 class SimulatorThread(QThread):
     def __init__(self,specColl):
         super().__init__()
@@ -186,9 +162,9 @@ class SimulatorThread(QThread):
                 
                 
     def run(self):
+        print("Start simulation")
         while self.specColl.isRunning:
             n=1000
-            print("Simulating ",n," counts")
             self.specColl.dm.GenerateDataMatrix(n)
             dat = np.transpose(self.specColl.dm.getData())
             dat2d = self.specColl.dm.getData2D()
@@ -199,16 +175,15 @@ class SimulatorThread(QThread):
             for i in range(0,len(self.names)):
                 if not self.is2Ds[i]:
                     sObj = self.specColl.spec1d[counter1d]
-                    ##            sObj.spec = dat[:,i]
                     sObj.spec_temp[:] = dat[:,counter1d]
                     counter1d = counter1d+1
                 else:
                     sObj = self.specColl.spec2d[counter2d]
                     sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
-                    ##print(sObj.spec2d_temp[25,1:50])
                     counter2d = counter2d+1
                     
             time.sleep(1)
+        print("Stop simulation")
         
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':

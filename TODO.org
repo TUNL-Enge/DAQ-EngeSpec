@@ -1,8 +1,10 @@
 * Current
-  - [ ] Zero histograms button
-  - [ ] Run simulations in background with threads and delays
+  - [ ] Zero histograms button (A.fill(0))
+  - [X] Run simulations in background with threads and delays
     - Button to start and stop
   - [ ] Better window scaling
+  - [ ] SpanSelector outside the spectrum range
+  - [ ] Why do the OutLog functions crash with simulations? 
 * GUI
   - [X] Tree to select histograms
   - [ ] Some feedback numbers
@@ -16,15 +18,15 @@
     - https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram2d.html
     - Apparently imshow updates better
       https://stackoverflow.com/questions/15992149/how-to-update-pcolor-in-matplotlib
-  - [ ] Check updates
+  - [X] Check updates
     - Scaling buttons don't work well
     - Update button doesn't work
   - [ ] Color scheme
   
 * Interface with c++
   - [X] Learn how to add data to arrays through c++
-  - [ ] 2D arrays?
-  - [ ] Interrupt simulation once running?
+  - [X] 2D arrays?
+  - [X] Interrupt simulation once running?
   - [ ] Learn how to pass gates to c++
     - All sorting in c++ code
     - Python just plots
