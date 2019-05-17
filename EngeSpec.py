@@ -16,10 +16,7 @@ from SpectrumCollection import *
 ##spec =
 app = QApplication([])
 
-## Load and initialize a spectrum 
-#Spec = SpectrumObject(0)
-#Spec.initialize()
-#Spec2D = SpectrumObject2D(0)
+## Load and initialize a collection of spectra 
 SpecColl = SpectrumCollection(0)
 
 ## Load the spectrum drawing routines

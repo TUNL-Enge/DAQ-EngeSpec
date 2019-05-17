@@ -111,46 +111,49 @@ class SpectrumCollection:
 
     ## Simulate a single set of counts
     def simcpp(self):
-        print(self.dm.sayhello())
-        dat = np.transpose(self.dm.GenerateDataMatrix(10000))
-        names = self.dm.SpectrumNames
+        n=10000
+        if(self.isRunning):
+            print("Simulating ",n," counts")
+            dat = np.transpose(self.dm.GenerateDataMatrix(10000))
 
-        print(np.shape(dat)[1]," Spectra have been made:")
-        for name in names:
-            print("  ",name)
-
-        ## First delete the old spectra
-        self.spec1d = []
-        self.spec2d = []
-        ## For each column in df, make a 1D spectrum
-        for i in range(np.shape(dat)[1]):
-            sObj = SpectrumObject(i)
-            sObj.Name = names[i]
-            print("Making Spectrum: ",sObj.Name)
-            h, edges = np.histogram(dat[:,i],bins=range(0,4097))
-            sObj.spec = h
-            sObj.spec_temp[:] = h
-            self.spec1d.append(sObj)
-
-        ## Make a 2D spectrum
-        sObj = SpectrumObject2D(0)
-        sObj.Name = names[0] + "vs" + names[1]
-        sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
-            x=dat[:,0],
-            y=dat[:,1],
-            bins=sObj.nx)
-        sObj.spec2d_temp[:] = sObj.spec2d
-        self.spec2d.append(sObj)
-        
+            ## For each column in df, make a 1D spectrum
+            for i in range(np.shape(dat)[1]):
+                sObj = self.spec1d[i]
+                ##            sObj.spec = dat[:,i]
+                sObj.spec_temp[:] = dat[:,i]
+        else:
+            print("The simulator isn't running")
+                
             
     
     ## Start a simulation of data
     def startsim(self):
         print(self.dm.sayhello())
         self.isRunning = True
-        while 1:
-            self.dm.GenerateData(500)
+        ## Initialize the DataMaker
+        self.dm.Initialize()
+        
+        ## First get the list of defined spectra in the datastream
+        names = self.dm.SpectrumNames
+        print(len(names)," Spectra have been made:")
+        for name in names:
+            print("  ",name)
+        
+        ## First delete the old spectra
+        self.spec1d = []
+        self.spec2d = []
 
+        ## Make the empty spectra
+        for i in range(len(names)):
+            sObj = SpectrumObject(i)
+            sObj.Name = names[i]
+            sObj.spec = np.zeros(4096)
+            ## TODO: FIX THIS! Just so scaling works on an empty spectrum
+            sObj.spec[0] = 1
+            sObj.spec_temp[:] = sObj.spec
+            self.spec1d.append(sObj)
+
+        
     def stopsim(self):
         print(self.dm.saygoodbye())
         self.isRunning = False

@@ -190,6 +190,9 @@ class Ui_MainWindow(QMainWindow):
     def LoadHDFData(self):
         print("Loading HDF Data")
         self.SpecCanvas.LoadHDFData()
+        self.PopulateTree()
+        
+    def PopulateTree(self):
         ## Now get the list of spectra and add them to the selection
         ## tree
         ## Remove the old tree first
@@ -213,6 +216,7 @@ class Ui_MainWindow(QMainWindow):
             item.spec = spec
             self.treeWidget.addTopLevelItem(item)
 
+        
     def Sort(self):
         ## Grab the spectrum collection
         SpecColl = self.SpecCanvas.SpecColl
@@ -239,6 +243,8 @@ class Ui_MainWindow(QMainWindow):
         if not self.SpecColl.isRunning:
             self.simButton.setText("Stop Simulation")
             self.SpecColl.startsim()
+            self.PopulateTree()
+            self.SpecCanvas.setSpecIndex(0,False)
         else:
             self.simButton.setText("Start Simulation")
             self.SpecColl.stopsim()

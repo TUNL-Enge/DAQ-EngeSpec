@@ -11,6 +11,22 @@ char const* DataMaker::saygoodbye( ) {
     return "Goodbye! I hope I served you well";
 }
 
+void DataMaker::Initialize(){
+
+  // Set the names of the data
+  DataNames.push_back("Pos1");
+  DataNames.push_back("DE");
+
+  // Fill some empty spectra
+  std::vector<int> tempSpec;
+  tempSpec.resize(4096,0);
+  for(int i=0; i<DataNames.size(); i++)
+    DataMatrix.push_back(tempSpec);
+
+  std::cout << "Made " << DataNames.size() << " empty spectra" << std::endl;
+  
+}
+
 np::ndarray DataMaker::GenerateDataMatrix(int n)
 //void DataMaker::GenerateDataMatrix(int n)
 {
@@ -20,30 +36,23 @@ np::ndarray DataMaker::GenerateDataMatrix(int n)
   std::normal_distribution<double> distribution1(500.0,50.0);
   std::normal_distribution<double> distribution2(200.0,10.0);
 
-  // Set the names of the data
-  DataNames.push_back("Pos1");
-  DataNames.push_back("DE");
 
   /*
   std::cout << "Name1 = " << DataNames[0] << std::endl;
   std::cout << "Name2 = " << DataNames[1] << std::endl;
   */
-  
-  std::vector<int> tempSpec;
-  tempSpec.resize(4096,0);
+
+  // Fill the first spectrum
   for(int i=0; i<n; i++){
     double d1 = distribution1(generator);
-    tempSpec[int(d1)]++;
+    DataMatrix[0][int(d1)]++;
   }
-  DataMatrix.push_back(tempSpec);
 
-  tempSpec.clear();
-  tempSpec.resize(4096,0);
+  // Fill the second spectrum
   for(int i=0; i<n; i++){
     double d2 = distribution2(generator);
-    tempSpec[int(d2)]++;
+    DataMatrix[1][int(d2)]++;
   }
-  DataMatrix.push_back(tempSpec);
 
   // Create the matrix to return to python
   u_int n_rows = DataMatrix.size();

@@ -69,11 +69,11 @@ class SpectrumCanvas(FigureCanvas):
         if is2D:
             self.sindex1d = 0
             self.sindex2d = i
+            self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
         else:            
             self.sindex1d = i
             self.sindex2d = 0
-        self.Spec = self.SpecColl.spec1d[self.sindex1d]
-        self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
+            self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.is2D = is2D
         self.PlotGeneral(is2D)
 
@@ -123,10 +123,12 @@ class SpectrumCanvas(FigureCanvas):
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
+        ## Update the background data in all plots
+        for sp in self.SpecColl.spec1d:
+            sp.spec[:] = sp.spec_temp
         if not self.is2D:
             x = np.array([x for x in range(0,4096)],dtype=int)
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
-            self.Spec.spec[:] = self.Spec.spec_temp
             y = self.Spec.spec
         
             xmin  = self.a.get_xlim()[0]

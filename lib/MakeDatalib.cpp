@@ -21,6 +21,7 @@ BOOST_PYTHON_MODULE(libMakeData)
   class_<DataMaker>("DataMaker")
     .def("sayhello", &DataMaker::sayhello)          // string
     .def("saygoodbye", &DataMaker::saygoodbye)          // string
+    .def("Initialize", &DataMaker::Initialize)          // void
     .def("GenerateDataMatrix", &DataMaker::GenerateDataMatrix)
     .def_readonly("SpectrumNames", &DataMaker::DataNames)
     .def("GenerateData", &DataMaker::GenerateData)  // void
