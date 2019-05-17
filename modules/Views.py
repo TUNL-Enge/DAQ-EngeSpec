@@ -58,9 +58,15 @@ class Ui_MainWindow(QMainWindow):
         self.loadButton.setObjectName("loadButton")
         self.loadButton.setText("Load Data File (ascii)")
         self.loadButton.clicked.connect(SpecCanvas.LoadData)
+        ## Connect the simulation
+        self.connectsimButton = QPushButton(self.LHMenuFrame)
+        self.connectsimButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
+        self.connectsimButton.setObjectName("connectsimButton")
+        self.connectsimButton.setText("Connect simulation")
+        self.connectsimButton.clicked.connect(self.connectsim)
         ## Start/stop simulation
         self.simButton = QPushButton(self.LHMenuFrame)
-        self.simButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
+        self.simButton.setGeometry(QtCore.QRect(10, 70, 240, 25))
         if not self.SpecColl.isRunning:
             self.simButton.setText("Start Simulation")
         else:
@@ -168,8 +174,8 @@ class Ui_MainWindow(QMainWindow):
         ## textedit below plotting window
         self.TextEdit = QTextEdit(self.frame)
         ## Add the output streams to the text editor
-        sys.stdout = OutLog(self.TextEdit, sys.stdout)
-        sys.stderr = OutLog(self.TextEdit, sys.stderr, QtGui.QColor(255,0,0) )
+        #sys.stdout = OutLog(self.TextEdit, sys.stdout)
+        #sys.stderr = OutLog(self.TextEdit, sys.stderr, QtGui.QColor(255,0,0) )
 
         self.TextEdit.setGeometry(QtCore.QRect(280, 620, 900, 100))
         self.TextEdit.setText("Welcome to EngeSpec!\n")
@@ -238,13 +244,17 @@ class Ui_MainWindow(QMainWindow):
         ##self.SpecCanvas.simcpp()
         self.SpecColl.simcpp()
         
+
+    def connectsim(self):
+        self.SpecColl.connectsim()
+        self.PopulateTree()
+        self.SpecCanvas.setSpecIndex(0,False)
+        
     def sim(self):
         ## Start or stop a simulation, which runs in c++
         if not self.SpecColl.isRunning:
             self.simButton.setText("Stop Simulation")
             self.SpecColl.startsim()
-            self.PopulateTree()
-            self.SpecCanvas.setSpecIndex(0,False)
         else:
             self.simButton.setText("Start Simulation")
             self.SpecColl.stopsim()

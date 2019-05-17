@@ -14,12 +14,14 @@ char const* DataMaker::saygoodbye( ) {
 void DataMaker::Initialize(){
 
   // Set the names of the data
+  DataNames.clear();
   DataNames.push_back("Pos1");
   DataNames.push_back("DE");
 
   // Fill some empty spectra
   std::vector<int> tempSpec;
   tempSpec.resize(4096,0);
+  DataMatrix.clear();
   for(int i=0; i<DataNames.size(); i++)
     DataMatrix.push_back(tempSpec);
 
