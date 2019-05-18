@@ -56,6 +56,8 @@ class DataMaker {
   std::vector<std::vector<int>> DataMatrix;
   std::vector<std::vector<std::vector<int>>> DataMatrix2D;
   std::default_random_engine generator;
+
+  std::vector<std::vector<std::vector<double>>> GateCollection;
 };
 
 #endif // MAKEDATA_H

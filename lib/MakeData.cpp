@@ -38,6 +38,15 @@ void DataMaker::Initialize(){
   //  tempSpec2D[0].resize(256,0);
   DataMatrix2D.push_back(tempSpec2D);
 
+  // Make Gated spectra
+  DataNames.push_back("DEvsPos1-gated");
+  is2D.push_back(true);
+  tempSpec2D.clear();
+  for(int i=0; i<256; i++)
+    tempSpec2D.push_back(row);
+  //  tempSpec2D[0].resize(256,0);
+  DataMatrix2D.push_back(tempSpec2D);
+  
   
   std::cout << "Made " << DataNames.size() << " empty spectra" << std::endl;
   
@@ -60,6 +69,15 @@ void DataMaker::GenerateDataMatrix(int n)
   std::cout << "Name2 = " << DataNames[1] << std::endl;
   */
 
+  // do rough gate
+  double xmax,xmin;
+  if(GateCollection.size()>0){
+    std::vector<std::vector<double>> Gate = GateCollection[0];
+    xmin=Gate[0][0];
+    xmax=Gate[1][0];
+    //std::cout << "xmin, xmax = " << xmin << " " << xmax << std::endl;
+  }
+
   // Fill the spectra
   std::vector<double> d1, d2;
   for(int i=0; i<n; i++){
@@ -73,6 +91,10 @@ void DataMaker::GenerateDataMatrix(int n)
     DataMatrix[0][int(d1[i])]++;
     DataMatrix[1][int(d2[i])]++;
     DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+
+    if(d1[i] > xmin & d1[i] < xmax)
+      DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+    
   }
 
   /*
@@ -147,7 +169,7 @@ np::ndarray DataMaker::getData2D(){
 
 void DataMaker::putGate(char* name, p::list x, p::list y){
 
-  std::cout << "The name is " << name << std::endl;
+  //std::cout << "The name is " << name << std::endl;
   p::ssize_t len = p::len(x);
   // Make a vector for the gate
   std::vector<std::vector<double>> Gate;
@@ -158,9 +180,13 @@ void DataMaker::putGate(char* name, p::list x, p::list y){
     Gate.push_back(tmp);
   }
 
+  GateCollection.push_back(Gate);
+
+  /*
   for(int i=0; i<Gate.size(); i++){
     std::cout << Gate[i][0] << " " << Gate[i][1] << std::endl;
   }
+  */
   
 }
 
