@@ -148,17 +148,20 @@ class SimulatorThread(QThread):
         self.specColl.spec2d = []
 
         ## Make the empty spectra
+        counter1d=0
+        counter2d=0
         for i in range(len(self.names)):
             if not self.is2Ds[i]:
-                sObj = SpectrumObject(i)
+                sObj = SpectrumObject(counter1d)
                 sObj.Name = self.names[i]
                 sObj.spec = np.zeros(4096)
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec[0] = 1
                 sObj.spec_temp[:] = sObj.spec
                 self.specColl.spec1d.append(sObj)
+                counter1d = counter1d+1
             else:
-                sObj = SpectrumObject2D(0)
+                sObj = SpectrumObject2D(counter2d)
                 sObj.Name = self.names[i]
                 sObj.xedges = np.array([x for x in range(0,4096,16)])
                 sObj.yedges = np.array([y for y in range(0,4096,16)])
@@ -167,6 +170,7 @@ class SimulatorThread(QThread):
                 sObj.spec2d[255,255] = 1
                 sObj.spec2d_temp[:] = sObj.spec2d
                 self.specColl.spec2d.append(sObj)
+                counter2d = counter2d+1
                 
                 
     def run(self):

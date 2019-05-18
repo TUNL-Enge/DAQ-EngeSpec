@@ -126,9 +126,9 @@ class SpectrumCanvas(FigureCanvas):
             self.a.set_ylim([ymin,ymax])
             
         else:
-            H = sp.spec2d.T
-            xe = sp.xedges
-            ye = sp.yedges
+            H = self.Spec2D.spec2d.T
+            xe = self.Spec2D.xedges
+            ye = self.Spec2D.yedges
             X, Y = np.meshgrid(xe,ye)
             self.a.clear()
 

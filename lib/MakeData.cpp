@@ -92,6 +92,7 @@ void DataMaker::GenerateDataMatrix(int n)
     DataMatrix[1][int(d2[i])]++;
     DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
 
+    // The gated spectrum
     if(d1[i] > xmin & d1[i] < xmax)
       DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
     
