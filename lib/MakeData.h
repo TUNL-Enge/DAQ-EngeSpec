@@ -26,10 +26,8 @@ class DataMaker {
   char const* sayhello( );
   char const* saygoodbye( );
   void Initialize();
-  void GenerateData(int n = 1000);
   void ClearData();
   void SimulateData();
-  void PrintData();
 
   // New 2d matrix method
   void GenerateDataMatrix(int n = 1000);
@@ -37,6 +35,9 @@ class DataMaker {
   np::ndarray getData2D();
 
   BoolVector getis2D(){return is2D;}
+
+  // Gate passing
+  void putGate(char* name, p::list x, p::list y);
   
   // For returning the old data arrays (clean this up later)
   std::vector<int>::iterator begin(){

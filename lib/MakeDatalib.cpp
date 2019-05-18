@@ -31,9 +31,8 @@ BOOST_PYTHON_MODULE(libMakeData)
     .def("getData2D", &DataMaker::getData2D)            // 2D histograms
     .def("getis2D", &DataMaker::getis2D)                // bool vector
     .def_readonly("SpectrumNames", &DataMaker::DataNames)
-    .def("GenerateData", &DataMaker::GenerateData)  // void
     .def("ClearData", &DataMaker::ClearData)        // void
-    .def("PrintData", &DataMaker::PrintData)        // void
+    .def("putGate", &DataMaker::putGate)            // void
     .def("data", range(&DataMaker::begin, &DataMaker::end)) 
     ;
 }

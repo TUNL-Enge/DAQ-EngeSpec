@@ -144,33 +144,24 @@ np::ndarray DataMaker::getData2D(){
   
 }
 
-void DataMaker::GenerateData(int n){
 
-  std::normal_distribution<double> distribution1(500.0,50.0);
-  std::normal_distribution<double> distribution2(200.0,10.0);
-  
-  for(int i=0; i<n; i++){
-    double d1 = distribution1(generator);
-    double d2 = distribution2(generator);
-    Dat[0].push_back(int(d1));
-    Dat[1].push_back(int(d2));
+void DataMaker::putGate(char* name, p::list x, p::list y){
+
+  std::cout << "The name is " << name << std::endl;
+  p::ssize_t len = p::len(x);
+  // Make a vector for the gate
+  std::vector<std::vector<double>> Gate;
+  for(int i=0; i<len; i++){
+    std::vector<double> tmp;
+    tmp.push_back(p::extract<double>(x[i]));
+    tmp.push_back(p::extract<double>(y[i]));
+    Gate.push_back(tmp);
+  }
+
+  for(int i=0; i<Gate.size(); i++){
+    std::cout << Gate[i][0] << " " << Gate[i][1] << std::endl;
   }
   
-}
-
-void DataMaker::PrintData(){
-  for(std::vector<int>::iterator it = Dat[0].begin(); it != Dat[0].end(); ++it)
-    std::cout << " " << *it ;
-  std::cout << "\n";
-
-  std::cout << "The data matrix is:\n";
-  std::vector< std::vector<int> >::iterator itrow;
-  std::vector<int>::iterator itcol;
-  for(itrow = DataMatrix.begin(); itrow != DataMatrix.end(); ++itrow){
-    for(itcol = itrow->begin(); itcol != itrow->end(); ++itcol)
-      std::cout << " " << *itcol;
-    std::cout << std::endl;
-  }
 }
 
 void DataMaker::ClearData(){

@@ -280,3 +280,6 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec2D.gate = (x,y)
         print(self.Spec2D.gate)
         
+        ## Send the gate over to c++
+##        print(self.Spec2D.gate[1])
+        self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gate[0],self.Spec2D.gate[1])
