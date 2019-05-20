@@ -18,6 +18,24 @@ typedef std::vector<mat> mat2d;
 typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 
+class Gate{
+  
+ public:
+
+  Gate() {};
+
+  void addVertex(std::vector<double> v);
+  std::vector<std::vector<double>> getPoints(){return Points;}
+  bool inBound(double x, double y);
+  bool inGate(double x, double y);
+  
+ private:
+
+  std::vector<std::vector<double>> Points;
+  
+};
+
+
 class DataMaker {
  public:
 
@@ -57,7 +75,11 @@ class DataMaker {
   std::vector<std::vector<std::vector<int>>> DataMatrix2D;
   std::default_random_engine generator;
 
-  std::vector<std::vector<std::vector<double>>> GateCollection;
+  //  std::vector<std::vector<std::vector<double>>> GateCollection;
+  std::vector<Gate> GateCollection;
 };
+
+
+
 
 #endif // MAKEDATA_H

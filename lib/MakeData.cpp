@@ -70,14 +70,20 @@ void DataMaker::GenerateDataMatrix(int n)
   */
 
   // do rough gate
-  double xmax,xmin;
+  /*  double xmax,xmin;
   if(GateCollection.size()>0){
-    std::vector<std::vector<double>> Gate = GateCollection[0];
-    xmin=Gate[0][0];
-    xmax=Gate[1][0];
+    Gate G1 = GateCollection[0];
+    xmin=G21[0][0];
+    xmax=G1[1][0];
     //std::cout << "xmin, xmax = " << xmin << " " << xmax << std::endl;
   }
+  */
 
+  Gate G1;
+  if(GateCollection.size()>0){
+    G1 = GateCollection[0];
+  }
+  
   // Fill the spectra
   std::vector<double> d1, d2;
   for(int i=0; i<n; i++){
@@ -93,11 +99,20 @@ void DataMaker::GenerateDataMatrix(int n)
     DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
 
     // The gated spectrum
-    if(d1[i] > xmin & d1[i] < xmax)
-      DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+    if(G1.getPoints().size()>0)
+      if(G1.inBound(d1[i],d2[i]))//d1[i] > xmin & d1[i] < xmax)
+	DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
     
   }
 
+  /*
+  // Test the gate
+  G1.inBound(0,0);
+  G1.inBound(1000,1000);
+  G1.inBound(500,500);
+  G1.inBound(1000,500);
+  */
+  
   /*
   for(int i=0; i<50; i++){
     for(int j=0; j<50; j++){
@@ -173,15 +188,15 @@ void DataMaker::putGate(char* name, p::list x, p::list y){
   //std::cout << "The name is " << name << std::endl;
   p::ssize_t len = p::len(x);
   // Make a vector for the gate
-  std::vector<std::vector<double>> Gate;
+  Gate G1;//std::vector<std::vector<double>> Gate;
   for(int i=0; i<len; i++){
     std::vector<double> tmp;
     tmp.push_back(p::extract<double>(x[i]));
     tmp.push_back(p::extract<double>(y[i]));
-    Gate.push_back(tmp);
+    G1.addVertex(tmp);
   }
 
-  GateCollection.push_back(Gate);
+  GateCollection.push_back(G1);
 
   /*
   for(int i=0; i<Gate.size(); i++){
@@ -208,3 +223,45 @@ void DataMaker::ClearData(){
 
 }
 
+//----------------------------------------------------------------------
+// Gates
+// Add a vertex to the gate
+void Gate::addVertex(std::vector<double> v){
+  Points.push_back(v);
+  //std::cout << v[0] << " " << v[1] << std::endl;
+}
+
+bool Gate::inBound(double x, double y){
+
+  // Find max and min x and y of gate
+  double maxx = Points[0][0];
+  double minx = Points[0][0];
+  double maxy = Points[0][1];
+  double miny = Points[0][1];
+
+  for(int i=1; i<Points.size(); i++){
+    if(Points[i][0] > maxx)maxx=Points[i][0];
+    if(Points[i][0] < minx)minx=Points[i][0];
+    if(Points[i][1] > maxy)maxy=Points[i][1];
+    if(Points[i][1] < miny)miny=Points[i][1];
+  }
+
+  /*
+  std::cout << "minx = " << minx << std::endl;
+  std::cout << "maxx = " << maxx << std::endl;
+  std::cout << "miny = " << miny << std::endl;
+  std::cout << "maxy = " << maxy << std::endl;
+  */
+  bool inbound = false;
+  if((x < maxx) & (x > minx) & (y < maxy) & (y > miny))inbound = true;
+
+  /*
+  std::cout << "The point at (x,y) = (" << x << "," << y << ") is ";
+  if(inbound)
+    std::cout << "INSIDE!" << std::endl;
+  else
+    std::cout << "outside the boundary" << std::endl;
+  */
+  
+  return inbound;
+}
