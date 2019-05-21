@@ -32,6 +32,7 @@ class Gate{
  private:
 
   std::vector<std::vector<double>> Points;
+  double minx, maxx, miny, maxy;
   
 };
 
@@ -77,6 +78,11 @@ class DataMaker {
 
   //  std::vector<std::vector<std::vector<double>>> GateCollection;
   std::vector<Gate> GateCollection;
+
+  // Some counters
+  int ipeak1 = 0;
+  int ipeak2 = 0;
+  int igated = 0;
 };
 
 

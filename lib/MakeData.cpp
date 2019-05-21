@@ -8,7 +8,11 @@ char const* DataMaker::sayhello( ) {
     return "Hello! This is the data maker running in c++!!!";
 }
 char const* DataMaker::saygoodbye( ) {
-    return "Goodbye! I hope I served you well";
+  std::cout << "Peak 1 has " << ipeak1 << " counts" << std::endl;
+  std::cout << "Peak 2 has " << ipeak2 << " counts" << std::endl;
+  std::cout << "Gated peak has " << igated << " counts" << std::endl;
+  
+  return "Goodbye! I hope I served you well";
 }
 
 void DataMaker::Initialize(){
@@ -64,20 +68,6 @@ void DataMaker::GenerateDataMatrix(int n)
   std::normal_distribution<double> distribution4(3000.0,100.0);
   std::normal_distribution<double> crap(100,50); 
 
-  /*
-  std::cout << "Name1 = " << DataNames[0] << std::endl;
-  std::cout << "Name2 = " << DataNames[1] << std::endl;
-  */
-
-  // do rough gate
-  /*  double xmax,xmin;
-  if(GateCollection.size()>0){
-    Gate G1 = GateCollection[0];
-    xmin=G21[0][0];
-    xmax=G1[1][0];
-    //std::cout << "xmin, xmax = " << xmin << " " << xmax << std::endl;
-  }
-  */
 
   Gate G1;
   if(GateCollection.size()>0){
@@ -88,9 +78,11 @@ void DataMaker::GenerateDataMatrix(int n)
   std::vector<double> d1, d2;
   for(int i=0; i<n; i++){
     if(crap(generator)>120){
+      ipeak1++;
       d1.push_back(distribution1(generator));
       d2.push_back(distribution2(generator));
     } else {
+      ipeak2++;
       d1.push_back(distribution3(generator));
       d2.push_back(distribution4(generator));
     }
@@ -99,10 +91,12 @@ void DataMaker::GenerateDataMatrix(int n)
     DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
 
     // The gated spectrum
-    if(G1.getPoints().size()>0)
-      if(G1.inBound(d1[i],d2[i]))//d1[i] > xmin & d1[i] < xmax)
+    if(G1.getPoints().size()>0){
+      if(G1.inBound(d1[i],d2[i])){
+	igated++;
 	DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
-    
+      }
+    }
   }
 
   /*
@@ -221,6 +215,8 @@ void DataMaker::ClearData(){
       DataMatrix2D[k][i] = row;
   }
 
+  ipeak1 = ipeak2 = igated = 0;
+  
 }
 
 //----------------------------------------------------------------------
@@ -228,40 +224,26 @@ void DataMaker::ClearData(){
 // Add a vertex to the gate
 void Gate::addVertex(std::vector<double> v){
   Points.push_back(v);
+
+  // Set the rough bound of the gate
+  if(Points.size() == 1){
+    minx = v[0];
+    maxx = v[0];
+    miny = v[1];
+    maxy = v[1];
+  } else {
+    if(v[0] > maxx)maxx=v[0];
+    if(v[0] < minx)minx=v[0];
+    if(v[1] > maxy)maxy=v[1];
+    if(v[1] < miny)miny=v[1];
+  }
   //std::cout << v[0] << " " << v[1] << std::endl;
 }
 
 bool Gate::inBound(double x, double y){
 
-  // Find max and min x and y of gate
-  double maxx = Points[0][0];
-  double minx = Points[0][0];
-  double maxy = Points[0][1];
-  double miny = Points[0][1];
-
-  for(int i=1; i<Points.size(); i++){
-    if(Points[i][0] > maxx)maxx=Points[i][0];
-    if(Points[i][0] < minx)minx=Points[i][0];
-    if(Points[i][1] > maxy)maxy=Points[i][1];
-    if(Points[i][1] < miny)miny=Points[i][1];
-  }
-
-  /*
-  std::cout << "minx = " << minx << std::endl;
-  std::cout << "maxx = " << maxx << std::endl;
-  std::cout << "miny = " << miny << std::endl;
-  std::cout << "maxy = " << maxy << std::endl;
-  */
   bool inbound = false;
   if((x < maxx) & (x > minx) & (y < maxy) & (y > miny))inbound = true;
 
-  /*
-  std::cout << "The point at (x,y) = (" << x << "," << y << ") is ";
-  if(inbound)
-    std::cout << "INSIDE!" << std::endl;
-  else
-    std::cout << "outside the boundary" << std::endl;
-  */
-  
   return inbound;
 }
