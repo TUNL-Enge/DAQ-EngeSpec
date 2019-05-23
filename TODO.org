@@ -28,7 +28,7 @@
   - [X] Learn how to add data to arrays through c++
   - [X] 2D arrays?
   - [X] Interrupt simulation once running?
-  - [ ] Learn how to pass gates to c++
+  - [X] Learn how to pass gates to c++
     - All sorting in c++ code
     - Python just plots
 * Fitting
