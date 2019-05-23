@@ -27,6 +27,7 @@ class Gate{
   void addVertex(std::vector<double> v);
   std::vector<std::vector<double>> getPoints(){return Points;}
   bool inBound(double x, double y);
+  int pnpoly(double testx, double testy);
   bool inGate(double x, double y);
   
  private:

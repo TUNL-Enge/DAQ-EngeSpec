@@ -90,24 +90,28 @@ void DataMaker::GenerateDataMatrix(int n)
     DataMatrix[1][int(d2[i])]++;
     DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
 
+    
     // The gated spectrum
+    // Is the gate defined?
     if(G1.getPoints().size()>0){
+      // Is the point in the rough gate?
       if(G1.inBound(d1[i],d2[i])){
-	igated++;
-	DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+	// Is it in the true gate?
+	if(G1.pnpoly(d1[i],d2[i])){
+	  igated++;
+	  DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+	}
       }
     }
   }
-
   /*
   // Test the gate
-  G1.inBound(0,0);
-  G1.inBound(1000,1000);
-  G1.inBound(500,500);
-  G1.inBound(1000,500);
+  G1.pnpoly(0,0);
+  G1.pnpoly(1000,1000);
+  G1.pnpoly(500,500);
+  G1.pnpoly(1000,500);
   */
-  
-  /*
+  /*  
   for(int i=0; i<50; i++){
     for(int j=0; j<50; j++){
       std::cout << DataMatrix2D[0][i][j] << " ";
@@ -246,4 +250,27 @@ bool Gate::inBound(double x, double y){
   if((x < maxx) & (x > minx) & (y < maxy) & (y > miny))inbound = true;
 
   return inbound;
+}
+
+int Gate::pnpoly(double testx, double testy)
+{
+  int nvert = Points.size();
+  //std::cout << "(x,y) = (" << testx << "," << testy << ")" << std::endl;
+  
+  int i, j, c = 0;
+  for (i = 0, j = nvert-1; i < nvert; j = i++) {
+    if ( ((Points[i][1]>testy) != (Points[j][1]>testy)) &&
+	 (testx < (Points[j][0]-Points[i][0]) * (testy-Points[i][1]) /
+	  (Points[j][1]-Points[i][1]) + Points[i][0]) )
+       c = !c;
+  }
+  //std::cout << "c=" << c << std::endl;
+  return c;
+}
+
+int Gate::inGate(double testx, double testy){
+
+  
+
+  return c;
 }
