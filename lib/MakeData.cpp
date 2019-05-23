@@ -93,16 +93,11 @@ void DataMaker::GenerateDataMatrix(int n)
     
     // The gated spectrum
     // Is the gate defined?
-    if(G1.getPoints().size()>0){
-      // Is the point in the rough gate?
-      if(G1.inBound(d1[i],d2[i])){
-	// Is it in the true gate?
-	if(G1.pnpoly(d1[i],d2[i])){
-	  igated++;
-	  DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
-	}
-      }
+    if(G1.inGate(d1[i],d2[i])){
+      igated++;
+      DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
     }
+
   }
   /*
   // Test the gate
@@ -244,10 +239,11 @@ void Gate::addVertex(std::vector<double> v){
   //std::cout << v[0] << " " << v[1] << std::endl;
 }
 
-bool Gate::inBound(double x, double y){
+bool Gate::inBound(double testx, double testy){
 
   bool inbound = false;
-  if((x < maxx) & (x > minx) & (y < maxy) & (y > miny))inbound = true;
+  if((testx < maxx) & (testx > minx) &
+     (testy < maxy) & (testy > miny))inbound = true;
 
   return inbound;
 }
@@ -268,9 +264,16 @@ int Gate::pnpoly(double testx, double testy)
   return c;
 }
 
+// Main gate testing function - is (testx,testy) in the gate?
 int Gate::inGate(double testx, double testy){
 
-  
-
+  int c = 0;
+  // Is the gate defined?
+  if(Points.size()>0){
+    // Is the point in the rough gate?
+    if(inBound(testx, testy))
+      // Is it in the true gate?
+      c = pnpoly(testx,testy);
+  }
   return c;
 }
