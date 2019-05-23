@@ -23,6 +23,8 @@ void DataMaker::Initialize(){
   is2D.push_back(false);
   DataNames.push_back("DE");
   is2D.push_back(false);
+  DataNames.push_back("Pos1-cut");
+  is2D.push_back(false);
   
   // Fill some empty spectra
   std::vector<int> tempSpec;
@@ -96,6 +98,7 @@ void DataMaker::GenerateDataMatrix(int n)
     if(G1.inGate(d1[i],d2[i])){
       igated++;
       DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+      DataMatrix[2][int(d1[i])]++;
     }
 
   }
