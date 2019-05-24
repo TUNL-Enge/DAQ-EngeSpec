@@ -303,7 +303,7 @@ class MyCustomToolbar(NavigationToolbar):
 
         ## net area
         self.a = self.addAction(QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
-                                "Net Area", self.select_tool)
+                                "Net Area", plotCanvas.netArea)
         self.a.setToolTip("Calculate the net area under a peak")
         self._actions['netarea'] = self.a
 

@@ -282,3 +282,49 @@ class SpectrumCanvas(FigureCanvas):
         
         ## Send the gate over to c++
         self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gate[0],self.Spec2D.gate[1])
+
+    def getSingle(self,color="red"):
+        clicks = self.fig.ginput(2)
+        xcut = list(range(int(clicks[0][0]),int(clicks[1][0])))
+        ycut = list(self.Spec.spec[xcut])
+        self.a.step(xcut,ycut,color)
+        
+        ## Do some weird python shit to shade the region
+        xplot = xcut.copy()
+        yplot = ycut.copy()
+        xplot.insert(0,xcut[0])
+        xplot.extend([xplot[-1],xplot[0]])
+        yplot.insert(0,0.1)
+        yplot.extend([0,0])
+        self.a.fill(xplot,yplot,facecolor=color,alpha=0.5)
+        
+        self.fig.canvas.draw()
+
+        return xcut,ycut
+        
+    def netArea(self):
+        print("Click around peak")
+        if not self.is2D:
+            points = self.getSingle("forestgreen")
+            #print(points[1])
+            area = sum(points[1])
+            darea = np.sqrt(area)
+            print("From ",points[0][0]," to ",points[0][-1])
+            dprecis = self.getprecis(darea)
+            nprecis = self.getprecis(area)
+            print("Area = ", self.round_to_n(area,nprecis), " +/- ",
+                  self.round_to_n(darea,dprecis))
+        else:
+            clicks = self.fig.ginput(4)
+
+    def getprecis(self,x):
+        l = np.log10(x)
+        return(int(l))
+            
+    def round_to_n(self, x, n):
+        if n < 1:
+            raise ValueError("number of significant digits must be >= 1")
+        # Use %e format to get the n most significant digits, as a string.
+        format = "%." + str(n-1) + "e"
+        as_string = format % x
+        return float(as_string)
