@@ -18,6 +18,9 @@ class SpectrumObject:
         self.spec_temp = np.zeros(4096)   ## The temporary spectrum in memory
         self.Name = "Test Spectrum"
 
+        self.xzoom = [0,4096]
+        self.yzoom = [0,1]
+
         ## Load the data library
         self.dm = libMakeData.DataMaker()
         
@@ -63,6 +66,9 @@ class SpectrumObject2D:
         self.spec2d = np.zeros(shape=(self.nx,self.ny))
         self.spec2d_temp = np.zeros(shape=(self.nx,self.ny))   ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
+
+        self.xzoom = [0,4096]
+        self.yzoom = [0,4096]
 
         self.gate = None
                       

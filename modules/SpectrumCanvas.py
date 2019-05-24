@@ -30,7 +30,7 @@ class SpectrumCanvas(FigureCanvas):
         self.a = self.fig.add_subplot(111)
 
         
-        self.a.set_xlim([0,4095])
+        self.a.set_xlim(self.Spec.xzoom)
         #self.a.set_ylim([0,800])
         self.a.set_xlabel("channel")
         self.a.set_ylabel("counts")
@@ -59,12 +59,12 @@ class SpectrumCanvas(FigureCanvas):
         
     def setSpecIndex(self,i,is2D):
         if is2D:
-            self.sindex1d = 0
+            ##self.sindex1d = 0
             self.sindex2d = i
             self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
         else:            
             self.sindex1d = i
-            self.sindex2d = 0
+            ##self.sindex2d = 0
             self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.is2D = is2D
         self.PlotGeneral(is2D)
@@ -89,25 +89,44 @@ class SpectrumCanvas(FigureCanvas):
     def PlotData(self):
         x = np.array([x for x in range(0,4096)],dtype=int)
         y = self.Spec.spec
+
+        xmin = self.Spec.xzoom[0]
+        xmax = self.Spec.xzoom[1]
+        ymin = self.Spec.yzoom[0]
+        ymax = self.Spec.yzoom[1]
+
         self.a.clear()
         self.a.step(x,y,'k',where='mid')
-        self.Resize()
+        self.a.set_xlim([xmin,xmax])
+        self.a.set_ylim([ymin,ymax])
+        #        self.Resize()
+        self.fig.canvas.draw()
+
 
     def PlotData2D(self):
+        xmin = self.Spec2D.xzoom[0]
+        xmax = self.Spec2D.xzoom[1]
+        ymin = self.Spec2D.yzoom[0]
+        ymax = self.Spec2D.yzoom[1]
+
         H = self.Spec2D.spec2d.T
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
         X, Y = np.meshgrid(xe,ye)
         self.a.clear()
         self.a.pcolormesh(X,Y,H)
-        self.Resize()
+        self.a.set_xlim([xmin,xmax])
+        self.a.set_ylim([ymin,ymax])
+
+        self.fig.canvas.draw()
+        ##        self.Resize()
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
-        xmin  = self.a.get_xlim()[0]
-        xmax  = self.a.get_xlim()[1]
-        ymin    = self.a.get_ylim()[0]
-        ymax    = self.a.get_ylim()[1]
+        ##xmin  = self.a.get_xlim()[0]
+        ##xmax  = self.a.get_xlim()[1]
+        ##ymin    = self.a.get_ylim()[0]
+        ##ymax    = self.a.get_ylim()[1]
 
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
@@ -116,6 +135,11 @@ class SpectrumCanvas(FigureCanvas):
             sp.spec2d[:] = sp.spec2d_temp
 
         if not self.is2D:
+            xmin = self.Spec.xzoom[0]
+            xmax = self.Spec.xzoom[1]
+            ymin = self.Spec.yzoom[0]
+            ymax = self.Spec.yzoom[1]
+
             x = np.array([x for x in range(0,4096)],dtype=int)
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
@@ -126,6 +150,11 @@ class SpectrumCanvas(FigureCanvas):
             self.a.set_ylim([ymin,ymax])
             
         else:
+            xmin = self.Spec2D.xzoom[0]
+            xmax = self.Spec2D.xzoom[1]
+            ymin = self.Spec2D.xzoom[0]
+            ymax = self.Spec2D.xzoom[1]
+            
             H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
@@ -159,7 +188,8 @@ class SpectrumCanvas(FigureCanvas):
             else:
                 ymin = 0 #max(0,0.9*self.GetMin())
                 self.a.set_ylim([ymin,1.10*self.GetMax()])
-        # JACK TEST
+        
+        self.Spec.yzoom = self.a.get_ylim()
         self.fig.canvas.draw()
 
     def Resize(self):
@@ -169,8 +199,12 @@ class SpectrumCanvas(FigureCanvas):
                 self.a.set_ylim([1,1.20*self.GetMax()])
             else:                    
                 self.a.set_ylim([0,1.20*self.GetMax()])
+            self.Spec.yzoom = self.a.get_ylim()
+            self.Spec.xzoom = self.a.get_xlim()
         else:
             self.a.set_ylim(0,self.maximumX)
+            self.Spec2D.yzoom = self.a.get_ylim()
+            self.Spec2D.xzoom = self.a.get_xlim()
         self.fig.canvas.draw()
 
     def ToggleLog(self):
@@ -207,6 +241,10 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim(newlowx,newhighx)
         if self.is2D:
             self.a.set_ylim(newlowy,newhighy)
+        ## Save to spectrum
+        self.Spec.xzoom = self.a.get_xlim()
+        self.Spec.yzoom = self.a.get_ylim()
+        ## And plot!
         self.fig.canvas.draw()
      
     def xZoomOut(self):
@@ -228,22 +266,32 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim(newlowx,newhighx)
         if self.is2D:
             self.a.set_ylim(newlowy,newhighy)
+        ## Save to spectrum
+        self.Spec.xzoom = self.a.get_xlim()
+        self.Spec.yzoom = self.a.get_ylim()
+        ## And plot!
         self.fig.canvas.draw()
 
     def yZoomIn(self):
         ylow,yhigh = self.a.get_ylim()
         newhigh = 0.80*yhigh
         self.a.set_ylim(ylow,newhigh)
+        self.Spec.yzoom = self.a.get_ylim()
         self.fig.canvas.draw()
 
     def yZoomOut(self):
         ylow,yhigh = self.a.get_ylim()
         newhigh = 1.20*yhigh
         self.a.set_ylim(ylow,newhigh)
+        self.Spec.yzoom = self.a.get_ylim()
         self.fig.canvas.draw()
 
     def xZoomRange(self, minx, maxx):
         self.a.set_xlim(int(minx),int(maxx))
+        if self.is2D:
+            self.Spec2D.xzoom = self.a.get_xlim()
+        else:
+            self.Spec.xzoom = self.a.get_xlim()
         self.fig.canvas.draw()
         self.span.set_visible(False)
             
@@ -253,6 +301,10 @@ class SpectrumCanvas(FigureCanvas):
         
     def yZoomRange(self, miny, maxy):
         self.a.set_ylim(miny,maxy)
+        if self.is2D:
+            self.Spec2D.yzoom = self.a.get_ylim()
+        else:
+            self.Spec.yzoom = self.a.get_ylim()
         self.fig.canvas.draw()
         self.span.set_visible(False)
             
