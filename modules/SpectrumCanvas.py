@@ -90,7 +90,7 @@ class SpectrumCanvas(FigureCanvas):
         x = np.array([x for x in range(0,4096)],dtype=int)
         y = self.Spec.spec
         self.a.clear()
-        self.a.step(x,y,'k')
+        self.a.step(x,y,'k',where='mid')
         self.Resize()
 
     def PlotData2D(self):
@@ -121,7 +121,7 @@ class SpectrumCanvas(FigureCanvas):
             y = self.Spec.spec
 
             self.a.clear()
-            self.a.step(x,y,'k')
+            self.a.step(x,y,'k',where='mid')
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
             
@@ -290,7 +290,7 @@ class SpectrumCanvas(FigureCanvas):
         ##print(self.Spec.spec)
         ##        ycut = list(self.Spec.spec[xcut])
         ycut = [self.Spec.spec[i] for i in xcut]
-        self.a.step(xcut,ycut,color)
+        self.a.step(xcut,ycut,color,where='mid')
         
         ## Do some weird python shit to shade the region
         xplot = xcut.copy()
@@ -300,7 +300,7 @@ class SpectrumCanvas(FigureCanvas):
         yplot.insert(0,0.1)
         yplot.extend([0,0])
         ##        self.a.fill(xplot,yplot,facecolor=color,alpha=0.5)
-        self.a.fill_between(xcut,ycut, step="pre", alpha=0.4, color=color)
+        self.a.fill_between(xcut,ycut, step="mid", alpha=0.4, color=color)
         
         self.fig.canvas.draw()
 
@@ -348,10 +348,8 @@ class SpectrumCanvas(FigureCanvas):
             totalsum = sum(peakpoints[1])
             gross = totalsum - bgsum
 
-            print(yplot)
-            print(bgsum,totalsum)
-            print("From ",peakpoints[0][0]," to ",peakpoints[0][-1])
-            print("Gross Area = ",gross)
+            print("From",peakpoints[0][0],"to",peakpoints[0][-1])
+            print("Gross Area =",gross)
 
             
     def getprecis(self,x):
