@@ -309,7 +309,7 @@ class MyCustomToolbar(NavigationToolbar):
 
         ## gross area
         self.a = self.addAction(QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
-                                "Gross Area", self.select_tool)
+                                "Gross Area", plotCanvas.grossArea)
         self.a.setToolTip("Calculate the gross, background-subtracted area under a peak")
         self._actions['grossarea'] = self.a
         

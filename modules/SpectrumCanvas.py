@@ -285,8 +285,11 @@ class SpectrumCanvas(FigureCanvas):
 
     def getSingle(self,color="red"):
         clicks = self.fig.ginput(2)
-        xcut = list(range(int(clicks[0][0]),int(clicks[1][0])))
-        ycut = list(self.Spec.spec[xcut])
+        xcut = list(range(int(np.floor(clicks[0][0])),int(1+np.ceil(clicks[1][0]))))
+        ##print(xcut)
+        ##print(self.Spec.spec)
+        ##        ycut = list(self.Spec.spec[xcut])
+        ycut = [self.Spec.spec[i] for i in xcut]
         self.a.step(xcut,ycut,color)
         
         ## Do some weird python shit to shade the region
@@ -296,7 +299,8 @@ class SpectrumCanvas(FigureCanvas):
         xplot.extend([xplot[-1],xplot[0]])
         yplot.insert(0,0.1)
         yplot.extend([0,0])
-        self.a.fill(xplot,yplot,facecolor=color,alpha=0.5)
+        ##        self.a.fill(xplot,yplot,facecolor=color,alpha=0.5)
+        self.a.fill_between(xcut,ycut, step="pre", alpha=0.4, color=color)
         
         self.fig.canvas.draw()
 
@@ -317,6 +321,39 @@ class SpectrumCanvas(FigureCanvas):
         else:
             clicks = self.fig.ginput(4)
 
+    def grossArea(self):
+        if self.is2D:
+            print("Not available in 2D spectra")
+        else:
+            ## Collect the regions
+            print("Click first background region")
+            bg1points = self.getSingle("firebrick")
+            print("Click second background region")
+            bg2points = self.getSingle("firebrick")
+            print("Click peak")
+            peakpoints = self.getSingle("forestgreen")
+
+            ## Calculate the background
+            bgx = bg1points[0] + bg2points[0]
+            bgy = bg1points[1] + bg2points[1]
+            bgfit = np.polyfit(bgx,bgy,deg=1)
+            ## Draw background line
+            xplot = list(range(min(bgx),max(bgx)))
+            yplot = np.poly1d(bgfit)
+            self.a.plot(xplot,yplot(xplot),"firebrick")
+            self.fig.canvas.draw()
+
+            ## Calculate the number of counts
+            bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
+            totalsum = sum(peakpoints[1])
+            gross = totalsum - bgsum
+
+            print(yplot)
+            print(bgsum,totalsum)
+            print("From ",peakpoints[0][0]," to ",peakpoints[0][-1])
+            print("Gross Area = ",gross)
+
+            
     def getprecis(self,x):
         l = np.log10(x)
         return(int(l))
