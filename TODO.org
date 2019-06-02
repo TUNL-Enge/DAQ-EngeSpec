@@ -9,6 +9,7 @@
   - [X] Draw gate on 2D histogram if set
   - [ ] Expand tree by default
   - [ ] Only draw gate when clicked in tree
+  - [ ] 1D Gates
   - [ ] Why do the OutLog functions crash with simulations? 
 * GUI
   - [X] Tree to select histograms
