@@ -5,8 +5,10 @@
   - [ ] Better window scaling
   - [X] 2D zooming better
   - [ ] SpanSelector outside the spectrum range
-  - [ ] Remember zooming properties of spectra
-  - [ ] Draw gate on 2D histogram if set
+  - [X] Remember zooming properties of spectra
+  - [X] Draw gate on 2D histogram if set
+  - [ ] Expand tree by default
+  - [ ] Only draw gate when clicked in tree
   - [ ] Why do the OutLog functions crash with simulations? 
 * GUI
   - [X] Tree to select histograms

@@ -55,6 +55,7 @@ class DataMaker {
   np::ndarray getData2D();
 
   BoolVector getis2D(){return is2D;}
+  BoolVector gethasGate(){return hasGate;}
 
   // Gate passing
   void putGate(char* name, p::list x, p::list y);
@@ -73,6 +74,7 @@ class DataMaker {
   bool isRunning = false;
   std::vector<int> Dat[2];
   std::vector<bool> is2D;
+  std::vector<bool> hasGate;
   std::vector<std::vector<int>> DataMatrix;
   std::vector<std::vector<std::vector<int>>> DataMatrix2D;
   std::default_random_engine generator;

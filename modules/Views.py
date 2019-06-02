@@ -173,16 +173,24 @@ class Ui_MainWindow(QMainWindow):
         for i in range(l1d):
             spec = SpecColl.spec1d[i]
             name = spec.Name
+            hasGate = spec.hasGate
             item = QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
+            if hasGate:
+                subitem = QTreeWidgetItem(item, ["Gate"])
+                subitem.spec = spec
             self.treeWidget.addTopLevelItem(item)
             
         l2d = len(SpecColl.spec2d)
         for i in range(l2d):
             spec = SpecColl.spec2d[i]
             name = spec.Name
+            hasGate = spec.hasGate
             item = QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
+            if hasGate:
+                subitem = QTreeWidgetItem(item, ["Gate"])
+                subitem.spec = spec
             self.treeWidget.addTopLevelItem(item)
 
         

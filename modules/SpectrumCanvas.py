@@ -118,6 +118,9 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
 
+        if self.Spec2D.hasGate and self.Spec2D.gate is not None:
+            self.drawGate()
+        
         self.fig.canvas.draw()
         ##        self.Resize()
 
@@ -161,9 +164,13 @@ class SpectrumCanvas(FigureCanvas):
             X, Y = np.meshgrid(xe,ye)
             self.a.clear()
 
+                
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
             self.a.pcolormesh(X,Y,H)
+
+            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
+                self.drawGate()
 
         self.fig.canvas.draw()
     
@@ -332,12 +339,18 @@ class SpectrumCanvas(FigureCanvas):
         y.append(y[0])
         self.a.plot(x,y, 'r-')
         self.fig.canvas.draw()
+        self.Spec2D.hasGate = True
         self.Spec2D.gate = (x,y)
         ##        print(self.Spec2D.gate)
         
         ## Send the gate over to c++
         self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gate[0],self.Spec2D.gate[1])
 
+    def drawGate(self):
+        x = self.Spec2D.gate[0]
+        y = self.Spec2D.gate[1]
+        self.a.plot(x,y,'r-')
+        
     def getSingle(self,color="red"):
         clicks = self.fig.ginput(2)
         xcut = list(range(int(np.floor(clicks[0][0])),int(1+np.ceil(clicks[1][0]))))

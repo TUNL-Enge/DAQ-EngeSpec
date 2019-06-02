@@ -142,7 +142,8 @@ class SimulatorThread(QThread):
             print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2D()
-            
+        self.hasGates = self.specColl.dm.gethasGate()
+        
         ## First delete the old spectra
         self.specColl.spec1d = []
         self.specColl.spec2d = []
@@ -154,6 +155,7 @@ class SimulatorThread(QThread):
             if not self.is2Ds[i]:
                 sObj = SpectrumObject(counter1d)
                 sObj.Name = self.names[i]
+                sObj.hasGate = self.hasGates[i]
                 sObj.spec = np.zeros(4096)
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec[0] = 1
@@ -163,6 +165,7 @@ class SimulatorThread(QThread):
             else:
                 sObj = SpectrumObject2D(counter2d)
                 sObj.Name = self.names[i]
+                sObj.hasGate = self.hasGates[i]
                 sObj.xedges = np.array([x for x in range(0,4096,16)])
                 sObj.yedges = np.array([y for y in range(0,4096,16)])
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum

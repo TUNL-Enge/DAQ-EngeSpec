@@ -21,10 +21,13 @@ void DataMaker::Initialize(){
   DataNames.clear();
   DataNames.push_back("Pos1");
   is2D.push_back(false);
+  hasGate.push_back(false);
   DataNames.push_back("DE");
   is2D.push_back(false);
+  hasGate.push_back(true);
   DataNames.push_back("Pos1-cut");
   is2D.push_back(false);
+  hasGate.push_back(false);
   
   // Fill some empty spectra
   std::vector<int> tempSpec;
@@ -36,6 +39,7 @@ void DataMaker::Initialize(){
   // Then make 2D spectrum
   DataNames.push_back("DEvsPos1");
   is2D.push_back(true);
+  hasGate.push_back(true);
   std::vector<int> row;
   row.resize(256,0);
   std::vector<std::vector<int>> tempSpec2D;
@@ -47,6 +51,7 @@ void DataMaker::Initialize(){
   // Make Gated spectra
   DataNames.push_back("DEvsPos1-gated");
   is2D.push_back(true);
+  hasGate.push_back(false);
   tempSpec2D.clear();
   for(int i=0; i<256; i++)
     tempSpec2D.push_back(row);

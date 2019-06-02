@@ -71,6 +71,7 @@ class SpectrumObject2D:
         self.yzoom = [0,4096]
 
         self.gate = None
+        self.hasGate = False
                       
     def __str__(self):
         return '2D Spectrum Name: {}'.format(self.Name)
