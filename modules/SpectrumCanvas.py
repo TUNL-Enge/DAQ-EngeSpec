@@ -152,8 +152,8 @@ class SpectrumCanvas(FigureCanvas):
         else:
             xmin = self.Spec2D.xzoom[0]
             xmax = self.Spec2D.xzoom[1]
-            ymin = self.Spec2D.xzoom[0]
-            ymax = self.Spec2D.xzoom[1]
+            ymin = self.Spec2D.yzoom[0]
+            ymax = self.Spec2D.yzoom[1]
             
             H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
@@ -241,9 +241,12 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim(newlowx,newhighx)
         if self.is2D:
             self.a.set_ylim(newlowy,newhighy)
-        ## Save to spectrum
-        self.Spec.xzoom = self.a.get_xlim()
-        self.Spec.yzoom = self.a.get_ylim()
+            ## Save to spectrum
+            self.Spec2D.xzoom = self.a.get_xlim()
+            self.Spec2D.yzoom = self.a.get_ylim()
+        else:
+            self.Spec.xzoom = self.a.get_xlim()
+            self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
         self.fig.canvas.draw()
      
