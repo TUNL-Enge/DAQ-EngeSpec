@@ -10,7 +10,9 @@
   - [ ] Expand tree by default
   - [ ] Only draw gate when clicked in tree
   - [ ] 1D Gates
-  - [ ] Why do the OutLog functions crash with simulations? 
+  - [ ] Why do the OutLog functions crash with simulations?
+  - [ ] Uncertainties on new counts
+  - [ ] 
 * GUI
   - [X] Tree to select histograms
   - [ ] Some feedback numbers
