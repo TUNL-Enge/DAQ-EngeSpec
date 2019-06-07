@@ -374,7 +374,7 @@ class SpectrumCanvas(FigureCanvas):
 
         return xcut,ycut
         
-    def netArea(self):
+    def grossArea(self):
         print("Click around peak")
         if not self.is2D:
             points = self.getSingle("forestgreen")
@@ -389,7 +389,7 @@ class SpectrumCanvas(FigureCanvas):
         else:
             clicks = self.fig.ginput(4)
 
-    def grossArea(self):
+    def netArea(self):
         if self.is2D:
             print("Not available in 2D spectra")
         else:

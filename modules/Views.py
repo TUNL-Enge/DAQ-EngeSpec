@@ -309,17 +309,17 @@ class MyCustomToolbar(NavigationToolbar):
         ## Add a Splitter
         self.a = self.addWidget(QSplitter())
 
-        ## net area
-        self.a = self.addAction(QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
-                                "Net Area", plotCanvas.netArea)
-        self.a.setToolTip("Calculate the net area under a peak")
-        self._actions['netarea'] = self.a
-
         ## gross area
         self.a = self.addAction(QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
                                 "Gross Area", plotCanvas.grossArea)
-        self.a.setToolTip("Calculate the gross, background-subtracted area under a peak")
+        self.a.setToolTip("Calculate the gross area under a peak")
         self._actions['grossarea'] = self.a
+
+        ## net area
+        self.a = self.addAction(QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
+                                "Net Area", plotCanvas.netArea)
+        self.a.setToolTip("Calculate the net, background-subtracted area under a peak")
+        self._actions['netarea'] = self.a
         
         ## Add a Splitter
         self.a = self.addWidget(QSplitter())

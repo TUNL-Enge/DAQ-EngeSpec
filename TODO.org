@@ -11,7 +11,7 @@
   - [ ] Only draw gate when clicked in tree
   - [ ] 1D Gates
   - [ ] Why do the OutLog functions crash with simulations?
-  - [ ] Uncertainties on new counts
+  - [ ] Uncertainties on net counts
   - [ ] 
 * GUI
   - [X] Tree to select histograms

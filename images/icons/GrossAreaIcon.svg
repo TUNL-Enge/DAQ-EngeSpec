@@ -13,11 +13,11 @@
    height="30mm"
    viewBox="0 0 30 30"
    version="1.1"
-   id="svg6276"
+   id="svg5675"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="GrossAreaIcon.svg">
+   sodipodi:docname="NetAreaIcon.svg">
   <defs
-     id="defs6270">
+     id="defs5669">
     <clipPath
        id="clipPath">
       <rect
@@ -48,7 +48,7 @@
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
-     id="metadata6273">
+     id="metadata5672">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -65,31 +65,24 @@
      id="layer1"
      transform="translate(0,-267)">
     <g
-       transform="translate(-21.97498,62.505388)"
-       id="g2614">
+       transform="translate(-21.922615,104.83872)"
+       id="g2608">
       <g
-         transform="translate(0,42.333335)"
-         id="g2505">
+         id="g2495">
         <path
-           transform="matrix(0.76836641,0,0,1,8.5525184,0)"
-           inkscape:connector-curvature="0"
-           style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:0.29166666"
-           d="m 21.922617,191.89925 v -0.54947 c 0.909091,-0.26658 1.818182,-0.69474 2.727273,-1.51219 0.909091,-0.81745 1.818182,-2.04478 2.727272,-3.87628 0.909091,-1.83151 1.818182,-4.29725 2.727273,-7.19011 0.909091,-2.89286 1.818182,-6.20519 2.727273,-9.15167 0.909091,-2.94647 1.818182,-5.46425 2.727273,-6.74476 0.909091,-1.28051 1.818181,-1.27812 2.727272,0 0.909091,1.27812 1.818182,3.79908 2.727273,6.74476 0.909091,2.94568 1.818182,6.25806 2.727273,9.15167 0.909091,2.89361 1.818182,5.35743 2.727273,7.19011 0.90909,1.83268 1.818181,3.05804 2.727272,3.87628 0.909091,0.81824 1.818182,1.24561 2.727273,1.51219 v 0.54947"
-           title="exp(-x*x)"
+           id="path2455"
            clip-path="url(#clipPath)"
-           id="path2501" />
-        <path
+           title="exp(-x*x)"
+           d="m 21.922617,191.89925 v -0.54947 c 0.909091,-0.26658 1.818182,-0.69474 2.727273,-1.51219 0.909091,-0.81745 1.818182,-2.04478 2.727272,-3.87628 0.909091,-1.83151 1.818182,-4.29725 2.727273,-7.19011 0.909091,-2.89286 1.818182,-6.20519 2.727273,-9.15167 0.909091,-2.94647 1.818182,-5.46425 2.727273,-6.74476 0.909091,-1.28051 1.818181,-1.27812 2.727272,0 0.909091,1.27812 1.818182,3.79908 2.727273,6.74476 0.909091,2.94568 1.818182,6.25806 2.727273,9.15167 0.909091,2.89361 1.818182,5.35743 2.727273,7.19011 0.90909,1.83268 1.818181,3.05804 2.727272,3.87628 0.909091,0.81824 1.818182,1.24561 2.727273,1.51219 v 0.54947"
+           style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:0.29166666"
            inkscape:connector-curvature="0"
-           id="path2503"
+           transform="matrix(0.76836641,0,0,1,8.5525184,0)" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
            d="M 21.922617,191.90727 H 51.922613"
-           style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+           id="path2491"
+           inkscape:connector-curvature="0" />
       </g>
-      <path
-         sodipodi:nodetypes="caaaccc"
-         inkscape:connector-curvature="0"
-         id="path2527"
-         d="m 21.922617,234.2406 c 0,0 6.631012,-1.08973 9.882456,-1.91984 2.989314,-0.76319 5.982704,-1.59439 8.819896,-2.80633 2.053115,-0.87701 3.998152,-2.00583 5.879927,-3.20723 1.893571,-1.20893 5.417717,-4.00904 5.417717,-4.00904 v 11.94245 z"
-         style="fill:#999999;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
   </g>
 </svg>
