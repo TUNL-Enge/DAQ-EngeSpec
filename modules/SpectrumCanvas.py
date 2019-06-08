@@ -405,28 +405,57 @@ class SpectrumCanvas(FigureCanvas):
             bgx = bg1points[0] + bg2points[0]
             bgy = bg1points[1] + bg2points[1]
             bgfit = np.polyfit(bgx,bgy,deg=1)
+            bgCounts = np.polyval(bgfit,bgx)
+            res = bgy-bgCounts
+
+            ubgCounts = np.mean(res)
+            
             ## Draw background line
             xplot = list(range(min(bgx),max(bgx)))
             yplot = np.poly1d(bgfit)
             self.a.plot(xplot,yplot(xplot),"firebrick")
             self.fig.canvas.draw()
 
+            ## Find the peak position
+            Chn = peakpoints[0]
+            Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)# - peakpoints[1]
+            centroid = sum(Chn*Counts/sum(Counts))
+            ucentroid = sum(Counts/((Chn-centroid)**2 *sum(Counts)))
+            ucentroid = np.sqrt(ucentroid/(max(Chn)-min(Chn)))
+
+            
             ## Calculate the number of counts
             bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
+            ubgsum = np.sqrt(bgsum + ubgCounts**2)
             totalsum = sum(peakpoints[1])
-            gross = totalsum - bgsum
+            net = totalsum - bgsum
+            unet = np.sqrt(net + ubgsum**2)
 
-            print("From",peakpoints[0][0],"to",peakpoints[0][-1])
-            print("Gross Area =",gross)
+
+
+            print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
+            ## rounding
+            dprecis = self.getprecis(ucentroid)
+            nprecis = self.getprecis(centroid)
+            #print(centroid, ucentroid)
+            #print(dprecis,nprecis)
+            print("Peak at ",self.round_to_n(centroid,1+nprecis), "+/-",
+                  self.round_to_n(ucentroid,dprecis))
+            ## rounding
+            dprecis = self.getprecis(unet)
+            nprecis = self.getprecis(net)
+            #            print(net,unet)
+            print("Net Area =",self.round_to_n(net,1+nprecis),"+/-",
+                  self.round_to_n(unet,dprecis))
 
             
     def getprecis(self,x):
         l = np.log10(x)
-        return(int(l))
+        return(int(np.ceil(l)))
             
     def round_to_n(self, x, n):
-        if n < 1:
-            raise ValueError("number of significant digits must be >= 1")
+        if n < 2:
+            n=2 #raise ValueError("number of significant digits must be >= 1")
         # Use %e format to get the n most significant digits, as a string.
         format = "%." + str(n-1) + "e"
         as_string = format % x
