@@ -52,7 +52,7 @@ class EngeAnalyzer {
   void SimulateData();
 
   /// Processes the midas event, fills histograms, etc.
-  int ProcessMidasEvent(TDataContainer& dataContainer);
+  void ProcessMidasEvent(TDataContainer& dataContainer);
   
   // New 2d matrix method
   void GenerateDataMatrix(int n = 1000);

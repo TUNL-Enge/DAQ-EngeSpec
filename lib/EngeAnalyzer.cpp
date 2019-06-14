@@ -3,6 +3,7 @@
 #include <random>
 
 #include "EngeAnalyzer.h"
+#include "TV792Data.hxx"
 
 char const* EngeAnalyzer::sayhello( ) {
     return "Hello! This is the data maker running in c++!!!";
@@ -63,9 +64,29 @@ void EngeAnalyzer::Initialize(){
   
 }
 
-int EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
+void EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
 
-  return 0;
+  struct timeval start,stop;
+  gettimeofday(&start,NULL);
+
+  // Get the ADC data
+  TV792Data *data = dataContainer.GetEventData<TV792Data>("ADC1");
+  if(!data) return;
+
+  /// Get the Vector of ADC Measurements.
+  std::vector<VADCMeasurement> measurements = data->GetMeasurements();
+  // for(unsigned int i = 0; i < measurements.size(); i++){ // loop over measurements
+  for(unsigned int i = 0; i < 2; i++){ // loop over measurements
+   
+    int chan = i;//measurements[i].GetChannel();
+    uint32_t adc = measurements[i].GetMeasurement();
+    //   std::cout << "chan " << chan << "   meas " << adc << std::endl;
+    if(chan >= 0 && chan < 32)
+      DataMatrix[chan][adc] ++;
+     
+  }
+  
+  return;
 }
 
 void EngeAnalyzer::GenerateDataMatrix(int n)
