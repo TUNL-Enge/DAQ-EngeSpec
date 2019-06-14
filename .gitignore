@@ -12,6 +12,7 @@
 *.pkl
 .DS_Store
 *.out
+*.root
 
 ## Folders we don't need
 modules/backup

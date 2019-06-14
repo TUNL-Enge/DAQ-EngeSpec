@@ -72,6 +72,12 @@ class Ui_MainWindow(QMainWindow):
         else:
             self.simButton.setText("Stop Simulation")
         self.simButton.clicked.connect(self.sim)
+        ## Connect Midas
+        self.connectmidasButton = QPushButton(self.LHMenuFrame)
+        self.connectmidasButton.setGeometry(QtCore.QRect(10, 100, 240, 25))
+        self.connectmidasButton.setObjectName("connectmidasButton")
+        self.connectmidasButton.setText("Connect MIDAS")
+        self.connectmidasButton.clicked.connect(self.connectmidas)
         
         ## Collect some clicks
         self.clicksButton = QPushButton(self.LHMenuFrame)
@@ -198,7 +204,12 @@ class Ui_MainWindow(QMainWindow):
         self.SpecColl.connectsim()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
-        
+
+    def connectmidas(self):
+        self.SpecColl.connectmidas()
+        self.PopulateTree()
+        self.SpecCanvas.setSpecIndex(0,False)
+
     def sim(self):
         ## Start or stop a simulation, which runs in c++
         if not self.SpecColl.isRunning:

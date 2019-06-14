@@ -124,6 +124,11 @@ class SpectrumCollection:
         self.isRunning = False
         print(self.dm.saygoodbye())
 
+    ## Start a simulation of data
+    def connectmidas(self):
+        self.midas_thread = MidasThread(self)
+        #self.midas_thread.start()
+
 ## Run the simulator in a separate thread so it doesn't lock up the GUI
 class SimulatorThread(QThread):
     def __init__(self,specColl):
@@ -199,7 +204,63 @@ class SimulatorThread(QThread):
                     
             time.sleep(1)
         print("Stop simulation")
+
+        ## Run the simulator in a separate thread so it doesn't lock up the GUI
+class MidasThread(QThread):
+    def __init__(self,specColl):
+        super().__init__()
+
+        self.specColl = specColl
         
+        print(self.specColl.dm.sayhello())
+        ## Initialize the DataMaker
+        self.specColl.dm.Initialize()
+        
+        ## First get the list of defined spectra in the datastream
+        self.names = self.specColl.dm.SpectrumNames
+        print(len(self.names)," Spectra have been made:")
+        for name in self.names:
+            print(" - ",name)
+
+        self.is2Ds = self.specColl.dm.getis2D()
+        self.hasGates = self.specColl.dm.gethasGate()
+        
+        ## First delete the old spectra
+        self.specColl.spec1d = []
+        self.specColl.spec2d = []
+
+        ## Make the empty spectra
+        counter1d=0
+        counter2d=0
+        for i in range(len(self.names)):
+            if not self.is2Ds[i]:
+                sObj = SpectrumObject(counter1d)
+                sObj.Name = self.names[i]
+                sObj.hasGate = self.hasGates[i]
+                sObj.spec = np.zeros(4096)
+                ## TODO: FIX THIS! Just so scaling works on an empty spectrum
+                sObj.spec[0] = 1
+                sObj.spec_temp[:] = sObj.spec
+                self.specColl.spec1d.append(sObj)
+                counter1d = counter1d+1
+            else:
+                sObj = SpectrumObject2D(counter2d)
+                sObj.Name = self.names[i]
+                sObj.hasGate = self.hasGates[i]
+                sObj.xedges = np.array([x for x in range(0,4096,16)])
+                sObj.yedges = np.array([y for y in range(0,4096,16)])
+                ## TODO: FIX THIS! Just so scaling works on an empty spectrum
+                sObj.spec2d[0,0] = 1
+                sObj.spec2d[255,255] = 1
+                sObj.spec2d_temp[:] = sObj.spec2d
+                self.specColl.spec2d.append(sObj)
+                counter2d = counter2d+1
+                
+                
+    def run(self):
+        print("Connecting MIDAS")
+        libEngeAnalyzer.MidasAnalyzer.connectMidasAnalyzer()
+
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

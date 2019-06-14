@@ -1,5 +1,5 @@
-#ifndef EngeAnalyzer_H
-#define EngeAnalyzer_H
+//#ifndef EngeAnalyzer_H
+//#define EngeAnalyzer_H
 
 #include <vector>
 #include <random>
@@ -9,6 +9,7 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "boost/multi_array.hpp"
 
+#include "TRootanaEventLoop.hxx"
 #include "THistogramArrayBase.h"
 
 namespace p = boost::python;
@@ -20,12 +21,14 @@ typedef std::vector<mat> mat2d;
 typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 
+
+
 class Gate{
   
  public:
-
+  
   Gate() {};
-
+  
   void addVertex(std::vector<double> v);
   std::vector<std::vector<double>> getPoints(){return Points;}
   bool inBound(double x, double y);
@@ -33,18 +36,20 @@ class Gate{
   int inGate(double x, double y);
   
  private:
-
+  
   std::vector<std::vector<double>> Points;
   double minx, maxx, miny, maxy;
   
 };
 
 
+
+//class EngeAnalyzer: public TRootanaEventLoop {
 class EngeAnalyzer {
  public:
-
+  
   EngeAnalyzer() {}
-
+  
   char const* sayhello( );
   char const* saygoodbye( );
   void Initialize();
@@ -52,7 +57,8 @@ class EngeAnalyzer {
   void SimulateData();
 
   /// Processes the midas event, fills histograms, etc.
-  void ProcessMidasEvent(TDataContainer& dataContainer);
+  int ProcessMidasEvent(TDataContainer& dataContainer);
+  void BeginRun(int transition, int run, int time){};
   
   // New 2d matrix method
   void GenerateDataMatrix(int n = 1000);
@@ -93,7 +99,33 @@ class EngeAnalyzer {
   int igated = 0;
 };
 
+// The midas analyzer class 
+class MidasAnalyzer: public TRootanaEventLoop {
+ public:
 
+  EngeAnalyzer *eAnalyzer;
 
+  MidasAnalyzer() {
+    //    eAnalyzer = ea;
+    DisableAutoMainWindow();
+  };
+  virtual ~MidasAnalyzer() {};
 
-#endif // EngeAnalyzer_H
+  //  void ConnectEngeAnalyzer(EngeAnalyzer *ea){eAnalyzer=ea;}
+  
+  void BeginRun(int transition,int run,int time){}
+  
+  // Get the midas event and print event number
+  bool ProcessMidasEvent(TDataContainer& dataContainer){
+    std::cout << "Event Number " << dataContainer.GetMidasEvent().GetSerialNumber() << std::endl;
+    eAnalyzer->ProcessMidasEvent(dataContainer);
+    return true;
+  }
+
+};
+
+int connectMidasAnalyzer(){
+  MidasAnalyzer::CreateSingleton<MidasAnalyzer>();
+  return MidasAnalyzer::Get().ExecuteLoop(0,0);
+}
+//#endif // EngeAnalyzer_H

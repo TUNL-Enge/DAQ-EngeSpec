@@ -64,14 +64,16 @@ void EngeAnalyzer::Initialize(){
   
 }
 
-void EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
+int EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
 
+  std::cout << "Event Number " << dataContainer.GetMidasEvent().GetSerialNumber() << std::endl;
+  
   struct timeval start,stop;
   gettimeofday(&start,NULL);
 
   // Get the ADC data
   TV792Data *data = dataContainer.GetEventData<TV792Data>("ADC1");
-  if(!data) return;
+  if(!data) return false;
 
   /// Get the Vector of ADC Measurements.
   std::vector<VADCMeasurement> measurements = data->GetMeasurements();
@@ -80,13 +82,13 @@ void EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
    
     int chan = i;//measurements[i].GetChannel();
     uint32_t adc = measurements[i].GetMeasurement();
-    //   std::cout << "chan " << chan << "   meas " << adc << std::endl;
+    std::cout << "chan " << chan << "   meas " << adc << std::endl;
     if(chan >= 0 && chan < 32)
       DataMatrix[chan][adc] ++;
      
   }
   
-  return;
+  return 0;
 }
 
 void EngeAnalyzer::GenerateDataMatrix(int n)
@@ -311,3 +313,4 @@ int Gate::inGate(double testx, double testy){
   }
   return c;
 }
+

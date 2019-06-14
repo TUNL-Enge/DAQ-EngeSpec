@@ -36,4 +36,9 @@ BOOST_PYTHON_MODULE(libEngeAnalyzer)
     .def("putGate", &EngeAnalyzer::putGate)            // void
     .def("data", range(&EngeAnalyzer::begin, &EngeAnalyzer::end)) 
     ;
+
+  class_<MidasAnalyzer>("MidasAnalyzer")
+    .def("connectMidasAnalyzer", &connectMidasAnalyzer) // int
+    ;
+
 }
