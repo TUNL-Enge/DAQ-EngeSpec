@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib as plt
 
 ## Import my own c++ library!
-import libMakeData
+import libEngeAnalyzer
 
 class SpectrumObject:
     def __init__(self, num):
@@ -22,7 +22,7 @@ class SpectrumObject:
         self.yzoom = [0,1]
 
         ## Load the data library
-        self.dm = libMakeData.DataMaker()
+        self.dm = libEngeAnalyzer.EngeAnalyzer()
         
     ## Load ascii file
     def LoadData(self):

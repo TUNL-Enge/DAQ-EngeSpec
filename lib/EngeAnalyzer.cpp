@@ -2,12 +2,12 @@
 #include <vector>
 #include <random>
 
-#include "MakeData.h"
+#include "EngeAnalyzer.h"
 
-char const* DataMaker::sayhello( ) {
+char const* EngeAnalyzer::sayhello( ) {
     return "Hello! This is the data maker running in c++!!!";
 }
-char const* DataMaker::saygoodbye( ) {
+char const* EngeAnalyzer::saygoodbye( ) {
   std::cout << "Peak 1 has " << ipeak1 << " counts" << std::endl;
   std::cout << "Peak 2 has " << ipeak2 << " counts" << std::endl;
   std::cout << "Gated peak has " << igated << " counts" << std::endl;
@@ -15,7 +15,7 @@ char const* DataMaker::saygoodbye( ) {
   return "Goodbye! I hope I served you well";
 }
 
-void DataMaker::Initialize(){
+void EngeAnalyzer::Initialize(){
 
   // Set the names of the data
   DataNames.clear();
@@ -63,8 +63,13 @@ void DataMaker::Initialize(){
   
 }
 
-void DataMaker::GenerateDataMatrix(int n)
-//void DataMaker::GenerateDataMatrix(int n)
+int EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
+
+  return 0;
+}
+
+void EngeAnalyzer::GenerateDataMatrix(int n)
+//void EngeAnalyzer::GenerateDataMatrix(int n)
 {
   int nbins = 4096;
   int nspec = 2;
@@ -125,7 +130,7 @@ void DataMaker::GenerateDataMatrix(int n)
   
 }
 
-np::ndarray DataMaker::getData(){
+np::ndarray EngeAnalyzer::getData(){
   
   // Create the matrix to return to python
   u_int n_rows = DataMatrix.size();
@@ -152,7 +157,7 @@ np::ndarray DataMaker::getData(){
   
 }
 
-np::ndarray DataMaker::getData2D(){
+np::ndarray EngeAnalyzer::getData2D(){
   
   // Create the 3D matrix to return to python
   u_int n_t = DataMatrix2D.size();
@@ -184,7 +189,7 @@ np::ndarray DataMaker::getData2D(){
 }
 
 
-void DataMaker::putGate(char* name, p::list x, p::list y){
+void EngeAnalyzer::putGate(char* name, p::list x, p::list y){
 
   //std::cout << "The name is " << name << std::endl;
   p::ssize_t len = p::len(x);
@@ -207,7 +212,7 @@ void DataMaker::putGate(char* name, p::list x, p::list y){
   
 }
 
-void DataMaker::ClearData(){
+void EngeAnalyzer::ClearData(){
 
   // Clear the 1D data
   std::vector<int> row;

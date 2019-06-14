@@ -1,5 +1,5 @@
-#ifndef MAKEDATA_H
-#define MAKEDATA_H
+#ifndef EngeAnalyzer_H
+#define EngeAnalyzer_H
 
 #include <vector>
 #include <random>
@@ -8,6 +8,8 @@
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "boost/multi_array.hpp"
+
+#include "THistogramArrayBase.h"
 
 namespace p = boost::python;
 namespace np = boost::python::numpy;
@@ -38,10 +40,10 @@ class Gate{
 };
 
 
-class DataMaker {
+class EngeAnalyzer {
  public:
 
-  DataMaker() {}
+  EngeAnalyzer() {}
 
   char const* sayhello( );
   char const* saygoodbye( );
@@ -49,6 +51,9 @@ class DataMaker {
   void ClearData();
   void SimulateData();
 
+  /// Processes the midas event, fills histograms, etc.
+  int ProcessMidasEvent(TDataContainer& dataContainer);
+  
   // New 2d matrix method
   void GenerateDataMatrix(int n = 1000);
   np::ndarray getData();
@@ -91,4 +96,4 @@ class DataMaker {
 
 
 
-#endif // MAKEDATA_H
+#endif // EngeAnalyzer_H

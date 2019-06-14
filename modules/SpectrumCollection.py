@@ -9,7 +9,7 @@ import time
 from SpectrumHandlers import *
 
 ## Import my own c++ library!
-import libMakeData
+import libEngeAnalyzer
 
 class SpectrumCollection:
     def __init__(self, num):
@@ -21,7 +21,7 @@ class SpectrumCollection:
         self.Name = "Test Collection of Spectra"
 
         ## Load the data library
-        self.dm = libMakeData.DataMaker()
+        self.dm = libEngeAnalyzer.EngeAnalyzer()
 
         self.isRunning = False
         

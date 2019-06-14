@@ -1,9 +1,9 @@
-#include "MakeData.h"
+#include "EngeAnalyzer.h"
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-BOOST_PYTHON_MODULE(libMakeData)
+BOOST_PYTHON_MODULE(libEngeAnalyzer)
 {
   using namespace boost::python;
   // Initialize numpy
@@ -22,18 +22,18 @@ BOOST_PYTHON_MODULE(libMakeData)
   class_<BoolVector>("BoolVector")
     .def(vector_indexing_suite<BoolVector>());
     
-  class_<DataMaker>("DataMaker")
-    .def("sayhello", &DataMaker::sayhello)          // string
-    .def("saygoodbye", &DataMaker::saygoodbye)          // string
-    .def("Initialize", &DataMaker::Initialize)          // void
-    .def("GenerateDataMatrix", &DataMaker::GenerateDataMatrix) // void
-    .def("getData", &DataMaker::getData)                // 1D histograms
-    .def("getData2D", &DataMaker::getData2D)            // 2D histograms
-    .def("getis2D", &DataMaker::getis2D)                // bool vector
-    .def("gethasGate", &DataMaker::gethasGate)          // bool vector
-    .def_readonly("SpectrumNames", &DataMaker::DataNames)
-    .def("ClearData", &DataMaker::ClearData)        // void
-    .def("putGate", &DataMaker::putGate)            // void
-    .def("data", range(&DataMaker::begin, &DataMaker::end)) 
+  class_<EngeAnalyzer>("EngeAnalyzer")
+    .def("sayhello", &EngeAnalyzer::sayhello)          // string
+    .def("saygoodbye", &EngeAnalyzer::saygoodbye)          // string
+    .def("Initialize", &EngeAnalyzer::Initialize)          // void
+    .def("GenerateDataMatrix", &EngeAnalyzer::GenerateDataMatrix) // void
+    .def("getData", &EngeAnalyzer::getData)                // 1D histograms
+    .def("getData2D", &EngeAnalyzer::getData2D)            // 2D histograms
+    .def("getis2D", &EngeAnalyzer::getis2D)                // bool vector
+    .def("gethasGate", &EngeAnalyzer::gethasGate)          // bool vector
+    .def_readonly("SpectrumNames", &EngeAnalyzer::DataNames)
+    .def("ClearData", &EngeAnalyzer::ClearData)        // void
+    .def("putGate", &EngeAnalyzer::putGate)            // void
+    .def("data", range(&EngeAnalyzer::begin, &EngeAnalyzer::end)) 
     ;
 }
