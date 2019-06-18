@@ -12,6 +12,9 @@
 #include "TRootanaEventLoop.hxx"
 #include "THistogramArrayBase.h"
 
+#include "manalyzer.h"
+#include "midasio.h"
+
 namespace p = boost::python;
 namespace np = boost::python::numpy;
 
@@ -130,3 +133,36 @@ int connectMidasAnalyzer(){
   return 0;
 }
 //#endif // EngeAnalyzer_H
+
+/*
+  Classes for manalyzer-type analyzer
+*/
+class MidasAnalyzerModule: public TAModuleInterface{
+ public:
+  void Init(const std::vector<std::string> &args);
+  void Finish();
+  TARunInterface* NewRun(TARunInfo* runinfo);
+
+  int fTotalEventCounter;
+};
+class MidasAnalyzerRun: public TARunInterface{
+ public:
+  MidasAnalyzerRun(TARunInfo* runinfo, MidasAnalyzerModule *m)
+    : TARunInterface(runinfo){
+    fModule = m;
+    fRunEventCounter = 0;
+  }
+  ~MidasAnalyzerRun(){}
+
+  void BeginRun(TARunInfo* runinfo){}
+  void EndRun(TARunInfo* runinfo){}
+  void PauseRun(TARunInfo* runinfo){}
+  void ResumeRun(TARunInfo* runinfo){}
+
+  TAFlowEvent* Analyze(TARunInfo* runinfo, TMEvent* event, TAFlags* flags, TAFlowEvent* flow){}
+  void AnalyzeSpecialEvent(TARunInfo* runinfo, TMEvent* event){}
+  
+  int fRunEventCounter;
+  MidasAnalyzerModule* fModule;
+};
+  
