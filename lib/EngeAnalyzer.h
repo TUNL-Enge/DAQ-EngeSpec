@@ -154,13 +154,13 @@ class MidasAnalyzerRun: public TARunInterface{
   }
   ~MidasAnalyzerRun(){}
 
-  void BeginRun(TARunInfo* runinfo){}
-  void EndRun(TARunInfo* runinfo){}
-  void PauseRun(TARunInfo* runinfo){}
-  void ResumeRun(TARunInfo* runinfo){}
+  void BeginRun(TARunInfo* runinfo);
+  void EndRun(TARunInfo* runinfo);
+  void PauseRun(TARunInfo* runinfo);
+  void ResumeRun(TARunInfo* runinfo);
 
-  TAFlowEvent* Analyze(TARunInfo* runinfo, TMEvent* event, TAFlags* flags, TAFlowEvent* flow){}
-  void AnalyzeSpecialEvent(TARunInfo* runinfo, TMEvent* event){}
+  TAFlowEvent* Analyze(TARunInfo* runinfo, TMEvent* event, TAFlags* flags, TAFlowEvent* flow);
+  void AnalyzeSpecialEvent(TARunInfo* runinfo, TMEvent* event);
   
   int fRunEventCounter;
   MidasAnalyzerModule* fModule;

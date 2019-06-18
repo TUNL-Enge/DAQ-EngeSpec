@@ -314,3 +314,42 @@ int Gate::inGate(double testx, double testy){
   return c;
 }
 
+/* 
+   manalyzer module
+*/
+void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
+
+  printf("Initializing Midas Analyzer Module\n");
+  fTotalEventCounter = 0;
+}
+void MidasAnalyzerModule::Finish(){
+  printf("Finish!");
+  printf("Counted %d events\n",fTotalEventCounter);
+}
+TARunInterface* MidasAnalyzerModule::NewRun(TARunInfo* runinfo){
+  printf("NewRun, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
+  return new MidasAnalyzerRun(runinfo, this);
+}
+
+/* 
+   manalyzer run
+*/
+void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
+  printf("Begin run %d\n",runinfo->fRunNo);
+  fRunEventCounter = 0;
+}
+void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
+  printf("End run %d\n",runinfo->fRunNo);
+  printf("Counted %d events\n",fRunEventCounter);
+}
+TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
+				    TAFlags* flags, TAFlowEvent* flow){
+  printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo,
+	 event->serial_number, (int)event->event_id, event->data_size);
+
+  fRunEventCounter++;
+  fModule->fTotalEventCounter++;
+
+  return flow;
+
+}
