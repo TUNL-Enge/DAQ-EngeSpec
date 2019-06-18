@@ -353,3 +353,4 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   return flow;
 
 }
+

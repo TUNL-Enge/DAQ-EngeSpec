@@ -127,11 +127,13 @@ class MidasAnalyzer: public TRootanaEventLoop {
 
 };
 
+/*
 int connectMidasAnalyzer(){
   MidasAnalyzer::CreateSingleton<MidasAnalyzer>();
   MidasAnalyzer::Get().ExecuteLoop(0,0);
   return 0;
 }
+*/
 //#endif // EngeAnalyzer_H
 
 /*
@@ -145,6 +147,7 @@ class MidasAnalyzerModule: public TAModuleInterface{
 
   int fTotalEventCounter;
 };
+
 class MidasAnalyzerRun: public TARunInterface{
  public:
   MidasAnalyzerRun(TARunInfo* runinfo, MidasAnalyzerModule *m)
@@ -156,13 +159,22 @@ class MidasAnalyzerRun: public TARunInterface{
 
   void BeginRun(TARunInfo* runinfo);
   void EndRun(TARunInfo* runinfo);
-  void PauseRun(TARunInfo* runinfo);
-  void ResumeRun(TARunInfo* runinfo);
+  void PauseRun(TARunInfo* runinfo){}
+  void ResumeRun(TARunInfo* runinfo){}
 
   TAFlowEvent* Analyze(TARunInfo* runinfo, TMEvent* event, TAFlags* flags, TAFlowEvent* flow);
-  void AnalyzeSpecialEvent(TARunInfo* runinfo, TMEvent* event);
+  void AnalyzeSpecialEvent(TARunInfo* runinfo, TMEvent* event){}
   
   int fRunEventCounter;
   MidasAnalyzerModule* fModule;
 };
   
+
+
+int connectMidasAnalyzer(){
+  TARegisterModule tarm(new MidasAnalyzerModule);
+
+  return manalyzer_main(0, 0);
+  //  return 0;
+}
+
