@@ -126,6 +126,7 @@ class MidasAnalyzer: public TRootanaEventLoop {
 
 int connectMidasAnalyzer(){
   MidasAnalyzer::CreateSingleton<MidasAnalyzer>();
-  return MidasAnalyzer::Get().ExecuteLoop(0,0);
+  MidasAnalyzer::Get().ExecuteLoop(0,0);
+  return 0;
 }
 //#endif // EngeAnalyzer_H
