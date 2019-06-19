@@ -260,7 +260,7 @@ class MidasThread(QThread):
     def run(self):
         print("Connecting MIDAS")
         libEngeAnalyzer.MidasAnalyzer.connectMidasAnalyzer()
-
+        
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
