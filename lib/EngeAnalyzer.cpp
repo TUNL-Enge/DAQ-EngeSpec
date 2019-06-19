@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <chrono>
 
 #include "EngeAnalyzer.h"
 #include "TV792Data.hxx"
@@ -150,6 +151,9 @@ void EngeAnalyzer::GenerateDataMatrix(int n)
     std::cout << std::endl;
   }
   */
+  Py_BEGIN_ALLOW_THREADS
+  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+  Py_END_ALLOW_THREADS
   
 }
 

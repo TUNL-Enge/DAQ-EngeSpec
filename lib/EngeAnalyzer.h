@@ -177,11 +177,17 @@ void mthread(){
 int connectMidasAnalyzer(){
   TARegisterModule tarm(new MidasAnalyzerModule);
 
-  std::thread manalyzerthread (mthread);
-  std::cout << "Waiting for thread to finish" << std::endl;
-  manalyzerthread.join();
-  std::cout << "Thread finished!" << std::endl;
-  
-  return 0;
+  Py_BEGIN_ALLOW_THREADS
+    manalyzer_main(0,0);
+  Py_END_ALLOW_THREADS
+    
+    /*
+      std::thread manalyzerthread (mthread);
+      std::cout << "Waiting for thread to finish" << std::endl;
+      manalyzerthread.join();
+      std::cout << "Thread finished!" << std::endl;
+    */  
+
+    return 0;
 }
 
