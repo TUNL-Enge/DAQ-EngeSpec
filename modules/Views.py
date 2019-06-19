@@ -78,13 +78,19 @@ class Ui_MainWindow(QMainWindow):
         self.connectmidasButton.setObjectName("connectmidasButton")
         self.connectmidasButton.setText("Connect MIDAS")
         self.connectmidasButton.clicked.connect(self.connectmidas)
+        ## run Midas
+        self.runmidasButton = QPushButton(self.LHMenuFrame)
+        self.runmidasButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
+        self.runmidasButton.setObjectName("runmidasButton")
+        self.runmidasButton.setText("Run MIDAS")
+        self.runmidasButton.clicked.connect(self.runmidas)
         
         ## Collect some clicks
-        self.clicksButton = QPushButton(self.LHMenuFrame)
-        self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
-        self.clicksButton.setObjectName("clicksButton")
-        self.clicksButton.setText("Test some clicks")
-        self.clicksButton.clicked.connect(SpecCanvas.getClicks)
+        ##        self.clicksButton = QPushButton(self.LHMenuFrame)
+        ##        self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
+        ##        self.clicksButton.setObjectName("clicksButton")
+        ##        self.clicksButton.setText("Test some clicks")
+        ##        self.clicksButton.clicked.connect(SpecCanvas.getClicks)
         ## Make a 2D Gate
         self.gateButton = QPushButton(self.LHMenuFrame)
         self.gateButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
@@ -209,6 +215,8 @@ class Ui_MainWindow(QMainWindow):
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
+    def runmidas(self):
+        self.SpecColl.midasrun()
 
     def sim(self):
         ## Start or stop a simulation, which runs in c++

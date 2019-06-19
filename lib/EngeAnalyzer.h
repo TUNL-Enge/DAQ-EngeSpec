@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <string>
+#include <thread>
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -170,11 +171,17 @@ class MidasAnalyzerRun: public TARunInterface{
 };
   
 
-
+void mthread(){
+  manalyzer_main(0,0);
+}
 int connectMidasAnalyzer(){
   TARegisterModule tarm(new MidasAnalyzerModule);
 
-  return manalyzer_main(0, 0);
-  //  return 0;
+  std::thread manalyzerthread (mthread);
+  std::cout << "Waiting for thread to finish" << std::endl;
+  manalyzerthread.join();
+  std::cout << "Thread finished!" << std::endl;
+  
+  return 0;
 }
 
