@@ -65,36 +65,13 @@ void EngeAnalyzer::Initialize(){
   
 }
 
-int EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
-
-  std::cout << "Event Number " << dataContainer.GetMidasEvent().GetSerialNumber() << std::endl;
-  
-  struct timeval start,stop;
-  gettimeofday(&start,NULL);
-
-  // Get the ADC data
-  TV792Data *data = dataContainer.GetEventData<TV792Data>("ADC1");
-  if(!data) return false;
-
-  /// Get the Vector of ADC Measurements.
-  std::vector<VADCMeasurement> measurements = data->GetMeasurements();
-  // for(unsigned int i = 0; i < measurements.size(); i++){ // loop over measurements
-  for(unsigned int i = 0; i < 2; i++){ // loop over measurements
-   
-    int chan = i;//measurements[i].GetChannel();
-    uint32_t adc = measurements[i].GetMeasurement();
-    std::cout << "chan " << chan << "   meas " << adc << std::endl;
-    if(chan >= 0 && chan < 32)
-      DataMatrix[chan][adc] ++;
-     
-  }
-  
-  return 0;
-}
-
 int EngeAnalyzer::connectMidasAnalyzer(){
-  TARegisterModule tarm(new MidasAnalyzerModule);
 
+  MidasAnalyzerModule mAMod;
+  TARegisterModule tarm(&mAMod);
+
+  mAMod.ConnectEngeAnalyzer(this);
+  
   Py_BEGIN_ALLOW_THREADS
     manalyzer_main(0,0);
   Py_END_ALLOW_THREADS
@@ -166,6 +143,29 @@ void EngeAnalyzer::GenerateDataMatrix(int n)
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     Py_END_ALLOW_THREADS
   */
+  
+}
+
+void EngeAnalyzer::putADC(uint32_t *dADC){
+
+  //std::cout << "inserting data: " << dADC[0] << " " << dADC[1] << std::endl;
+  
+  DataMatrix[0][int(dADC[0])]++;
+  DataMatrix[1][int(dADC[1])]++;
+  DataMatrix2D[0][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
+
+  // The gated spectrum
+  Gate G1;
+  if(GateCollection.size()>0){
+    G1 = GateCollection[0];
+  }
+  
+  // Is the gate defined?
+  if(G1.inGate(dADC[0],dADC[1])){
+    igated++;
+    DataMatrix2D[1][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
+    DataMatrix[2][int(dADC[0])]++;
+  }
   
 }
 
@@ -341,6 +341,7 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
 void MidasAnalyzerModule::Finish(){
   printf("Finish!");
   printf("Counted %d events\n",fTotalEventCounter);
+  std::cout << "number of spectra: " << eA.DataNames.size() << std::endl;
 }
 TARunInterface* MidasAnalyzerModule::NewRun(TARunInfo* runinfo){
   printf("NewRun, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
@@ -373,10 +374,11 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   TMBank* bADC = event->FindBank("ADC1");
 
   uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
-  std::cout << dADC[0] << "  " << dADC[1] << "  " << dADC[2] << "  " << dADC[3] << std::endl;
+  //std::cout << dADC[0] << "  " << dADC[1] << "  " << dADC[2] << "  " << dADC[3] << std::endl;
   
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
+  fModule->eA.putADC(dADC);
 
   return flow;
 

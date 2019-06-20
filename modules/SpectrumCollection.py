@@ -128,6 +128,8 @@ class SpectrumCollection:
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
         self.midas_thread.start()
+        self.midas_collection_thread = MidasCollectionThread(self)
+        self.midas_collection_thread.start()
     ##def midasrun(self):
     ##    self.midas_thread.start()
 
@@ -207,7 +209,7 @@ class SimulatorThread(QThread):
             time.sleep(1)
         print("Stop simulation")
 
-        ## Run the simulator in a separate thread so it doesn't lock up the GUI
+## Run MIDAS in a separate thread so it doesn't lock up the GUI
 class MidasThread(QThread):
     def __init__(self,specColl):
         super().__init__()
@@ -263,6 +265,44 @@ class MidasThread(QThread):
         print("Connecting MIDAS")
         self.specColl.dm.connectMidasAnalyzer()
         
+
+class MidasCollectionThread(QThread):
+    def __init__(self,specColl):
+        super().__init__()
+
+        self.specColl = specColl
+        ## First get the list of defined spectra in the datastream
+        self.names = self.specColl.dm.SpectrumNames
+        print(len(self.names)," Spectra have been made:")
+        for name in self.names:
+            print(" - ",name)
+
+        self.is2Ds = self.specColl.dm.getis2D()
+        self.hasGates = self.specColl.dm.gethasGate()
+
+    def run(self):
+        print("Collecting MIDAS data")
+        while self.specColl.isRunning:
+            dat = np.transpose(self.specColl.dm.getData())
+            print(dat[:,0])
+            dat2d = self.specColl.dm.getData2D()
+        
+            ## Go through the names and fill them for the appropriate data
+            counter1d=0
+            counter2d=0
+            for i in range(0,len(self.names)):
+                if not self.is2Ds[i]:
+                    sObj = self.specColl.spec1d[counter1d]
+                    sObj.spec_temp[:] = dat[:,counter1d]
+                    counter1d = counter1d+1
+                else:
+                    sObj = self.specColl.spec2d[counter2d]
+                    sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
+                    counter2d = counter2d+1
+                
+            time.sleep(1)
+        
+            
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

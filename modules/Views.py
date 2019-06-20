@@ -212,11 +212,16 @@ class Ui_MainWindow(QMainWindow):
         self.SpecCanvas.setSpecIndex(0,False)
 
     def connectmidas(self):
+        if not self.SpecColl.isRunning:
+            self.SpecColl.isRunning = True
+            print("Running!")
+        else:
+            self.SpecColl.isRunning = False
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
-    def runmidas(self):
-        self.SpecColl.midasrun()
+    ##def runmidas(self):
+    ##        self.SpecColl.midasrun()
 
     def sim(self):
         ## Start or stop a simulation, which runs in c++

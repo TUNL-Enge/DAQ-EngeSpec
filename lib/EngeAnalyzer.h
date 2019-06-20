@@ -60,10 +60,6 @@ class EngeAnalyzer {
   void ClearData();
   void SimulateData();
 
-  /// Processes the midas event, fills histograms, etc.
-  int ProcessMidasEvent(TDataContainer& dataContainer);
-  void BeginRun(int transition, int run, int time){};
-
   // Connect the midas analyzer
   int connectMidasAnalyzer();
   
@@ -72,6 +68,8 @@ class EngeAnalyzer {
   np::ndarray getData();
   np::ndarray getData2D();
 
+  void putADC(uint32_t *dADC);
+  
   BoolVector getis2D(){return is2D;}
   BoolVector gethasGate(){return hasGate;}
 
@@ -115,10 +113,12 @@ class EngeAnalyzer {
 class MidasAnalyzerModule: public TAModuleInterface{
  public:
   void Init(const std::vector<std::string> &args);
+  void ConnectEngeAnalyzer(EngeAnalyzer *ea){eA=*ea;}
   void Finish();
   TARunInterface* NewRun(TARunInfo* runinfo);
     
   int fTotalEventCounter;
+  EngeAnalyzer eA;
 };
   
 class MidasAnalyzerRun: public TARunInterface{
