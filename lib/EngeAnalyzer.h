@@ -63,6 +63,9 @@ class EngeAnalyzer {
   /// Processes the midas event, fills histograms, etc.
   int ProcessMidasEvent(TDataContainer& dataContainer);
   void BeginRun(int transition, int run, int time){};
+
+  // Connect the midas analyzer
+  int connectMidasAnalyzer();
   
   // New 2d matrix method
   void GenerateDataMatrix(int n = 1000);
@@ -103,40 +106,6 @@ class EngeAnalyzer {
   int igated = 0;
 };
 
-// The midas analyzer class 
-class MidasAnalyzer: public TRootanaEventLoop {
- public:
-
-  EngeAnalyzer *eAnalyzer;
-
-  MidasAnalyzer() {
-    //    eAnalyzer = ea;
-    DisableAutoMainWindow();
-  };
-  virtual ~MidasAnalyzer() {};
-
-  //  void ConnectEngeAnalyzer(EngeAnalyzer *ea){eAnalyzer=ea;}
-  
-  void BeginRun(int transition,int run,int time){}
-  
-  // Get the midas event and print event number
-  bool ProcessMidasEvent(TDataContainer& dataContainer){
-    std::cout << "Event Number " << dataContainer.GetMidasEvent().GetSerialNumber() << std::endl;
-    eAnalyzer->ProcessMidasEvent(dataContainer);
-    return true;
-  }
-
-};
-
-/*
-int connectMidasAnalyzer(){
-  MidasAnalyzer::CreateSingleton<MidasAnalyzer>();
-  MidasAnalyzer::Get().ExecuteLoop(0,0);
-  return 0;
-}
-*/
-//#endif // EngeAnalyzer_H
-
 /*
   Classes for manalyzer-type analyzer
 */
@@ -171,23 +140,4 @@ class MidasAnalyzerRun: public TARunInterface{
 };
   
 
-void mthread(){
-  manalyzer_main(0,0);
-}
-int connectMidasAnalyzer(){
-  TARegisterModule tarm(new MidasAnalyzerModule);
-
-  Py_BEGIN_ALLOW_THREADS
-    manalyzer_main(0,0);
-  Py_END_ALLOW_THREADS
-    
-    /*
-      std::thread manalyzerthread (mthread);
-      std::cout << "Waiting for thread to finish" << std::endl;
-      manalyzerthread.join();
-      std::cout << "Thread finished!" << std::endl;
-    */  
-
-    return 0;
-}
 

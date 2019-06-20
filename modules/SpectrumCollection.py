@@ -127,9 +127,9 @@ class SpectrumCollection:
     ## Start a simulation of data
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
-        ##        self.midas_thread.start()
-    def midasrun(self):
         self.midas_thread.start()
+    ##def midasrun(self):
+    ##    self.midas_thread.start()
 
 ## Run the simulator in a separate thread so it doesn't lock up the GUI
 class SimulatorThread(QThread):
@@ -261,7 +261,7 @@ class MidasThread(QThread):
                 
     def run(self):
         print("Connecting MIDAS")
-        libEngeAnalyzer.MidasAnalyzer.connectMidasAnalyzer()
+        self.specColl.dm.connectMidasAnalyzer()
         
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':

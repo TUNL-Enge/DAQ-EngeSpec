@@ -92,6 +92,15 @@ int EngeAnalyzer::ProcessMidasEvent(TDataContainer& dataContainer){
   return 0;
 }
 
+int EngeAnalyzer::connectMidasAnalyzer(){
+  TARegisterModule tarm(new MidasAnalyzerModule);
+
+  Py_BEGIN_ALLOW_THREADS
+    manalyzer_main(0,0);
+  Py_END_ALLOW_THREADS
+    
+  return 0;
+}
 void EngeAnalyzer::GenerateDataMatrix(int n)
 //void EngeAnalyzer::GenerateDataMatrix(int n)
 {
@@ -151,9 +160,12 @@ void EngeAnalyzer::GenerateDataMatrix(int n)
     std::cout << std::endl;
   }
   */
-  Py_BEGIN_ALLOW_THREADS
-  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-  Py_END_ALLOW_THREADS
+
+  /*
+    Py_BEGIN_ALLOW_THREADS
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    Py_END_ALLOW_THREADS
+  */
   
 }
 
@@ -348,8 +360,8 @@ void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
 }
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 				    TAFlags* flags, TAFlowEvent* flow){
-  printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo,
-	 event->serial_number, (int)event->event_id, event->data_size);
+  //printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo,
+  //  event->serial_number, (int)event->event_id, event->data_size);
 
   fRunEventCounter++;
   fModule->fTotalEventCounter++;

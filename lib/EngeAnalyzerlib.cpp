@@ -26,6 +26,7 @@ BOOST_PYTHON_MODULE(libEngeAnalyzer)
     .def("sayhello", &EngeAnalyzer::sayhello)          // string
     .def("saygoodbye", &EngeAnalyzer::saygoodbye)          // string
     .def("Initialize", &EngeAnalyzer::Initialize)          // void
+    .def("connectMidasAnalyzer", &EngeAnalyzer::connectMidasAnalyzer) // int
     .def("GenerateDataMatrix", &EngeAnalyzer::GenerateDataMatrix) // void
     .def("getData", &EngeAnalyzer::getData)                // 1D histograms
     .def("getData2D", &EngeAnalyzer::getData2D)            // 2D histograms
@@ -35,10 +36,6 @@ BOOST_PYTHON_MODULE(libEngeAnalyzer)
     .def("ClearData", &EngeAnalyzer::ClearData)        // void
     .def("putGate", &EngeAnalyzer::putGate)            // void
     .def("data", range(&EngeAnalyzer::begin, &EngeAnalyzer::end)) 
-    ;
-
-  class_<MidasAnalyzer>("MidasAnalyzer")
-    .def("connectMidasAnalyzer", &connectMidasAnalyzer) // int
     ;
 
 }
