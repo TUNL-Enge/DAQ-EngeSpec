@@ -352,6 +352,9 @@ TARunInterface* MidasAnalyzerModule::NewRun(TARunInfo* runinfo){
 */
 void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Begin run %d\n",runinfo->fRunNo);
+  time_t run_start_time = runinfo->fOdb->odbReadUint32("/Runinfo/Start time binary", 0, 0);
+  printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
+
   fRunEventCounter = 0;
 }
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
@@ -361,8 +364,17 @@ void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 				    TAFlags* flags, TAFlowEvent* flow){
   //printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo,
-  //  event->serial_number, (int)event->event_id, event->data_size);
+  //	 event->serial_number, (int)event->event_id, event->data_size);
 
+  if(event->event_id != 1)
+    return flow;
+
+  // Get the ADC Bank
+  TMBank* bADC = event->FindBank("ADC1");
+
+  uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
+  std::cout << dADC[0] << "  " << dADC[1] << "  " << dADC[2] << "  " << dADC[3] << std::endl;
+  
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
 

@@ -79,11 +79,11 @@ class Ui_MainWindow(QMainWindow):
         self.connectmidasButton.setText("Connect MIDAS")
         self.connectmidasButton.clicked.connect(self.connectmidas)
         ## run Midas
-        self.runmidasButton = QPushButton(self.LHMenuFrame)
-        self.runmidasButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
-        self.runmidasButton.setObjectName("runmidasButton")
-        self.runmidasButton.setText("Run MIDAS")
-        self.runmidasButton.clicked.connect(self.runmidas)
+        ##self.runmidasButton = QPushButton(self.LHMenuFrame)
+        ##self.runmidasButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
+        ##self.runmidasButton.setObjectName("runmidasButton")
+        ##self.runmidasButton.setText("Run MIDAS")
+        ##self.runmidasButton.clicked.connect(self.runmidas)
         
         ## Collect some clicks
         ##        self.clicksButton = QPushButton(self.LHMenuFrame)
