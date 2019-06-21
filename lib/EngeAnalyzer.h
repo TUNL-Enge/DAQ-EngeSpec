@@ -113,12 +113,12 @@ class EngeAnalyzer {
 class MidasAnalyzerModule: public TAModuleInterface{
  public:
   void Init(const std::vector<std::string> &args);
-  void ConnectEngeAnalyzer(EngeAnalyzer *ea){eA=*ea;}
+  void ConnectEngeAnalyzer(EngeAnalyzer *ea){eA=ea;}
   void Finish();
   TARunInterface* NewRun(TARunInfo* runinfo);
     
   int fTotalEventCounter;
-  EngeAnalyzer eA;
+  EngeAnalyzer *eA;
 };
   
 class MidasAnalyzerRun: public TARunInterface{

@@ -148,8 +148,6 @@ void EngeAnalyzer::GenerateDataMatrix(int n)
 
 void EngeAnalyzer::putADC(uint32_t *dADC){
 
-  //std::cout << "inserting data: " << dADC[0] << " " << dADC[1] << std::endl;
-  
   DataMatrix[0][int(dADC[0])]++;
   DataMatrix[1][int(dADC[1])]++;
   DataMatrix2D[0][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
@@ -179,17 +177,23 @@ np::ndarray EngeAnalyzer::getData(){
   np::dtype dtype = np::dtype::get_builtin<int>();
   p::object own;
   np::ndarray converted = np::zeros(shape, dtype);
+
+  /*
+    std::cout << "DataMatrix Size = " << n_rows << "x" << n_cols << std::endl;
+    std::cout << "DataMatrix[0][0] = " << DataMatrix[0][0] << std::endl;
+  */
   
   for (u_int i = 0; i < n_rows; i++)
     {
       shape = p::make_tuple(n_cols);
       converted[i] = np::from_data(DataMatrix[i].data(), dtype, shape, stride, own);
-      /*      int sum=0;
+      int sum=0;
+      /*
       for(int j=0; j<4096; j++){
 	sum += DataMatrix[i][j];
       }
       std::cout << "Sum = " << sum << std::endl;
-      */
+      */      
     }
 
   return converted;
@@ -341,7 +345,7 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
 void MidasAnalyzerModule::Finish(){
   printf("Finish!");
   printf("Counted %d events\n",fTotalEventCounter);
-  std::cout << "number of spectra: " << eA.DataNames.size() << std::endl;
+  std::cout << "number of spectra: " << eA->DataNames.size() << std::endl;
 }
 TARunInterface* MidasAnalyzerModule::NewRun(TARunInfo* runinfo){
   printf("NewRun, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
@@ -378,7 +382,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
-  fModule->eA.putADC(dADC);
+  fModule->eA->putADC(dADC);
 
   return flow;
 

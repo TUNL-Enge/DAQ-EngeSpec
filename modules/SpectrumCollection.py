@@ -264,7 +264,6 @@ class MidasThread(QThread):
     def run(self):
         print("Connecting MIDAS")
         self.specColl.dm.connectMidasAnalyzer()
-        
 
 class MidasCollectionThread(QThread):
     def __init__(self,specColl):
@@ -273,18 +272,18 @@ class MidasCollectionThread(QThread):
         self.specColl = specColl
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.SpectrumNames
-        print(len(self.names)," Spectra have been made:")
-        for name in self.names:
-            print(" - ",name)
+        ##print(len(self.names)," Spectra have been made:")
+        ##for name in self.names:
+        ##    print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2D()
         self.hasGates = self.specColl.dm.gethasGate()
 
     def run(self):
-        print("Collecting MIDAS data")
+        ##print("Collecting MIDAS data")
         while self.specColl.isRunning:
             dat = np.transpose(self.specColl.dm.getData())
-            print(dat[:,0])
+            ##print(dat[:,0])
             dat2d = self.specColl.dm.getData2D()
         
             ## Go through the names and fill them for the appropriate data
