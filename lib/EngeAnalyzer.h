@@ -10,8 +10,8 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "boost/multi_array.hpp"
 
-#include "TRootanaEventLoop.hxx"
-#include "THistogramArrayBase.h"
+//#include "TRootanaEventLoop.hxx"
+//#include "THistogramArrayBase.h"
 
 #include "manalyzer.h"
 #include "midasio.h"
