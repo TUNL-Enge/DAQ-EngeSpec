@@ -37,7 +37,7 @@ class Ui_MainWindow(QMainWindow):
         self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-
+        
         self.frame = QFrame(self.horizontalLayoutWidget)
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
