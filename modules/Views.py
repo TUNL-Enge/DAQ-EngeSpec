@@ -217,7 +217,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         os.system("odbedit -c stop")
         
     def setgate(self):
-        SpecCanvas.getGate()
+        self.SpecCanvas.getGate()
 
     def PopulateTree(self):
         ## Now get the list of spectra and add them to the selection
