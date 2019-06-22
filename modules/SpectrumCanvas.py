@@ -57,7 +57,7 @@ class SpectrumCanvas(FigureCanvas):
             print("Filling default data")
             self.PlotData()
         
-    def setSpecIndex(self,i,is2D):
+    def setSpecIndex(self,i,is2D,drawGate=False):
         if is2D:
             ##self.sindex1d = 0
             self.sindex2d = i
@@ -67,13 +67,13 @@ class SpectrumCanvas(FigureCanvas):
             ##self.sindex2d = 0
             self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.is2D = is2D
-        self.PlotGeneral(is2D)
+        self.PlotGeneral(is2D,drawGate)
 
-    def PlotGeneral(self,is2D):
+    def PlotGeneral(self,is2D,drawGate=False):
         if not is2D:
-            self.PlotData()
+            self.PlotData(drawGate)
         else:
-            self.PlotData2D()
+            self.PlotData2D(drawGate)
             
     def LoadData(self):
         self.Spec.LoadData()
@@ -86,7 +86,7 @@ class SpectrumCanvas(FigureCanvas):
         self.PlotData()
         ##self.PlotData2D()
         
-    def PlotData(self):
+    def PlotData(self,drawGate=False):
         x = np.array([x for x in range(0,4096)],dtype=int)
         y = self.Spec.spec
 
@@ -103,7 +103,7 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
 
-    def PlotData2D(self):
+    def PlotData2D(self,drawGate=False):
         xmin = self.Spec2D.xzoom[0]
         xmax = self.Spec2D.xzoom[1]
         ymin = self.Spec2D.yzoom[0]
@@ -118,7 +118,7 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
 
-        if self.Spec2D.hasGate and self.Spec2D.gate is not None:
+        if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
             self.drawGate()
         
         self.fig.canvas.draw()

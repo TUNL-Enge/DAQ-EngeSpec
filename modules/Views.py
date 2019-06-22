@@ -257,12 +257,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             item.spec = spec
             if hasGate:
                 subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
-                subitem.spec = spec
+                subitem.spec = spec.gate
             self.treeWidget.addTopLevelItem(item)
 
     def itemclicked(self,it,col):
-        self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
-
+        if it.parent() is None:
+            self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D,False)
+        else:
+            self.SpecCanvas.setSpecIndex(it.parent().spec.num,it.parent().spec.is2D,True)
         
 
 class MyCustomToolbar(NavigationToolbar): 
