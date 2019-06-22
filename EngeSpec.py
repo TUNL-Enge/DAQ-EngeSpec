@@ -7,7 +7,7 @@ import random
 ## All code is in the modules folder
 sys.path.append('./modules')
 
-from NewViews import Ui_MainWindow
+from Views import Ui_MainWindow
 from SpectrumCanvas import *
 from SpectrumCollection import *
 #from SpectrumHandlers import *

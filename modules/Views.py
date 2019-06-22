@@ -1,178 +1,224 @@
 import sys, os
 import matplotlib
-##matplotlib.use("Qt5Agg")
-from PySide2 import QtCore
-from PySide2 import QtGui
-from PySide2.QtWidgets import QMainWindow, QFrame, QMenu, QVBoxLayout, QHBoxLayout, \
-    QSizePolicy, QMessageBox, QWidget, QToolBar, QFileDialog, QPushButton, QLabel, QTabWidget,\
-    QMenuBar, QStatusBar, QTextEdit, QSplitter, QTreeWidget, QTreeWidgetItem, QSpinBox
+from PySide2 import QtCore, QtWidgets, QtGui
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 
-class Ui_MainWindow(QMainWindow):
+
+class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, SpecCanvas):
 
-        ## super().__init__ allows us to have all properties of
-        ## QMainWindw available
-        super().__init__()
+        super(Ui_MainWindow,self).__init__()
 
-        ##self.Spec = Spec
-        self.SpecCanvas = SpecCanvas 
-
+        self.SpecCanvas = SpecCanvas
         ## Grab the spectrum collection
         self.SpecColl = self.SpecCanvas.SpecColl
         
-        ## The main window
-        self.setObjectName("MainWindow")
-        self.resize(1200, 780)
-        self.setWindowTitle("EngeSpec")
+        ##  -----------------------------------------------------------------
+        ##  Menu ..  ..                                                Help
+        ##  -----------------------------------------------------------------
+        ##  Control buttons (run, stop, etc.)
+        ##  -----------------------------------------------------------------
+        ##            |
+        ##   Spectrum |  Spectrum tabs
+        ##   Tree     |
+        ##            |
+        ##            |------------------------------------------------------
+        ##   Logo     |   Editor
+        ##            |
+        ##  -----------------------------------------------------------------
 
-        self.centralwidget = QWidget()
-        self.centralwidget.setObjectName("centralwidget")
+        ## The menu bar
+        self.createMenus()
 
+        ## The main widget that holds everything else
+        self.main_widget = QtWidgets.QWidget(self)
 
-        self.horizontalLayoutWidget = QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 1190, 730))
-        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
-        self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        ## Start with two vertical groups
+        ## - toolbar holds all of the run start, stop, gates, etc.
+        ## - mainFrame holds the tree, spectrum, etc
+        self.makeToolbar()
+        ## The main frame that holds everything
+        mainFrame = QtWidgets.QFrame()
+        ##mainFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        ##mainFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         
-        self.frame = QFrame(self.horizontalLayoutWidget)
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
-        self.frame.setObjectName("frame")
+        ## Layout of vertical groups
+        ## Note: only one group now
+        gridmain = QtWidgets.QGridLayout(self.main_widget)
+        gridmain.setSpacing(10)
+        gridmain.addWidget(mainFrame, 1, 0)
         
-        ## ----------------------------------------------------------------------
-        ## The Left-hand menu frame
-        self.LHMenuFrame = QFrame(self.frame)
-        self.LHMenuFrame.setGeometry(QtCore.QRect(10, 10, 260, 720))
-        self.LHMenuFrame.setFrameShape(QFrame.StyledPanel)
-        self.LHMenuFrame.setFrameShadow(QFrame.Raised)
-        self.LHMenuFrame.setObjectName("LHMenuFrame")
+        ## Make a second grid for the mainFrame
+        ## - treeFrame is Left-hand frame for the tree
+        ## - dataFrame holds the spectrum tabs and command window
+        treeFrame = QtWidgets.QFrame()
+        treeFrame.setMinimumSize(260,720)
+        treeFrame.setMaximumWidth(260)
+        ##        treeFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        dataFrame = QtWidgets.QFrame()
+        dataFrame.setMinimumSize(900,600)
 
-        ## A couple of buttons
-        ## Load a file
-        self.loadButton = QPushButton(self.LHMenuFrame)
-        self.loadButton.setGeometry(QtCore.QRect(10, 10, 240, 25))
-        self.loadButton.setObjectName("loadButton")
-        self.loadButton.setText("Load Spectrum File (ascii)")
-        self.loadButton.clicked.connect(SpecCanvas.LoadData)
-        ## Connect the simulation
-        self.connectsimButton = QPushButton(self.LHMenuFrame)
-        self.connectsimButton.setGeometry(QtCore.QRect(10, 40, 240, 25))
-        self.connectsimButton.setObjectName("connectsimButton")
-        self.connectsimButton.setText("Connect simulation")
-        self.connectsimButton.clicked.connect(self.connectsim)
-        ## Start/stop simulation
-        self.simButton = QPushButton(self.LHMenuFrame)
-        self.simButton.setGeometry(QtCore.QRect(10, 70, 240, 25))
-        if not self.SpecColl.isRunning:
-            self.simButton.setText("Start Simulation")
-        else:
-            self.simButton.setText("Stop Simulation")
-        self.simButton.clicked.connect(self.sim)
-        ## Connect Midas
-        self.connectmidasButton = QPushButton(self.LHMenuFrame)
-        self.connectmidasButton.setGeometry(QtCore.QRect(10, 100, 240, 25))
-        self.connectmidasButton.setObjectName("connectmidasButton")
-        self.connectmidasButton.setText("Connect MIDAS")
-        self.connectmidasButton.clicked.connect(self.connectmidas)
-        ## run Midas
-        ##self.runmidasButton = QPushButton(self.LHMenuFrame)
-        ##self.runmidasButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
-        ##self.runmidasButton.setObjectName("runmidasButton")
-        ##self.runmidasButton.setText("Run MIDAS")
-        ##self.runmidasButton.clicked.connect(self.runmidas)
-        
-        ## Collect some clicks
-        ##        self.clicksButton = QPushButton(self.LHMenuFrame)
-        ##        self.clicksButton.setGeometry(QtCore.QRect(10, 130, 240, 25))
-        ##        self.clicksButton.setObjectName("clicksButton")
-        ##        self.clicksButton.setText("Test some clicks")
-        ##        self.clicksButton.clicked.connect(SpecCanvas.getClicks)
-        ## Make a 2D Gate
-        self.gateButton = QPushButton(self.LHMenuFrame)
-        self.gateButton.setGeometry(QtCore.QRect(10, 160, 240, 25))
-        self.gateButton.setObjectName("gateButton")
-        self.gateButton.setText("Make a gate")
-        self.gateButton.clicked.connect(SpecCanvas.getGate)
-        ## Read HDF 2D Data
-        self.load2DButton = QPushButton(self.LHMenuFrame)
-        self.load2DButton.setGeometry(QtCore.QRect(10, 220, 240, 25))
-        self.load2DButton.setObjectName("load2DButton")
-        self.load2DButton.setText("Load 2D HDF")
-        self.load2DButton.clicked.connect(self.LoadHDFData)
-
-        ## A selection tree
-        self.treeWidget = QTreeWidget(self.LHMenuFrame)
-        self.treeWidget.setGeometry(QtCore.QRect(10,330,240,240))
+        ##----------------------------------------------------------------------
+        ## The tree widget
+        self.treeWidget = QtWidgets.QTreeWidget()
         self.treeWidget.setColumnCount(1)
-        header = QTreeWidgetItem(["Spectra"])
+        header = QtWidgets.QTreeWidgetItem(["Spectra"])
         self.treeWidget.setHeaderItem(header)
-        item = QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
+        item = QtWidgets.QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
         item.spec = SpecCanvas.Spec
         self.treeWidget.addTopLevelItem(item)
         self.treeWidget.itemClicked.connect(self.itemclicked)
 
-        ## The FENRIS Logo
+        ## FENRIS logo
         pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
-        label = QLabel(self.LHMenuFrame)
-        label.setGeometry(QtCore.QRect(10, 600, 240, 100))
+        label = QtWidgets.QLabel()
+        label.resize(240, 100)
         label.setPixmap(pixmap)
-        
-        
-        ##----------------------------------------------------------------------
-        ## The Right-hand plotting area
-        self.tabWidget = QTabWidget(self.frame)
-        self.tabWidget.setGeometry(QtCore.QRect(280, 10, 900, 600))
-        self.tab = QWidget()
 
-        ## The actual plot sits in the first tab!
-        self.Matplotlib = QWidget(self.tab)
-        self.Matplotlib.setGeometry(QtCore.QRect(10, 10, 880, 580))
-        self.Matplotlib.setObjectName("Matplotlib")
-        l = QVBoxLayout(self.Matplotlib)
+        ## Within the tree frame, make a vertical box layout
+        treeFramevbox = QtWidgets.QVBoxLayout()
+        treeFramevbox.addWidget(self.treeWidget)
+        #        treeFramevbox.addStretch(1)
+        treeFramevbox.addWidget(label)
+
+        treeFrame.setLayout(treeFramevbox)
+
+        ##----------------------------------------------------------------------
+        ## Layout the mainFrame grid
+        gridmainFrame = QtWidgets.QGridLayout(mainFrame)
+        gridmainFrame.setSpacing(10)
+        gridmainFrame.addWidget(treeFrame,1,0)
+        gridmainFrame.addWidget(dataFrame,1,1)
+
+        ## Make a third grid for the spectrum and command window
+        ## - tabWidget holds the spectra
+        ## - commandWidget is the command editor
+
+        ## Make the spectrum tabs
+        tabWidget = QtWidgets.QTabWidget()
+        ## Tab 1
+        tab1 = QtWidgets.QWidget()
+
+        self.Matplotlib = QtWidgets.QWidget()
+        l = QtWidgets.QVBoxLayout()
         toolbar = MyCustomToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
         l.addWidget(self.SpecCanvas)
-
-        ## Second tab (nothing here!)
-        self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.tabWidget.addTab(self.tab_2, "There's nothing in this tab!")
-
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), "Spectrum Inspector")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), "Empty Tab")
-
-        ## textedit below plotting window
-        self.TextEdit = QTextEdit(self.frame)
-        ## Add the output streams to the text editor
-        ##sys.stdout = OutLog(self.TextEdit, sys.stdout)
-        ##sys.stderr = OutLog(self.TextEdit, sys.stderr, QtGui.QColor(255,0,0) )
-
-        self.TextEdit.setGeometry(QtCore.QRect(280, 620, 900, 100))
-        self.TextEdit.setText("Welcome to EngeSpec!\n")
+        tab1.setLayout(l)
         
-        ## Finally get everything laid out and set up
-        self.horizontalLayout.addWidget(self.frame)
-        self.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 900, 30))
+        tabWidget.addTab(tab1,"")
+        tabWidget.setTabText(tabWidget.indexOf(tab1), "Spectrum Inspector")
+        ## Tab 2
+        tab2 = QtWidgets.QWidget()
+        tabWidget.addTab(tab2,"There's nothing in this tab!")
+        tabWidget.setTabText(tabWidget.indexOf(tab2), "Empty Tab")
         
-        self.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(self)
-        self.setStatusBar(self.statusbar)
+        ## the command editor
+        commandWidget = QtWidgets.QTextEdit()
+        commandWidget.setText("Welcome to EngeSpec!\n")
+        commandWidget.setMaximumHeight(100)
 
-        self.tabWidget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(self)
+        gridDataFrame = QtWidgets.QGridLayout(dataFrame)
+        gridDataFrame.setSpacing(10)
+        gridDataFrame.addWidget(tabWidget,1,0)
+        gridDataFrame.addWidget(commandWidget,2,0)
+        
+        self.setLayout(gridmain) 
 
+        self.main_widget.setFocus()
+        self.setCentralWidget(self.main_widget)
+
+        self.setGeometry(300, 300, 350, 300)
+        self.setWindowTitle('EngeSpec')    
+        self.show()
+
+    def fileQuit(self):
+        self.close()
+
+    def about(self):
+        QtWidgets.QMessageBox.about(self, "About",
+                          """This is EngeSpec!"""
+        )
+
+    ## Make the menus
+    def createMenus(self):
+        ## -----
+        ## File menu
+        self.file_menu = QtWidgets.QMenu('&File', self)
+        ## Load ascii spectrum
+        self.file_menu.addAction('&Load Spectrum File (ascii)',
+                                 self.LoadData)
+        ## Load HDF data
+        self.file_menu.addAction('&Load HDF File',
+                                 self.LoadHDFData)
+        ## Connect to a simulation
+        self.file_menu.addAction('&Connect simulation',
+                                 self.connectsim)
+        ## Connect to MIDAS
+        self.file_menu.addAction('&Connect MIDAS',
+                                 self.connectmidas)
+        ## Quit
+        self.file_menu.addAction('&Quit', self.fileQuit,
+           QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
+        self.menuBar().addMenu(self.file_menu)
+
+        ## -----
+        ## Help Menu
+        self.help_menu = QtWidgets.QMenu('&Help', self)
+        self.menuBar().addSeparator()
+        self.menuBar().addMenu(self.help_menu)
+        self.help_menu.addAction('&About', self.about)
+
+    ## Make the toolbar for starting, stopping runs etc.
+    def makeToolbar(self):
+        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                               "..", "images", "icons", "")
+        exitAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Exit.ico'), 'Exit', self)
+        exitAction.triggered.connect(self.close)
+        startAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run', self)
+        startAction.triggered.connect(self.startmidas)
+        stopAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Stop.ico'), 'Stop Run', self)
+        stopAction.triggered.connect(self.stopmidas)
+        gateAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'MakeGate.ico'), 'Set Gate', self)
+        gateAction.triggered.connect(self.setgate)
+
+        self.runControlsToolbar = self.addToolBar('Exit')
+        self.runControlsToolbar.addAction(exitAction)
+        self.runControlsToolbar.addAction(startAction)
+        self.runControlsToolbar.addAction(stopAction)
+        self.runControlsToolbar.addAction(gateAction)
+
+        
+    def LoadData(self):
+        self.SpecCanvas.LoadData()
+        
     def LoadHDFData(self):
         print("Loading HDF Data")
         self.SpecCanvas.LoadHDFData()
         self.PopulateTree()
+
+    def connectsim(self):
+        self.SpecColl.connectsim()
+        self.PopulateTree()
+        self.SpecCanvas.setSpecIndex(0,False)
+
+    def connectmidas(self):
+        self.SpecColl.connectmidas()
+        self.PopulateTree()
+        self.SpecCanvas.setSpecIndex(0,False)
         
+    def startmidas(self):
+        print("Running midas")
+        os.system("odbedit -c start")
+        
+    def stopmidas(self):
+        print("Stopping midas")
+        os.system("odbedit -c stop")
+        
+    def setgate(self):
+        SpecCanvas.getGate()
+
     def PopulateTree(self):
         ## Now get the list of spectra and add them to the selection
         ## tree
@@ -186,10 +232,10 @@ class Ui_MainWindow(QMainWindow):
             spec = SpecColl.spec1d[i]
             name = spec.Name
             hasGate = spec.hasGate
-            item = QTreeWidgetItem(self.treeWidget, [name])
+            item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
             if hasGate:
-                subitem = QTreeWidgetItem(item, ["Gate"])
+                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
                 subitem.spec = spec
             self.treeWidget.addTopLevelItem(item)
             
@@ -198,64 +244,17 @@ class Ui_MainWindow(QMainWindow):
             spec = SpecColl.spec2d[i]
             name = spec.Name
             hasGate = spec.hasGate
-            item = QTreeWidgetItem(self.treeWidget, [name])
+            item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
             if hasGate:
-                subitem = QTreeWidgetItem(item, ["Gate"])
+                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
                 subitem.spec = spec
             self.treeWidget.addTopLevelItem(item)
 
-        
-    def connectsim(self):
-        self.SpecColl.connectsim()
-        self.PopulateTree()
-        self.SpecCanvas.setSpecIndex(0,False)
-
-    def connectmidas(self):
-        self.SpecColl.connectmidas()
-        self.PopulateTree()
-        self.SpecCanvas.setSpecIndex(0,False)
-    
-    def sim(self):
-        ## Start or stop a simulation, which runs in c++
-        if not self.SpecColl.isRunning:
-            self.simButton.setText("Stop Simulation")
-            self.SpecColl.startsim()
-        else:
-            self.simButton.setText("Start Simulation")
-            self.SpecColl.stopsim()
-            
-
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
-       
+
         
-## Class to write stdout to the GUI rather than the terminal
-class OutLog:
-    def __init__(self, edit, out=None, color=None):
-        """(edit, out=None, color=None) -> can write stdout, stderr to a
-        QTextEdit.
-        edit = QTextEdit
-        out = alternate stream ( can be the original sys.stdout )
-        color = alternate color (i.e. color stderr a different color)
-        """
-        self.edit = edit
-        self.out = None
-        self.color = color
-
-    def write(self, m):
-        if self.color:
-            tc = self.edit.textColor()
-            self.edit.setTextColor(self.color)
-
-        self.edit.moveCursor(QtGui.QTextCursor.End)
-        self.edit.insertPlainText( m )
-
-        if self.color:
-            self.edit.setTextColor(tc)
-
-        if self.out:
-            self.out.write(m)
 
 class MyCustomToolbar(NavigationToolbar): 
     def __init__(self, plotCanvas, parent=None):
@@ -324,7 +323,7 @@ class MyCustomToolbar(NavigationToolbar):
 
         
         ## Add a Splitter
-        self.a = self.addWidget(QSplitter())
+        self.a = self.addWidget(QtWidgets.QSplitter())
 
         ## gross area
         self.a = self.addAction(QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
@@ -339,7 +338,43 @@ class MyCustomToolbar(NavigationToolbar):
         self._actions['netarea'] = self.a
         
         ## Add a Splitter
-        self.a = self.addWidget(QSplitter())
+        self.a = self.addWidget(QtWidgets.QSplitter())
         
     def select_tool(self):
         print("You clicked the selection tool")
+
+##
+##def main():
+##    
+##    app = QtWidgets.QApplication(sys.argv)
+##    ex = Ui_MainWindow()
+##    sys.exit(app.exec_())
+##
+##if __name__ == '__main__':
+##    main()
+## Class to write stdout to the GUI rather than the terminal
+class OutLog:
+    def __init__(self, edit, out=None, color=None):
+        """(edit, out=None, color=None) -> can write stdout, stderr to a
+        QTextEdit.
+        edit = QTextEdit
+        out = alternate stream ( can be the original sys.stdout )
+        color = alternate color (i.e. color stderr a different color)
+        """
+        self.edit = edit
+        self.out = None
+        self.color = color
+
+    def write(self, m):
+        if self.color:
+            tc = self.edit.textColor()
+            self.edit.setTextColor(self.color)
+
+        self.edit.moveCursor(QtGui.QTextCursor.End)
+        self.edit.insertPlainText( m )
+
+        if self.color:
+            self.edit.setTextColor(tc)
+
+        if self.out:
+            self.out.write(m)
