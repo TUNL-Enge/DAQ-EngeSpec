@@ -204,19 +204,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecCanvas.setSpecIndex(0,False)
 
     def connectmidas(self):
-        if not self.SpecColl.isRunning:
-            self.SpecColl.isRunning = True
-            print("Running!")
-        else:
-            self.SpecColl.isRunning = False
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
-            ##self.SpecColl.midasrun()
+        
     def startmidas(self):
         print("Running midas")
+        os.system("odbedit -c start")
+        
     def stopmidas(self):
         print("Stopping midas")
+        os.system("odbedit -c stop")
+        
     def setgate(self):
         SpecCanvas.getGate()
 

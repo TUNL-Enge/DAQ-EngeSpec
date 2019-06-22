@@ -24,6 +24,7 @@ class SpectrumCollection:
         self.dm = libEngeAnalyzer.EngeAnalyzer()
 
         self.isRunning = False
+        self.MIDASisRunning = False
         
     def __str__(self):
         return 'Spectrum Collection Name: {}'.format(self.Name)
@@ -128,8 +129,10 @@ class SpectrumCollection:
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
         self.midas_thread.start()
+        self.MIDASisRunning = True
         self.midas_collection_thread = MidasCollectionThread(self)
         self.midas_collection_thread.start()
+
     ##def midasrun(self):
     ##    self.midas_thread.start()
 
@@ -281,7 +284,7 @@ class MidasCollectionThread(QThread):
 
     def run(self):
         ##print("Collecting MIDAS data")
-        while self.specColl.isRunning:
+        while self.specColl.MIDASisRunning:
             dat = np.transpose(self.specColl.dm.getData())
             ##print(dat[:,0])
             dat2d = self.specColl.dm.getData2D()
