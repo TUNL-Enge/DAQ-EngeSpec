@@ -123,7 +123,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         commandWidget = QtWidgets.QTextEdit()
         commandWidget.setText("Welcome to EngeSpec!\n")
         commandWidget.setMaximumHeight(100)
+        ## Add the output streams to the text editor
+        sys.stdout = OutLog(commandWidget, sys.stdout)
+        sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
 
+        
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
         gridDataFrame.setSpacing(10)
         gridDataFrame.addWidget(tabWidget,1,0)
