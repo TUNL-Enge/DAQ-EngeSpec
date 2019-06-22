@@ -23,6 +23,10 @@ class SpectrumObject:
 
         ## Load the data library
         self.dm = libEngeAnalyzer.EngeAnalyzer()
+
+        self.gate = None
+        self.hasGate = False
+
         
     ## Load ascii file
     def LoadData(self):

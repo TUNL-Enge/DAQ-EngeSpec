@@ -23,6 +23,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##   Spectrum |  Spectrum tabs
         ##   Tree     |
         ##            |
+        ##            |
+        ##            |
+        ##            |
+        ##            |
+        ##            |
         ##            |------------------------------------------------------
         ##   Logo     |   Editor
         ##            |
