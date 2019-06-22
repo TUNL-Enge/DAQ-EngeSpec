@@ -1,14 +1,18 @@
 import sys, os
+import matplotlib
 from PySide2 import QtCore, QtWidgets, QtGui
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backend_tools import ToolBase
+
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, SpecCanvas):
 
         super(Ui_MainWindow,self).__init__()
 
-        ##self.SpecCanvas = SpecCanvas
-        #### Grab the spectrum collection
-        ##self.SpecColl = self.SpecCanvas.SpecColl
+        self.SpecCanvas = SpecCanvas
+        ## Grab the spectrum collection
+        self.SpecColl = self.SpecCanvas.SpecColl
         
         ##  -----------------------------------------------------------------
         ##  Menu ..  ..                                                Help
@@ -56,18 +60,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dataFrame.setMinimumSize(900,600)
 
         ##----------------------------------------------------------------------
-        ## Thre tree widget
+        ## The tree widget
         self.treeWidget = QtWidgets.QTreeWidget()
         self.treeWidget.setColumnCount(1)
         header = QtWidgets.QTreeWidgetItem(["Spectra"])
         self.treeWidget.setHeaderItem(header)
-        item = QtWidgets.QTreeWidgetItem(self.treeWidget, ["tmp"])#[self.SpecCanvas.Spec.Name])
-        #        item.spec = SpecCanvas.Spec
+        item = QtWidgets.QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
+        item.spec = SpecCanvas.Spec
         self.treeWidget.addTopLevelItem(item)
         self.treeWidget.itemClicked.connect(self.itemclicked)
 
         ## FENRIS logo
-        pixmap = QtGui.QPixmap('../images/FENRISLogo-notext.png')
+        pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
         label = QtWidgets.QLabel()
         label.resize(240, 100)
         label.setPixmap(pixmap)
@@ -87,8 +91,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         gridmainFrame.addWidget(treeFrame,1,0)
         gridmainFrame.addWidget(dataFrame,1,1)
 
-
-
         ## Make a third grid for the spectrum and command window
         ## - tabWidget holds the spectra
         ## - commandWidget is the command editor
@@ -97,7 +99,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         tabWidget = QtWidgets.QTabWidget()
         ## Tab 1
         tab1 = QtWidgets.QWidget()
-        test2Edit = QtWidgets.QTextEdit(tab1)
+
+        self.Matplotlib = QtWidgets.QWidget()
+        l = QtWidgets.QVBoxLayout()
+        toolbar = MyCustomToolbar(self.SpecCanvas, self)
+        l.addWidget(toolbar)
+        l.addWidget(self.SpecCanvas)
+        tab1.setLayout(l)
+        
         tabWidget.addTab(tab1,"")
         tabWidget.setTabText(tabWidget.indexOf(tab1), "Spectrum Inspector")
         ## Tab 2
@@ -215,11 +224,126 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
 
         
-def main():
-    
-    app = QtWidgets.QApplication(sys.argv)
-    ex = Ui_MainWindow()
-    sys.exit(app.exec_())
 
-if __name__ == '__main__':
-    main()
+class MyCustomToolbar(NavigationToolbar): 
+    def __init__(self, plotCanvas, parent=None):
+        self.toolitems = ()
+        # create the default toolbar
+        NavigationToolbar.__init__(self, plotCanvas, parent)
+
+        ## --------------------------------------------------
+        ## Custom items
+        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                    "..", "images", "icons", "")
+
+        ## Update
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ReloadIcon.ico"),
+                                "Reload", plotCanvas.UpdatePlot)
+        self.a.setToolTip("Update the plot")
+        self._actions['update'] = self.a
+
+        ## LogLin
+        self.a = self.addAction(QtGui.QIcon(iconDir + "LogLinIcon.ico"),
+                                "LogLin", plotCanvas.ToggleLog)
+        self.a.setToolTip("Change to Log or Linear Scale")
+        self._actions['loglin'] = self.a
+
+        ## Scale-all
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ScaleAllIcon.ico"),
+                                "Auto Scale", plotCanvas.Resize)
+        self.a.setToolTip("Resize to all")
+        self._actions['scaleall'] = self.a
+        
+        ## Auto y-scale
+        self.a = self.addAction(QtGui.QIcon(iconDir + "AutoScaleIcon.ico"),
+                                "Auto Scale", plotCanvas.Autosize)
+        self.a.setToolTip("Auto-scale the y-direction")
+        self._actions['autoscale'] = self.a
+
+        ## XRange
+        self.a = self.addAction(QtGui.QIcon(iconDir + "XRangeIcon.ico"),
+                                "X Range", plotCanvas.xInteractiveZoom)
+        self.a.setToolTip("Adjust the x-range")
+        self._actions['xrange'] = self.a
+
+        ## YRange
+        self.a = self.addAction(QtGui.QIcon(iconDir + "YRangeIcon.ico"),
+                                "Y Range", plotCanvas.yInteractiveZoom)
+        self.a.setToolTip("Adjust the y-range")
+        self._actions['yrange'] = self.a
+
+        ## Zoom in
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ZoomInIcon.ico"),
+                                "Zoom in", plotCanvas.xZoomIn)
+        self.a.setToolTip("Zoom in")
+        self._actions['zoomin'] = self.a
+
+        ## Zoom in
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ZoomOutIcon.ico"),
+                                "Zoom out", plotCanvas.xZoomOut)
+        self.a.setToolTip("Zoom out")
+        self._actions['zoomout'] = self.a
+
+        ## Zero all spectra
+        self.a = self.addAction(QtGui.QIcon(iconDir + "ZeroIcon.ico"),
+                                "Zero all", plotCanvas.ZeroAll)
+        self.a.setToolTip("Zero all spectra")
+        self._actions['zeroall'] = self.a
+
+        
+        ## Add a Splitter
+        self.a = self.addWidget(QtWidgets.QSplitter())
+
+        ## gross area
+        self.a = self.addAction(QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
+                                "Gross Area", plotCanvas.grossArea)
+        self.a.setToolTip("Calculate the gross area under a peak")
+        self._actions['grossarea'] = self.a
+
+        ## net area
+        self.a = self.addAction(QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
+                                "Net Area", plotCanvas.netArea)
+        self.a.setToolTip("Calculate the net, background-subtracted area under a peak")
+        self._actions['netarea'] = self.a
+        
+        ## Add a Splitter
+        self.a = self.addWidget(QtWidgets.QSplitter())
+        
+    def select_tool(self):
+        print("You clicked the selection tool")
+
+##
+##def main():
+##    
+##    app = QtWidgets.QApplication(sys.argv)
+##    ex = Ui_MainWindow()
+##    sys.exit(app.exec_())
+##
+##if __name__ == '__main__':
+##    main()
+## Class to write stdout to the GUI rather than the terminal
+class OutLog:
+    def __init__(self, edit, out=None, color=None):
+        """(edit, out=None, color=None) -> can write stdout, stderr to a
+        QTextEdit.
+        edit = QTextEdit
+        out = alternate stream ( can be the original sys.stdout )
+        color = alternate color (i.e. color stderr a different color)
+        """
+        self.edit = edit
+        self.out = None
+        self.color = color
+
+    def write(self, m):
+        if self.color:
+            tc = self.edit.textColor()
+            self.edit.setTextColor(self.color)
+
+        self.edit.moveCursor(QtGui.QTextCursor.End)
+        self.edit.insertPlainText( m )
+
+        if self.color:
+            self.edit.setTextColor(tc)
+
+        if self.out:
+            self.out.write(m)
