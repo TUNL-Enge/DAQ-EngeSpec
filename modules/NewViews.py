@@ -220,6 +220,38 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def setgate(self):
         SpecCanvas.getGate()
 
+    def PopulateTree(self):
+        ## Now get the list of spectra and add them to the selection
+        ## tree
+        ## Remove the old tree first
+        self.treeWidget.clear()
+        ## Grab the spectrum collection
+        SpecColl = self.SpecCanvas.SpecColl
+        ## Fill the 1d and 2d items
+        l1d = len(SpecColl.spec1d)
+        for i in range(l1d):
+            spec = SpecColl.spec1d[i]
+            name = spec.Name
+            hasGate = spec.hasGate
+            item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
+            item.spec = spec
+            if hasGate:
+                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
+                subitem.spec = spec
+            self.treeWidget.addTopLevelItem(item)
+            
+        l2d = len(SpecColl.spec2d)
+        for i in range(l2d):
+            spec = SpecColl.spec2d[i]
+            name = spec.Name
+            hasGate = spec.hasGate
+            item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
+            item.spec = spec
+            if hasGate:
+                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
+                subitem.spec = spec
+            self.treeWidget.addTopLevelItem(item)
+
     def itemclicked(self,it,col):
         self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D)
 
