@@ -1,18 +1,20 @@
 * Current
+  - [X] Better window scaling
+  - [ ] SpanSelector outside the spectrum range
+  - [ ] Expand tree by default
+  - [ ] 1D Gates
+  - [ ] Separate out sort routine
+  - [ ] Scaler display
   - [X] Zero histograms button (A.fill(0))
   - [X] Run simulations in background with threads and delays
     - Button to start and stop
-  - [ ] Better window scaling
+  - [X] MIDAS Connection!
   - [X] 2D zooming better
-  - [ ] SpanSelector outside the spectrum range
   - [X] Remember zooming properties of spectra
   - [X] Draw gate on 2D histogram if set
-  - [ ] Expand tree by default
-  - [ ] Only draw gate when clicked in tree
-  - [ ] 1D Gates
-  - [ ] Why do the OutLog functions crash with simulations?
-  - [ ] Uncertainties on net counts
-  - [ ] 
+  - [X] Only draw gate when clicked in tree
+  - [X] Why do the OutLog functions crash with simulations?
+  - [X] Uncertainties on net counts
 * GUI
   - [X] Tree to select histograms
   - [ ] Some feedback numbers
@@ -39,8 +41,8 @@
     - All sorting in c++ code
     - Python just plots
 * Fitting
-  - [ ] Simple net counts
-  - [ ] Fitting for gross counts
+  - [X] Simple net counts
+  - [X] Fitting for gross counts
   - [ ] Reimplement MCMCGaus
     - Note that my R version is actually a minimization + sampling
     - Start my re-implementing that
