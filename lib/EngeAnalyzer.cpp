@@ -4,7 +4,6 @@
 #include <chrono>
 
 #include "EngeAnalyzer.h"
-#include "TV792Data.hxx"
 
 char const* EngeAnalyzer::sayhello( ) {
     return "Hello! This is the data maker running in c++!!!";
@@ -21,13 +20,16 @@ void EngeAnalyzer::Initialize(){
 
   // Set the names of the data
   DataNames.clear();
-  DataNames.push_back("Pos1");
+  DataNames.push_back("CeBr1");
   is2D.push_back(false);
   hasGate.push_back(false);
-  DataNames.push_back("DE");
+  DataNames.push_back("CeBr2");
   is2D.push_back(false);
-  hasGate.push_back(true);
-  DataNames.push_back("Pos1-cut");
+  hasGate.push_back(false);
+  DataNames.push_back("Pulser");
+  is2D.push_back(false);
+  hasGate.push_back(false);
+  DataNames.push_back("CeBr1 cut");
   is2D.push_back(false);
   hasGate.push_back(false);
   
@@ -39,9 +41,13 @@ void EngeAnalyzer::Initialize(){
     DataMatrix.push_back(tempSpec);
 
   // Then make 2D spectrum
-  DataNames.push_back("DEvsPos1");
+  DataNames.push_back("CeBr1 vs CeBr2");
   is2D.push_back(true);
   hasGate.push_back(true);
+  DataNames.push_back("CeBr1 vs Pulser");
+  is2D.push_back(true);
+  hasGate.push_back(false);
+
   std::vector<int> row;
   row.resize(256,0);
   std::vector<std::vector<int>> tempSpec2D;
@@ -49,9 +55,10 @@ void EngeAnalyzer::Initialize(){
     tempSpec2D.push_back(row);
   //  tempSpec2D[0].resize(256,0);
   DataMatrix2D.push_back(tempSpec2D);
+  DataMatrix2D.push_back(tempSpec2D);
 
   // Make Gated spectra
-  DataNames.push_back("DEvsPos1-gated");
+  DataNames.push_back("CeBr1 vs CeBr2 cut");
   is2D.push_back(true);
   hasGate.push_back(false);
   tempSpec2D.clear();
@@ -78,79 +85,15 @@ int EngeAnalyzer::connectMidasAnalyzer(){
     
   return 0;
 }
-void EngeAnalyzer::GenerateDataMatrix(int n)
-//void EngeAnalyzer::GenerateDataMatrix(int n)
-{
-  int nbins = 4096;
-  int nspec = 2;
-
-  std::normal_distribution<double> distribution1(1500.0,200.0);
-  std::normal_distribution<double> distribution2(2000.0,100.0);
-  std::normal_distribution<double> distribution3(1700.0,200.0);
-  std::normal_distribution<double> distribution4(3000.0,100.0);
-  std::normal_distribution<double> crap(100,50); 
-
-
-  Gate G1;
-  if(GateCollection.size()>0){
-    G1 = GateCollection[0];
-  }
-  
-  // Fill the spectra
-  std::vector<double> d1, d2;
-  for(int i=0; i<n; i++){
-    if(crap(generator)>120){
-      ipeak1++;
-      d1.push_back(distribution1(generator));
-      d2.push_back(distribution2(generator));
-    } else {
-      ipeak2++;
-      d1.push_back(distribution3(generator));
-      d2.push_back(distribution4(generator));
-    }
-    DataMatrix[0][int(d1[i])]++;
-    DataMatrix[1][int(d2[i])]++;
-    DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
-
-    
-    // The gated spectrum
-    // Is the gate defined?
-    if(G1.inGate(d1[i],d2[i])){
-      igated++;
-      DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
-      DataMatrix[2][int(d1[i])]++;
-    }
-
-  }
-  /*
-  // Test the gate
-  G1.pnpoly(0,0);
-  G1.pnpoly(1000,1000);
-  G1.pnpoly(500,500);
-  G1.pnpoly(1000,500);
-  */
-  /*  
-  for(int i=0; i<50; i++){
-    for(int j=0; j<50; j++){
-      std::cout << DataMatrix2D[0][i][j] << " ";
-    }
-    std::cout << std::endl;
-  }
-  */
-
-  /*
-    Py_BEGIN_ALLOW_THREADS
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-    Py_END_ALLOW_THREADS
-  */
-  
-}
 
 void EngeAnalyzer::putADC(uint32_t *dADC){
 
-  DataMatrix[0][int(dADC[0])]++;
-  DataMatrix[1][int(dADC[1])]++;
-  DataMatrix2D[0][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
+  // Raw CeBr signals
+  DataMatrix[0][int(dADC[8])]++;   // CeBr1
+  DataMatrix[1][int(dADC[9])]++;   // CeBr2
+  DataMatrix[2][int(dADC[10])]++;  // Pulser
+  DataMatrix2D[0][int(dADC[8]/16.0)][int(dADC[9]/16.0)]++;
+  DataMatrix2D[1][int(dADC[8]/16.0)][int(dADC[10]/16.0)]++;
 
   // The gated spectrum
   Gate G1;
@@ -159,10 +102,10 @@ void EngeAnalyzer::putADC(uint32_t *dADC){
   }
   
   // Is the gate defined?
-  if(G1.inGate(dADC[0],dADC[1])){
+  if(G1.inGate(dADC[8],dADC[9])){
     igated++;
-    DataMatrix2D[1][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
-    DataMatrix[2][int(dADC[0])]++;
+    DataMatrix2D[2][int(dADC[8]/16.0)][int(dADC[9]/16.0)]++;
+    DataMatrix[3][int(dADC[8])]++;
   }
   
 }
@@ -251,6 +194,74 @@ void EngeAnalyzer::putGate(char* name, p::list x, p::list y){
   for(int i=0; i<Gate.size(); i++){
     std::cout << Gate[i][0] << " " << Gate[i][1] << std::endl;
   }
+  */
+  
+}
+
+void EngeAnalyzer::GenerateDataMatrix(int n)
+//void EngeAnalyzer::GenerateDataMatrix(int n)
+{
+  int nbins = 4096;
+  int nspec = 2;
+
+  std::normal_distribution<double> distribution1(1500.0,200.0);
+  std::normal_distribution<double> distribution2(2000.0,100.0);
+  std::normal_distribution<double> distribution3(1700.0,200.0);
+  std::normal_distribution<double> distribution4(3000.0,100.0);
+  std::normal_distribution<double> crap(100,50); 
+
+
+  Gate G1;
+  if(GateCollection.size()>0){
+    G1 = GateCollection[0];
+  }
+  
+  // Fill the spectra
+  std::vector<double> d1, d2;
+  for(int i=0; i<n; i++){
+    if(crap(generator)>120){
+      ipeak1++;
+      d1.push_back(distribution1(generator));
+      d2.push_back(distribution2(generator));
+    } else {
+      ipeak2++;
+      d1.push_back(distribution3(generator));
+      d2.push_back(distribution4(generator));
+    }
+    DataMatrix[0][int(d1[i])]++;
+    DataMatrix[1][int(d2[i])]++;
+    DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+
+    
+    // The gated spectrum
+    // Is the gate defined?
+    if(G1.inGate(d1[i],d2[i])){
+      igated++;
+      DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
+      DataMatrix[2][int(d1[i])]++;
+    }
+
+  }
+  /*
+  // Test the gate
+  G1.pnpoly(0,0);
+  G1.pnpoly(1000,1000);
+  G1.pnpoly(500,500);
+  G1.pnpoly(1000,500);
+  */
+  /*  
+  for(int i=0; i<50; i++){
+    for(int j=0; j<50; j++){
+      std::cout << DataMatrix2D[0][i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+  */
+
+  /*
+    Py_BEGIN_ALLOW_THREADS
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    Py_END_ALLOW_THREADS
   */
   
 }
