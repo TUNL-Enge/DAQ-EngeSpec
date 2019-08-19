@@ -115,7 +115,7 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec2D.yzoom[0]
         ymax = self.Spec2D.yzoom[1]
 
-        H = self.Spec2D.spec2d.T-1
+        H = self.Spec2D.spec2d.T
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
         X, Y = np.meshgrid(xe,ye)
@@ -164,7 +164,7 @@ class SpectrumCanvas(FigureCanvas):
             ymin = self.Spec2D.yzoom[0]
             ymax = self.Spec2D.yzoom[1]
             
-            H = self.Spec2D.spec2d.T-1
+            H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
             X, Y = np.meshgrid(xe,ye)
