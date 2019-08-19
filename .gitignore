@@ -1,7 +1,6 @@
 ## Libraries, backup, images
 *.so
 *.pyc
-*.txt
 *.png
 *.bak
 *#
@@ -27,4 +26,3 @@ CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
 Makefile
-!CMakeLists.txt
