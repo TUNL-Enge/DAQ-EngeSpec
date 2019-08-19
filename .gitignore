@@ -1,7 +1,6 @@
 ## Libraries, backup, images
 *.so
 *.pyc
-*.txt
 *.png
 *.bak
 *#
