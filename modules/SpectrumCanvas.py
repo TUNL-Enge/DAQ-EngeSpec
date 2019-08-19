@@ -10,6 +10,7 @@ from matplotlib.widgets import SpanSelector
 from matplotlib.backend_tools import ToolBase, ToolToggleBase
 import matplotlib.colors as colors
 import matplotlib.cm as cm
+from matplotlib.colors import ListedColormap
 import copy
 
 class SpectrumCanvas(FigureCanvas):
@@ -29,7 +30,12 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
         self.a = self.fig.add_subplot(111)
 
-        
+        ## Colormaps
+        basecolormap = cm.get_cmap('inferno',256)
+        newcolors = basecolormap(np.linspace(0,1,256))
+        newcolors[:5,:] = np.array([0.99,0.99,0.99,1])
+        self.cols = ListedColormap(newcolors)
+
         self.a.set_xlim(self.Spec.xzoom)
         #self.a.set_ylim([0,800])
         self.a.set_xlabel("channel")
@@ -109,12 +115,12 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec2D.yzoom[0]
         ymax = self.Spec2D.yzoom[1]
 
-        H = self.Spec2D.spec2d.T
+        H = self.Spec2D.spec2d.T-1
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
         X, Y = np.meshgrid(xe,ye)
         self.a.clear()
-        self.a.pcolormesh(X,Y,H)
+        self.a.pcolormesh(X,Y,H,cmap=self.cols)
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
 
@@ -158,7 +164,7 @@ class SpectrumCanvas(FigureCanvas):
             ymin = self.Spec2D.yzoom[0]
             ymax = self.Spec2D.yzoom[1]
             
-            H = self.Spec2D.spec2d.T
+            H = self.Spec2D.spec2d.T-1
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
             X, Y = np.meshgrid(xe,ye)
@@ -167,7 +173,7 @@ class SpectrumCanvas(FigureCanvas):
                 
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
-            self.a.pcolormesh(X,Y,H)
+            self.a.pcolormesh(X,Y,H,cmap=self.cols)
 
             if self.Spec2D.hasGate and self.Spec2D.gate is not None:
                 self.drawGate()
