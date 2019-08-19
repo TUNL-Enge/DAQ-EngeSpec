@@ -68,7 +68,8 @@ void EngeAnalyzer::Initialize(){
 int EngeAnalyzer::connectMidasAnalyzer(){
 
   MidasAnalyzerModule mAMod;
-  TARegisterModule tarm(&mAMod);
+  //TARegisterModule tarm(&mAMod);
+  TARegister tar(&mAMod);
 
   mAMod.ConnectEngeAnalyzer(this);
   
@@ -340,6 +341,10 @@ int Gate::inGate(double testx, double testy){
 void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
 
   printf("Initializing Midas Analyzer Module\n");
+  printf("Arguments:\n");
+  for (unsigned i=0; i<args.size(); i++)
+    printf("arg[%d]: [%s]\n", i, args[i].c_str());
+
   fTotalEventCounter = 0;
 }
 void MidasAnalyzerModule::Finish(){
@@ -347,8 +352,8 @@ void MidasAnalyzerModule::Finish(){
   printf("Counted %d events\n",fTotalEventCounter);
   std::cout << "number of spectra: " << eA->DataNames.size() << std::endl;
 }
-TARunInterface* MidasAnalyzerModule::NewRun(TARunInfo* runinfo){
-  printf("NewRun, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
+TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
+  printf("NewRunObject, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
   return new MidasAnalyzerRun(runinfo, this);
 }
 

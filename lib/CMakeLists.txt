@@ -18,7 +18,7 @@ MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
 
 set(MIDASSYS "$ENV{MIDASSYS}")
 include_directories( ${MIDASSYS}/include )
-link_directories( ${MIDASSYS}/linux/lib )
+link_directories( ${MIDASSYS}/lib )
 MESSAGE(STATUS "MIDAS: " ${MIDASSYS}/include)
 
 set(ROOTANASYS "$ENV{ROOTANASYS}")

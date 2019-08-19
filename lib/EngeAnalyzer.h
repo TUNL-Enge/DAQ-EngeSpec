@@ -110,21 +110,22 @@ class EngeAnalyzer {
 /*
   Classes for manalyzer-type analyzer
 */
-class MidasAnalyzerModule: public TAModuleInterface{
+class MidasAnalyzerModule: public TAFactory{
  public:
   void Init(const std::vector<std::string> &args);
   void ConnectEngeAnalyzer(EngeAnalyzer *ea){eA=ea;}
   void Finish();
-  TARunInterface* NewRun(TARunInfo* runinfo);
+  TARunObject* NewRunObject(TARunInfo* runinfo);
     
   int fTotalEventCounter;
   EngeAnalyzer *eA;
 };
   
-class MidasAnalyzerRun: public TARunInterface{
+class MidasAnalyzerRun: public TARunObject{
  public:
+
  MidasAnalyzerRun(TARunInfo* runinfo, MidasAnalyzerModule *m)
-   : TARunInterface(runinfo){
+   : TARunObject(runinfo){
     fModule = m;
     fRunEventCounter = 0;
   }
