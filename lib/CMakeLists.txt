@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( BoostPythonMakeData )
  
 # Find necessary packages
+find_package( PythonInterp 3 REQUIRED )
 find_package( PythonLibs 3 REQUIRED )
 include_directories( ${PYTHON_INCLUDE_DIRS} )
 MESSAGE(STATUS "Pythonlibs: " ${PYTHON_INCLUDE_DIRS})
