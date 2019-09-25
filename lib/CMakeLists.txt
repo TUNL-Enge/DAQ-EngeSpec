@@ -12,9 +12,10 @@ find_package( Boost COMPONENTS numpy3 REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 MESSAGE(STATUS "Boost: " ${Boost_INCLUDE_DIR})
 
-find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP REQUIRED )
-include_directories( ${ROOT_INCLUDE_DIRS} )
-MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
+#find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP REQUIRED )
+#include_directories( ${ROOT_INCLUDE_DIRS} )
+#MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
+#set(NO_ROOT "1")
 
 set(MIDASSYS "$ENV{MIDASSYS}")
 include_directories( ${MIDASSYS}/include )
@@ -37,7 +38,7 @@ add_library( libMakeData SHARED MakeDatalib.cpp )
 add_library( libEngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 target_link_libraries( libMakeData ${Boost_LIBRARIES} MakeData )
 target_link_libraries( libEngeAnalyzer ${Boost_LIBRARIES} EngeAnalyzer
-  librootana.a ${ROOT_LIBRARIES}  libmidas.a )
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 # don't prepend wrapper library name with lib
 set_target_properties( libMakeData PROPERTIES PREFIX "../" )
 set_target_properties( libEngeAnalyzer PROPERTIES PREFIX "../" )

@@ -254,11 +254,11 @@ class MidasThread(QThread):
                 sObj = SpectrumObject2D(counter2d)
                 sObj.Name = self.names[i]
                 sObj.hasGate = self.hasGates[i]
-                sObj.xedges = np.array([x for x in range(0,4096,16)])
-                sObj.yedges = np.array([y for y in range(0,4096,16)])
+                sObj.xedges = np.array([x for x in range(0,256)])
+                sObj.yedges = np.array([y for y in range(0,256)])
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec2d[0,0] = 1
-                sObj.spec2d[255,255] = 1
+                sObj.spec2d[254,254] = 1
                 sObj.spec2d_temp[:] = sObj.spec2d
                 self.specColl.spec2d.append(sObj)
                 counter2d = counter2d+1

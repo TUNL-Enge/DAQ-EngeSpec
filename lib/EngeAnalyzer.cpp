@@ -59,7 +59,13 @@ void EngeAnalyzer::Initialize(){
     tempSpec2D.push_back(row);
   //  tempSpec2D[0].resize(256,0);
   DataMatrix2D.push_back(tempSpec2D);
-  
+
+  /*
+  u_int n_t = DataMatrix2D.size();
+  u_int n_rows = DataMatrix2D[0].size();
+  u_int n_cols = DataMatrix2D[0][0].size();
+  std::cout << n_t << " " << n_rows << " " << n_cols << std::endl;
+  */
   
   std::cout << "Made " << DataNames.size() << " empty spectra" << std::endl;
   
@@ -149,21 +155,42 @@ void EngeAnalyzer::GenerateDataMatrix(int n)
 
 void EngeAnalyzer::putADC(uint32_t *dADC){
 
-  DataMatrix[0][int(dADC[0])]++;
-  DataMatrix[1][int(dADC[1])]++;
-  DataMatrix2D[0][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
+  int size = sizeof(dADC)/sizeof(dADC[0]);
+  /*
+  std::cout << "Channels: " << size << std::endl;
+  for(int i=0; i<size; i++){
+    std::cout << i << ": " << dADC[i] << "  " ;
+  }
+  std::cout << std::endl;
+  */  
+  int cPos1 = 0;
+  int cDE = 1;
+
+  if(dADC[cPos1] < 200 || dADC[cPos1] > 4095)dADC[cPos1] = 0;
+  if(dADC[cDE] < 200 || dADC[cDE] > 4095)dADC[cDE] = 0;
+  
+  DataMatrix[0][int(dADC[cPos1])]++;
+  DataMatrix[1][int(dADC[cDE])]++;
+
+  /*  std::cout << dADC[cPos1] << " " << dADC[cDE] << std::endl;
+  std::cout << int(dADC[cPos1]/16.0) << "  " << int(dADC[cDE]/16.0)
+	    << std::endl;
+  */
+  
+  DataMatrix2D[0][int(dADC[cPos1]/16.0)][int(dADC[cDE]/16.0)]++;
 
   // The gated spectrum
+  
   Gate G1;
   if(GateCollection.size()>0){
     G1 = GateCollection[0];
   }
   
   // Is the gate defined?
-  if(G1.inGate(dADC[0],dADC[1])){
+  if(G1.inGate(dADC[0]/16,dADC[1]/16)){
     igated++;
-    DataMatrix2D[1][int(dADC[0]/16.0)][int(dADC[1]/16.0)]++;
-    DataMatrix[2][int(dADC[0])]++;
+    DataMatrix2D[1][int(dADC[cPos1]/16.0)][int(dADC[cDE]/16.0)]++;
+    DataMatrix[2][int(dADC[cPos1])]++;
   }
   
 }

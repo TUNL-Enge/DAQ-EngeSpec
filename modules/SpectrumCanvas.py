@@ -118,6 +118,7 @@ class SpectrumCanvas(FigureCanvas):
         H = self.Spec2D.spec2d.T
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
+#        print(xe,ye)
         X, Y = np.meshgrid(xe,ye)
         self.a.clear()
         self.a.pcolormesh(X,Y,H,cmap=self.cols)
@@ -170,10 +171,16 @@ class SpectrumCanvas(FigureCanvas):
             X, Y = np.meshgrid(xe,ye)
             self.a.clear()
 
-                
+            x = xe[xe>xmin]# & xe<xmax]
+            x = x[x<xmax]
+            y = ye[ye>ymin]# & ye<ymax]
+            y = y[y<ymax]
+            Xcut, Ycut = np.meshgrid(x,y)
+            Hmax = H[Xcut,Ycut].max()
+                        
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
-            self.a.pcolormesh(X,Y,H,cmap=self.cols)
+            self.a.pcolormesh(X,Y,H,vmin=0,vmax=Hmax,cmap=self.cols)
 
             if self.Spec2D.hasGate and self.Spec2D.gate is not None:
                 self.drawGate()
@@ -182,7 +189,7 @@ class SpectrumCanvas(FigureCanvas):
     
 
     def GetMax(self):
-        binlow = max(0,int(self.a.get_xlim()[0]))
+        binlow = max(1,int(self.a.get_xlim()[0]))
         binhigh= min(4095,int(self.a.get_xlim()[1]))
         maxarray=self.Spec.spec[binlow:binhigh]
         return max(maxarray)
@@ -206,8 +213,8 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def Resize(self):
-        self.a.set_xlim(0,self.maximumX)
         if not self.is2D:
+            self.a.set_xlim(0,self.maximumX)
             if(self.isLogPlot==True):
                 self.a.set_ylim([1,1.20*self.GetMax()])
             else:                    
@@ -215,9 +222,10 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.yzoom = self.a.get_ylim()
             self.Spec.xzoom = self.a.get_xlim()
         else:
-            self.a.set_ylim(0,self.maximumX)
-            self.Spec2D.yzoom = self.a.get_ylim()
-            self.Spec2D.xzoom = self.a.get_xlim()
+            self.a.set_xlim([0,256])
+            self.a.set_ylim([0,256])#self.maximumX)
+            self.Spec2D.yzoom = [0,256]#self.a.get_ylim()
+            self.Spec2D.xzoom = [0,256]#self.a.get_xlim()
         self.fig.canvas.draw()
 
     def ToggleLog(self):

@@ -71,8 +71,8 @@ class SpectrumObject2D:
         self.spec2d_temp = np.zeros(shape=(self.nx,self.ny))   ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
 
-        self.xzoom = [0,4096]
-        self.yzoom = [0,4096]
+        self.xzoom = [1,256]
+        self.yzoom = [1,256]
 
         self.gate = None
         self.hasGate = False
