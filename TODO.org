@@ -1,48 +1,19 @@
 * Current
-  - [X] Better window scaling
+  - [ ] Separate out sort routines
+  - [ ] Fix updating on 2D histograms
+  - [ ] Color scheme in 2D for small number of counts
+  - [ ] 2D z-zooming
   - [ ] SpanSelector outside the spectrum range
+  - [ ] Click-to-zoom
   - [ ] Expand tree by default
   - [ ] 1D Gates
-  - [ ] Separate out sort routine
   - [ ] Scaler display
-  - [X] Zero histograms button (A.fill(0))
-  - [X] Run simulations in background with threads and delays
-    - Button to start and stop
-  - [X] MIDAS Connection!
-  - [X] 2D zooming better
-  - [X] Remember zooming properties of spectra
-  - [X] Draw gate on 2D histogram if set
-  - [X] Only draw gate when clicked in tree
-  - [X] Why do the OutLog functions crash with simulations?
-  - [X] Uncertainties on net counts
 * GUI
-  - [X] Tree to select histograms
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
 * 2D Histograms
-  - [X] Make a test data set P1 and DE
-  - [X] Read data set
-  - [X] Make initial histogram using np.histogram2d 
-    - Use pre-dedined 512x512 bins 
-  - [X] Use imshow or pcolormesh to plot
-    - https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram2d.html
-    - Apparently imshow updates better
-      https://stackoverflow.com/questions/15992149/how-to-update-pcolor-in-matplotlib
-  - [X] Check updates
-    - Scaling buttons don't work well
-    - Update button doesn't work
-  - [ ] Color scheme
-  
-* Interface with c++
-  - [X] Learn how to add data to arrays through c++
-  - [X] 2D arrays?
-  - [X] Interrupt simulation once running?
-  - [X] Learn how to pass gates to c++
-    - All sorting in c++ code
-    - Python just plots
+  - [X] Color scheme
 * Fitting
-  - [X] Simple net counts
-  - [X] Fitting for gross counts
   - [ ] Reimplement MCMCGaus
     - Note that my R version is actually a minimization + sampling
     - Start my re-implementing that
