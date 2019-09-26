@@ -30,15 +30,11 @@ MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 ##find_package(Boost REQUIRED COMPONENTS numpy)
  
 # Build our library
-add_library( MakeData SHARED MakeData.cpp )
 add_library( EngeAnalyzer SHARED EngeAnalyzer.cpp)
  
 # Define the wrapper library that wraps our library
-add_library( libMakeData SHARED MakeDatalib.cpp )
 add_library( libEngeAnalyzer SHARED EngeAnalyzerlib.cpp )
-target_link_libraries( libMakeData ${Boost_LIBRARIES} MakeData )
 target_link_libraries( libEngeAnalyzer ${Boost_LIBRARIES} EngeAnalyzer
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 # don't prepend wrapper library name with lib
-set_target_properties( libMakeData PROPERTIES PREFIX "../" )
 set_target_properties( libEngeAnalyzer PROPERTIES PREFIX "../" )
