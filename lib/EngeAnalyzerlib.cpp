@@ -21,6 +21,27 @@ std::string Messages::saygoodbye( ) {
 }
 
 //----------------------------------------------------------------------
+// HISTOGRAMS
+void Histogram1D::CreateHistogram1D(std::string name, int nChannels){
+
+  Name = name;
+  
+  // Fill an empty spectrum
+  Bins.resize(nChannels);
+
+  std::cout << "Make histogram: " << Name << " with " << nChannels << " channels" << std::endl;
+  
+}
+void Histogram1D::Print(){
+
+  std::cout << "Histogram: " << Name << std::endl;
+  for(int i=0; i<10; i++)
+    std::cout << Bins[i] << " ";
+  std::cout << std::endl;
+
+}
+
+//----------------------------------------------------------------------
 // DATA STREAMS
 
 // Clear the data

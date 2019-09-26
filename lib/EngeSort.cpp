@@ -15,8 +15,13 @@ std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
 }
 
+Histogram1D hPos1;
+  
 void EngeSort::Initialize(){
 
+  hPos1.CreateHistogram1D("Pos1", 4096);
+  hPos1.Print();
+  
   Data data;
   data.ClearData();
 
@@ -400,7 +405,8 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def_readonly("SpectrumNames", &EngeSort::DataNames)
     .def("ClearData", &EngeSort::ClearData)        // void
     .def("putGate", &EngeSort::putGate)            // void
-    .def("data", range(&EngeSort::begin, &EngeSort::end)) 
+    .def("data", range(&EngeSort::begin, &EngeSort::end))
+    //    .def("Histogram1D", &Histogram1D::Histogram1D)
     ;
 
 }

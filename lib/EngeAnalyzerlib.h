@@ -15,6 +15,22 @@ class Messages{
 };
 
 //----------------------------------------------------------------------
+class Histogram1D{
+
+ public:
+
+  Histogram1D(){};
+
+  void CreateHistogram1D(std::string name, int nChannels);
+  void Print();
+  
+ private:
+
+  std::string Name;
+  std::vector<int> Bins;
+};
+
+//----------------------------------------------------------------------
 class Data{
 
  public:
