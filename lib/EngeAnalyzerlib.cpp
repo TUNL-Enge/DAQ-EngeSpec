@@ -7,6 +7,58 @@
 
 #include "EngeAnalyzerlib.h"
 
+//----------------------------------------------------------------------
+// HELLO AND GOODBYE MESSAGES
+std::string Messages::sayhello(std::string mesg){
+
+  std::string s = "Hello! This is " + mesg + " sort routine running in c++!!!";
+  return s;
+}
+
+std::string Messages::saygoodbye( ) {
+    
+  return "Goodbye! I hope I served you well";
+}
+
+//----------------------------------------------------------------------
+// DATA STREAMS
+
+// Clear the data
+void Data::ClearData(){
+  DataNames.clear();
+  DataMatrix.clear();
+
+  std::cout << "Length of DataNames = " << DataNames.size() << std::endl;
+
+}
+
+// Define a data channel
+int Data::Histogram1D(std::string name, int index){
+
+  DataNames.push_back(name);
+  
+  // Fill an empty spectrum
+  std::vector<int> tempSpec;
+  tempSpec.resize(4096,0);
+  DataMatrix.push_back(tempSpec);
+  
+}
+
+// Print details
+void Data::PrintData(){
+
+  for(int i=0; i<DataNames.size(); i++){
+    std::cout << "Name: " << DataNames[i] << std::endl;
+    for(int j=0; j<10; j++){
+      std::cout << DataMatrix[i][j] << "  ";
+    }
+    std::cout << std::endl;
+  }
+  
+}
+
+//----------------------------------------------------------------------
+// GATES
 
 // Add a vertex to the gate
 void Gate::addVertex(std::vector<double> v){

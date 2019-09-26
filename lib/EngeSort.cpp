@@ -6,19 +6,25 @@
 #include "EngeSort.h"
 #include "TV792Data.hxx"
 
-char const* EngeSort::sayhello( ) {
-    return "Hello! This is the Enge sort routine running in c++!!!";
+Messages messages;
+
+std::string EngeSort::sayhello( ) {
+  return messages.sayhello("EngeSort");
 }
-char const* EngeSort::saygoodbye( ) {
-  std::cout << "Peak 1 has " << ipeak1 << " counts" << std::endl;
-  std::cout << "Peak 2 has " << ipeak2 << " counts" << std::endl;
-  std::cout << "Gated peak has " << igated << " counts" << std::endl;
-  
-  return "Goodbye! I hope I served you well";
+std::string EngeSort::saygoodbye( ) {
+  return messages.saygoodbye();
 }
 
 void EngeSort::Initialize(){
 
+  Data data;
+  data.ClearData();
+
+  data.Histogram1D("Pos1", 0);
+  data.Histogram1D("DE", 0);
+
+  data.PrintData();
+  
   // Set the names of the data
   DataNames.clear();
   DataNames.push_back("Pos1");

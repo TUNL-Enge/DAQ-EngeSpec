@@ -30,8 +30,8 @@ class EngeSort {
   
   EngeSort() {}
   
-  char const* sayhello( );
-  char const* saygoodbye( );
+  std::string sayhello( );
+  std::string saygoodbye( );
   void Initialize();
   void ClearData();
   void SimulateData();

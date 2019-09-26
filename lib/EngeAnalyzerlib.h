@@ -1,6 +1,39 @@
 //#ifndef EngeAnalyzerlib_H
 //#define EngeAnalyzerlib_H
+typedef std::vector<std::string> StringVector;
 
+//----------------------------------------------------------------------
+class Messages{
+
+ public:
+
+  Messages(){};
+
+  std::string sayhello(std::string mesg);
+  std::string saygoodbye();
+
+};
+
+//----------------------------------------------------------------------
+class Data{
+
+ public:
+
+  // Clear all data
+  void ClearData();
+  // Make a data stream
+  int Histogram1D(std::string, int);
+  // Print all data (poorly formatted)
+  void PrintData();
+
+ private:
+  
+  StringVector DataNames;
+  std::vector<std::vector<int>> DataMatrix;
+
+};
+
+//----------------------------------------------------------------------
 class Gate{
   
  public:
