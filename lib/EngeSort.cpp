@@ -3,13 +3,13 @@
 #include <random>
 #include <chrono>
 
-#include "EngeAnalyzer.h"
+#include "EngeSort.h"
 #include "TV792Data.hxx"
 
-char const* EngeAnalyzer::sayhello( ) {
-    return "Hello! This is the data maker running in c++!!!";
+char const* EngeSort::sayhello( ) {
+    return "Hello! This is the Enge sort routine running in c++!!!";
 }
-char const* EngeAnalyzer::saygoodbye( ) {
+char const* EngeSort::saygoodbye( ) {
   std::cout << "Peak 1 has " << ipeak1 << " counts" << std::endl;
   std::cout << "Peak 2 has " << ipeak2 << " counts" << std::endl;
   std::cout << "Gated peak has " << igated << " counts" << std::endl;
@@ -17,7 +17,7 @@ char const* EngeAnalyzer::saygoodbye( ) {
   return "Goodbye! I hope I served you well";
 }
 
-void EngeAnalyzer::Initialize(){
+void EngeSort::Initialize(){
 
   // Set the names of the data
   DataNames.clear();
@@ -71,7 +71,7 @@ void EngeAnalyzer::Initialize(){
   
 }
 
-int EngeAnalyzer::connectMidasAnalyzer(){
+int EngeSort::connectMidasAnalyzer(){
 
   MidasAnalyzerModule mAMod;
   //TARegisterModule tarm(&mAMod);
@@ -85,8 +85,8 @@ int EngeAnalyzer::connectMidasAnalyzer(){
     
   return 0;
 }
-void EngeAnalyzer::GenerateDataMatrix(int n)
-//void EngeAnalyzer::GenerateDataMatrix(int n)
+void EngeSort::GenerateDataMatrix(int n)
+//void EngeSort::GenerateDataMatrix(int n)
 {
   int nbins = 4096;
   int nspec = 2;
@@ -153,7 +153,7 @@ void EngeAnalyzer::GenerateDataMatrix(int n)
   
 }
 
-void EngeAnalyzer::putADC(uint32_t *dADC){
+void EngeSort::putADC(uint32_t *dADC){
 
   int size = sizeof(dADC)/sizeof(dADC[0]);
   /*
@@ -195,7 +195,7 @@ void EngeAnalyzer::putADC(uint32_t *dADC){
   
 }
 
-np::ndarray EngeAnalyzer::getData(){
+np::ndarray EngeSort::getData(){
   
   // Create the matrix to return to python
   u_int n_rows = DataMatrix.size();
@@ -228,7 +228,7 @@ np::ndarray EngeAnalyzer::getData(){
   
 }
 
-np::ndarray EngeAnalyzer::getData2D(){
+np::ndarray EngeSort::getData2D(){
   
   // Create the 3D matrix to return to python
   u_int n_t = DataMatrix2D.size();
@@ -260,7 +260,7 @@ np::ndarray EngeAnalyzer::getData2D(){
 }
 
 
-void EngeAnalyzer::putGate(char* name, p::list x, p::list y){
+void EngeSort::putGate(char* name, p::list x, p::list y){
 
   //std::cout << "The name is " << name << std::endl;
   p::ssize_t len = p::len(x);
@@ -283,7 +283,7 @@ void EngeAnalyzer::putGate(char* name, p::list x, p::list y){
   
 }
 
-void EngeAnalyzer::ClearData(){
+void EngeSort::ClearData(){
 
   // Clear the 1D data
   std::vector<int> row;
@@ -303,64 +303,6 @@ void EngeAnalyzer::ClearData(){
 }
 
 //----------------------------------------------------------------------
-// Gates
-// Add a vertex to the gate
-void Gate::addVertex(std::vector<double> v){
-  Points.push_back(v);
-
-  // Set the rough bound of the gate
-  if(Points.size() == 1){
-    minx = v[0];
-    maxx = v[0];
-    miny = v[1];
-    maxy = v[1];
-  } else {
-    if(v[0] > maxx)maxx=v[0];
-    if(v[0] < minx)minx=v[0];
-    if(v[1] > maxy)maxy=v[1];
-    if(v[1] < miny)miny=v[1];
-  }
-  //std::cout << v[0] << " " << v[1] << std::endl;
-}
-
-bool Gate::inBound(double testx, double testy){
-
-  bool inbound = false;
-  if((testx < maxx) & (testx > minx) &
-     (testy < maxy) & (testy > miny))inbound = true;
-
-  return inbound;
-}
-
-int Gate::pnpoly(double testx, double testy)
-{
-  int nvert = Points.size();
-  //std::cout << "(x,y) = (" << testx << "," << testy << ")" << std::endl;
-  
-  int i, j, c = 0;
-  for (i = 0, j = nvert-1; i < nvert; j = i++) {
-    if ( ((Points[i][1]>testy) != (Points[j][1]>testy)) &&
-	 (testx < (Points[j][0]-Points[i][0]) * (testy-Points[i][1]) /
-	  (Points[j][1]-Points[i][1]) + Points[i][0]) )
-       c = !c;
-  }
-  //std::cout << "c=" << c << std::endl;
-  return c;
-}
-
-// Main gate testing function - is (testx,testy) in the gate?
-int Gate::inGate(double testx, double testy){
-
-  int c = 0;
-  // Is the gate defined?
-  if(Points.size()>0){
-    // Is the point in the rough gate?
-    if(inBound(testx, testy))
-      // Is it in the true gate?
-      c = pnpoly(testx,testy);
-  }
-  return c;
-}
 
 /* 
    manalyzer module
@@ -420,3 +362,39 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 
 }
 
+BOOST_PYTHON_MODULE(libEngeSort)
+{
+  using namespace boost::python;
+  // Initialize numpy
+  Py_Initialize();
+  boost::python::numpy::initialize();
+  //    def( "MakeData", MakeData );
+
+  class_<vec>("double_vec")
+    .def(vector_indexing_suite<vec>());
+  class_<mat>("double_mat")
+    .def(vector_indexing_suite<mat>());
+  class_<mat2d>("double_mat2d")
+    .def(vector_indexing_suite<mat2d>());
+  class_<StringVector>("StringVector")
+    .def(vector_indexing_suite<StringVector>());
+  class_<BoolVector>("BoolVector")
+    .def(vector_indexing_suite<BoolVector>());
+    
+  class_<EngeSort>("EngeSort")
+    .def("sayhello", &EngeSort::sayhello)          // string
+    .def("saygoodbye", &EngeSort::saygoodbye)          // string
+    .def("Initialize", &EngeSort::Initialize)          // void
+    .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
+    .def("GenerateDataMatrix", &EngeSort::GenerateDataMatrix) // void
+    .def("getData", &EngeSort::getData)                // 1D histograms
+    .def("getData2D", &EngeSort::getData2D)            // 2D histograms
+    .def("getis2D", &EngeSort::getis2D)                // bool vector
+    .def("gethasGate", &EngeSort::gethasGate)          // bool vector
+    .def_readonly("SpectrumNames", &EngeSort::DataNames)
+    .def("ClearData", &EngeSort::ClearData)        // void
+    .def("putGate", &EngeSort::putGate)            // void
+    .def("data", range(&EngeSort::begin, &EngeSort::end)) 
+    ;
+
+}

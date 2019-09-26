@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib as plt
 
 ## Import my own c++ library!
-import libEngeAnalyzer
+import EngeSort
 
 class SpectrumObject:
     def __init__(self, num):

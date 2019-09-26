@@ -28,13 +28,18 @@ link_directories( ${ROOTANASYS}/lib )
 MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 
 ##find_package(Boost REQUIRED COMPONENTS numpy)
+
+#include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/lib )
+# Define the general Enge analyzer library
+add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
+
+# Build our Sort Routine
+add_library( EngeSort SHARED EngeSort.cpp)
  
-# Build our library
-add_library( EngeAnalyzer SHARED EngeAnalyzer.cpp)
- 
-# Define the wrapper library that wraps our library
-add_library( libEngeAnalyzer SHARED EngeAnalyzerlib.cpp )
-target_link_libraries( libEngeAnalyzer ${Boost_LIBRARIES} EngeAnalyzer
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
+
+target_link_libraries( EngeSort ${Boost_LIBRARIES} 
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  EngeAnalyzer)
+
 # don't prepend wrapper library name with lib
-set_target_properties( libEngeAnalyzer PROPERTIES PREFIX "../" )
+set_target_properties( EngeSort PROPERTIES PREFIX "../" )
+#set_target_properties( EngeAnalyzer PROPERTIES PREFIX "../lib" )

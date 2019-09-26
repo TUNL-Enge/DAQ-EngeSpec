@@ -1,5 +1,6 @@
 //#ifndef EngeAnalyzer_H
 //#define EngeAnalyzer_H
+#include "EngeAnalyzerlib.h"
 
 #include <vector>
 #include <random>
@@ -9,9 +10,6 @@
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "boost/multi_array.hpp"
-
-//#include "TRootanaEventLoop.hxx"
-//#include "THistogramArrayBase.h"
 
 #include "manalyzer.h"
 #include "midasio.h"
@@ -26,33 +24,11 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 
 
-
-class Gate{
-  
- public:
-  
-  Gate() {};
-  
-  void addVertex(std::vector<double> v);
-  std::vector<std::vector<double>> getPoints(){return Points;}
-  bool inBound(double x, double y);
-  int pnpoly(double testx, double testy);
-  int inGate(double x, double y);
-  
- private:
-  
-  std::vector<std::vector<double>> Points;
-  double minx, maxx, miny, maxy;
-  
-};
-
-
-
 //class EngeAnalyzer: public TRootanaEventLoop {
-class EngeAnalyzer {
+class EngeSort {
  public:
   
-  EngeAnalyzer() {}
+  EngeSort() {}
   
   char const* sayhello( );
   char const* saygoodbye( );
@@ -105,20 +81,18 @@ class EngeAnalyzer {
   int igated = 0;
 };
 
-
-
 /*
   Classes for manalyzer-type analyzer
 */
 class MidasAnalyzerModule: public TAFactory{
  public:
   void Init(const std::vector<std::string> &args);
-  void ConnectEngeAnalyzer(EngeAnalyzer *ea){eA=ea;}
+  void ConnectEngeAnalyzer(EngeSort *ea){eA=ea;}
   void Finish();
   TARunObject* NewRunObject(TARunInfo* runinfo);
     
   int fTotalEventCounter;
-  EngeAnalyzer *eA;
+  EngeSort *eA;
 };
   
 class MidasAnalyzerRun: public TARunObject{

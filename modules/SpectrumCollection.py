@@ -9,7 +9,7 @@ import time
 from SpectrumHandlers import *
 
 ## Import my own c++ library!
-import libEngeAnalyzer
+import EngeSort
 
 class SpectrumCollection:
     def __init__(self, num):
@@ -21,7 +21,7 @@ class SpectrumCollection:
         self.Name = "Test Collection of Spectra"
 
         ## Load the data library
-        self.dm = libEngeAnalyzer.EngeAnalyzer()
+        self.dm = EngeSort.EngeSort()
 
         self.isRunning = False
         self.MIDASisRunning = False
