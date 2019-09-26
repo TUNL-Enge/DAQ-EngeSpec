@@ -37,9 +37,9 @@ add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 add_library( EngeSort SHARED EngeSort.cpp)
  
 
-target_link_libraries( EngeSort ${Boost_LIBRARIES} 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  EngeAnalyzer)
+target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  )
 
 # don't prepend wrapper library name with lib
 set_target_properties( EngeSort PROPERTIES PREFIX "../" )
-#set_target_properties( EngeAnalyzer PROPERTIES PREFIX "../lib" )
+

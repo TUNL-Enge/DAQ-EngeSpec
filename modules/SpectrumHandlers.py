@@ -22,7 +22,7 @@ class SpectrumObject:
         self.yzoom = [0,1]
 
         ## Load the data library
-        self.dm = libEngeAnalyzer.EngeAnalyzer()
+        self.dm = EngeSort.EngeSort()
 
         self.gate = None
         self.hasGate = False

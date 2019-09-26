@@ -362,7 +362,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 
 }
 
-BOOST_PYTHON_MODULE(libEngeSort)
+BOOST_PYTHON_MODULE(EngeSort)
 {
   using namespace boost::python;
   // Initialize numpy
