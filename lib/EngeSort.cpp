@@ -16,73 +16,27 @@ std::string EngeSort::saygoodbye( ) {
 }
 
 Histogram1D *hPos1;
-  
+Histogram1D *hDE;
+Histogram1D *hPos1_gDEvPos1;
+
+Histogram2D *hDEvsPos1;
+
 void EngeSort::Initialize(){
 
-  /*  hPos1 -> CreateHistogram1D("Pos1", 4096);
-  hPos1 -> Print();
-  */
-  hPos1 = new Histogram1D("Pos1", 4096);
-  hPos1 -> Print(0, 10);
-  
-  Data data;
-  data.ClearData();
+  //--------------------
+  // 1D Histograms
+  hPos1 = new Histogram1D("Position 1", 4096);
+  //  hPos1 -> Print(0, 10);
+  hDE = new Histogram1D("Delta E", 4096);
 
-  data.Histogram1D("Pos1", 0);
-  data.Histogram1D("DE", 0);
+  //--------------------
+  // 2D Histograms
+  hDEvsPos1 = new Histogram2D("DE vs Pos 1", 256);
 
-  data.PrintData();
-  
-  // Set the names of the data
-  DataNames.clear();
-  DataNames.push_back("Pos1");
-  is2D.push_back(false);
-  hasGate.push_back(false);
-  DataNames.push_back("DE");
-  is2D.push_back(false);
-  hasGate.push_back(true);
-  DataNames.push_back("Pos1-cut");
-  is2D.push_back(false);
-  hasGate.push_back(false);
-  
-  // Fill some empty spectra
-  std::vector<int> tempSpec;
-  tempSpec.resize(4096,0);
-  DataMatrix.clear();
-  for(int i=0; i<DataNames.size(); i++)
-    DataMatrix.push_back(tempSpec);
-
-  // Then make 2D spectrum
-  DataNames.push_back("DEvsPos1");
-  is2D.push_back(true);
-  hasGate.push_back(true);
-  std::vector<int> row;
-  row.resize(256,0);
-  std::vector<std::vector<int>> tempSpec2D;
-  for(int i=0; i<256; i++)
-    tempSpec2D.push_back(row);
-  //  tempSpec2D[0].resize(256,0);
-  DataMatrix2D.push_back(tempSpec2D);
-
-  // Make Gated spectra
-  DataNames.push_back("DEvsPos1-gated");
-  is2D.push_back(true);
-  hasGate.push_back(false);
-  tempSpec2D.clear();
-  for(int i=0; i<256; i++)
-    tempSpec2D.push_back(row);
-  //  tempSpec2D[0].resize(256,0);
-  DataMatrix2D.push_back(tempSpec2D);
-
-  /*
-  u_int n_t = DataMatrix2D.size();
-  u_int n_rows = DataMatrix2D[0].size();
-  u_int n_cols = DataMatrix2D[0][0].size();
-  std::cout << n_t << " " << n_rows << " " << n_cols << std::endl;
-  */
-  
-  std::cout << "Made " << DataNames.size() << " empty spectra" << std::endl;
-  
+  //--------------------
+  // Gated Histograms
+  hPos1_gDEvPos1 = new Histogram1D("Pos. 1; GPos1vDE", 4096);
+    
 }
 
 int EngeSort::connectMidasAnalyzer(){
@@ -98,73 +52,6 @@ int EngeSort::connectMidasAnalyzer(){
   Py_END_ALLOW_THREADS
     
   return 0;
-}
-void EngeSort::GenerateDataMatrix(int n)
-//void EngeSort::GenerateDataMatrix(int n)
-{
-  int nbins = 4096;
-  int nspec = 2;
-
-  std::normal_distribution<double> distribution1(1500.0,200.0);
-  std::normal_distribution<double> distribution2(2000.0,100.0);
-  std::normal_distribution<double> distribution3(1700.0,200.0);
-  std::normal_distribution<double> distribution4(3000.0,100.0);
-  std::normal_distribution<double> crap(100,50); 
-
-
-  Gate G1;
-  if(GateCollection.size()>0){
-    G1 = GateCollection[0];
-  }
-  
-  // Fill the spectra
-  std::vector<double> d1, d2;
-  for(int i=0; i<n; i++){
-    if(crap(generator)>120){
-      ipeak1++;
-      d1.push_back(distribution1(generator));
-      d2.push_back(distribution2(generator));
-    } else {
-      ipeak2++;
-      d1.push_back(distribution3(generator));
-      d2.push_back(distribution4(generator));
-    }
-    DataMatrix[0][int(d1[i])]++;
-    DataMatrix[1][int(d2[i])]++;
-    DataMatrix2D[0][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
-
-    
-    // The gated spectrum
-    // Is the gate defined?
-    if(G1.inGate(d1[i],d2[i])){
-      igated++;
-      DataMatrix2D[1][int(d1[i]/16.0)][int(d2[i]/16.0)]++;
-      DataMatrix[2][int(d1[i])]++;
-    }
-
-  }
-  /*
-  // Test the gate
-  G1.pnpoly(0,0);
-  G1.pnpoly(1000,1000);
-  G1.pnpoly(500,500);
-  G1.pnpoly(1000,500);
-  */
-  /*  
-  for(int i=0; i<50; i++){
-    for(int j=0; j<50; j++){
-      std::cout << DataMatrix2D[0][i][j] << " ";
-    }
-    std::cout << std::endl;
-  }
-  */
-
-  /*
-    Py_BEGIN_ALLOW_THREADS
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-    Py_END_ALLOW_THREADS
-  */
-  
 }
 
 void EngeSort::putADC(uint32_t *dADC){

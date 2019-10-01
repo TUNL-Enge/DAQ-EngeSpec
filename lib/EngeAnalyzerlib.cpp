@@ -41,9 +41,36 @@ void Histogram1D::Print(int minBin=0, int maxBin=10){
 
 }
 
+// 2D Histogram
+Histogram2D::Histogram2D(std::string name, int nChannels){
+
+  Name = name;
+
+  // Fill an empty spectrum
+  std::vector<int> row;
+  row.resize(nChannels,0);
+  for(int i=0; i<nChannels; i++)
+    Bins.push_back(row);
+
+  std::cout << "Make histogram: " << Name << " with " << nChannels << "x" << nChannels
+	    << " channels" << std::endl;
+}
+  
+void Histogram2D::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=0){
+
+  std::cout << "Histogram: " << Name << std::endl;
+  for(int i=minBinx; i<maxBinx; i++){
+    for(int j=minBiny; j<maxBiny; j++){
+      std::cout << Bins[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+
+}
+
 //----------------------------------------------------------------------
 // DATA STREAMS
-
+/*
 // Clear the data
 void Data::ClearData(){
   DataNames.clear();
@@ -77,6 +104,7 @@ void Data::PrintData(){
   }
   
 }
+*/
 
 //----------------------------------------------------------------------
 // GATES

@@ -27,9 +27,26 @@ class Histogram1D{
 
   std::string Name;
   std::vector<int> Bins;
-};
 
+};
 //----------------------------------------------------------------------
+class Histogram2D{
+
+ public:
+
+  Histogram2D(std::string name, int nChannels);
+
+  void Print(int, int, int, int);
+  
+ private:
+
+  std::string Name;
+  std::vector<std::vector<int>> Bins;
+  double compress;                            // Compression factor for 2D histogram (unused)
+
+};
+//----------------------------------------------------------------------
+/*
 class Data{
 
  public:
@@ -47,6 +64,7 @@ class Data{
   std::vector<std::vector<int>> DataMatrix;
 
 };
+*/
 
 //----------------------------------------------------------------------
 class Gate{
