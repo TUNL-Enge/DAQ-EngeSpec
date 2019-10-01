@@ -22,7 +22,7 @@ std::string Messages::saygoodbye( ) {
 
 //----------------------------------------------------------------------
 // HISTOGRAMS
-void Histogram1D::CreateHistogram1D(std::string name, int nChannels){
+Histogram1D::Histogram1D(std::string name, int nChannels){
 
   Name = name;
   
@@ -30,12 +30,12 @@ void Histogram1D::CreateHistogram1D(std::string name, int nChannels){
   Bins.resize(nChannels);
 
   std::cout << "Make histogram: " << Name << " with " << nChannels << " channels" << std::endl;
-  
 }
-void Histogram1D::Print(){
+  
+void Histogram1D::Print(int minBin=0, int maxBin=10){
 
   std::cout << "Histogram: " << Name << std::endl;
-  for(int i=0; i<10; i++)
+  for(int i=minBin; i<maxBin; i++)
     std::cout << Bins[i] << " ";
   std::cout << std::endl;
 

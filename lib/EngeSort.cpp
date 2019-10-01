@@ -15,12 +15,15 @@ std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
 }
 
-Histogram1D hPos1;
+Histogram1D *hPos1;
   
 void EngeSort::Initialize(){
 
-  hPos1.CreateHistogram1D("Pos1", 4096);
-  hPos1.Print();
+  /*  hPos1 -> CreateHistogram1D("Pos1", 4096);
+  hPos1 -> Print();
+  */
+  hPos1 = new Histogram1D("Pos1", 4096);
+  hPos1 -> Print(0, 10);
   
   Data data;
   data.ClearData();

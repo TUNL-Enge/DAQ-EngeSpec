@@ -19,10 +19,9 @@ class Histogram1D{
 
  public:
 
-  Histogram1D(){};
+  Histogram1D(std::string name, int nChannels);
 
-  void CreateHistogram1D(std::string name, int nChannels);
-  void Print();
+  void Print(int, int);
   
  private:
 
