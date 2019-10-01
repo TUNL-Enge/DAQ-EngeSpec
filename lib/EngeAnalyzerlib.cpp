@@ -23,6 +23,57 @@ std::string Messages::saygoodbye( ) {
 //----------------------------------------------------------------------
 // HISTOGRAMS
 
+// Generic Histograms
+Histogram::Histogram(std::string name, int nChannels, int dims){
+  Name = name;
+  nDims = dims;
+  hasGate = false;
+  
+  // Fill an empty spectrum
+  switch(dims){
+  case 1:
+    Bins1D.resize(nChannels);
+    break;
+  case 2:
+    std::vector<int> row;
+    row.resize(nChannels,0);
+    for(int i=0; i<nChannels; i++)
+      Bins2D.push_back(row);
+    break;
+    //  default:
+    //std::cout << "You have the wrong number of dimensions! " << dims << std::endl;
+  }
+  
+  std::cout << "Make histogram: " << Name << " with " << nChannels << " channels" << std::endl;
+}
+void Histogram::inc(int c){
+  Bins1D[c]++;
+}
+void Histogram::inc(int cx, int cy){
+  Bins2D[cx][cy]++;
+}
+void Histogram::Print(int minBin=0, int maxBin=10){
+
+  std::cout << "Histogram: " << Name << std::endl;
+  for(int i=minBin; i<maxBin; i++)
+    std::cout << Bins1D[i] << " ";
+  std::cout << std::endl;
+
+}
+void Histogram::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=0){
+
+  std::cout << "Histogram: " << Name << std::endl;
+  for(int i=minBinx; i<maxBinx; i++){
+    for(int j=minBiny; j<maxBiny; j++){
+      std::cout << Bins2D[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+
+}
+
+
+
 // 1D Histogram definition
 Histogram1D::Histogram1D(std::string name, int nChannels){
 

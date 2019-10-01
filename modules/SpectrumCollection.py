@@ -283,11 +283,12 @@ class MidasCollectionThread(QThread):
         self.hasGates = self.specColl.dm.gethasGate()
 
     def run(self):
-        ##print("Collecting MIDAS data")
+        print("Collecting MIDAS data")
         while self.specColl.MIDASisRunning:
+            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())
-            ##print(dat[:,0])
-            dat2d = self.specColl.dm.getData2D()
+            print(dat[:,0])
+            ##dat2d = self.specColl.dm.getData2D()
         
             ## Go through the names and fill them for the appropriate data
             counter1d=0

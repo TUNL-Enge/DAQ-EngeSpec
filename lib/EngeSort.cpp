@@ -18,11 +18,11 @@ std::string EngeSort::saygoodbye( ) {
 int Channels1D = 4096;
 int Channels2D = 256;
 
-Histogram1D *hPos1;
-Histogram1D *hDE;
-Histogram1D *hPos1_gDEvPos1;
+Histogram *hPos1;
+Histogram *hDE;
+Histogram *hPos1_gDEvPos1;
 
-Histogram2D *hDEvsPos1;
+Histogram *hDEvsPos1;
 
 void EngeSort::Initialize(){
 
@@ -30,13 +30,16 @@ void EngeSort::Initialize(){
   
   //--------------------
   // 1D Histograms
-  hname = "Position 1";
-  hPos1 = new Histogram1D(hname, Channels1D);
-  SpectrumNames.push_back(hname);
-  is2D.push_back(false);
-  hasGate.push_back(false);
-
+  hPos1 = new Histogram("Position 1", Channels1D, 1);
   //  hPos1 -> Print(0, 10);
+
+  // TODO
+  // http://www.cplusplus.com/forum/general/103269/
+  // http://www.cplusplus.com/reference/set/set/
+  // Make a struct that holds all of the histograms. This could then
+  // be iterated over to collect data, etc.
+
+  /*
   hname = "Delta E";
   hDE = new Histogram1D(hname, Channels1D);
   SpectrumNames.push_back(hname);
@@ -58,7 +61,7 @@ void EngeSort::Initialize(){
   SpectrumNames.push_back(hname);
   is2D.push_back(false);
   hasGate.push_back(false);
-
+  */
 }
 
 //======================================================================
