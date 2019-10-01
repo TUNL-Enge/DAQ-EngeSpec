@@ -59,11 +59,13 @@ class EngeSort {
     return Dat[0].end();
   }
   
-  StringVector DataNames;
-
+  StringVector getSpectrumNames(){return SpectrumNames;}
   
  private:
   bool isRunning = false;
+
+  StringVector SpectrumNames;
+
   std::vector<int> Dat[2];
   std::vector<bool> is2D;
   std::vector<bool> hasGate;

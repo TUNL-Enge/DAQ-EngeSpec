@@ -26,20 +26,39 @@ Histogram2D *hDEvsPos1;
 
 void EngeSort::Initialize(){
 
+  std::string hname;
+  
   //--------------------
   // 1D Histograms
-  hPos1 = new Histogram1D("Position 1", Channels1D);
-  //  hPos1 -> Print(0, 10);
-  hDE = new Histogram1D("Delta E", Channels1D);
+  hname = "Position 1";
+  hPos1 = new Histogram1D(hname, Channels1D);
+  SpectrumNames.push_back(hname);
+  is2D.push_back(false);
+  hasGate.push_back(false);
 
+  //  hPos1 -> Print(0, 10);
+  hname = "Delta E";
+  hDE = new Histogram1D(hname, Channels1D);
+  SpectrumNames.push_back(hname);
+  is2D.push_back(false);
+  hasGate.push_back(false);
+  
   //--------------------
   // 2D Histograms
-  hDEvsPos1 = new Histogram2D("DE vs Pos 1", Channels2D);
-
+  hname = "DE vs Pos 1";
+  hDEvsPos1 = new Histogram2D(hname, Channels2D);
+  SpectrumNames.push_back(hname);
+  is2D.push_back(true);
+  hasGate.push_back(false);
+  
   //--------------------
   // Gated Histograms
-  hPos1_gDEvPos1 = new Histogram1D("Pos. 1; GPos1vDE", Channels1D);
-    
+  hname = "Pos. 1; GPos1vDE";
+  hPos1_gDEvPos1 = new Histogram1D(hname, Channels1D);
+  SpectrumNames.push_back(hname);
+  is2D.push_back(false);
+  hasGate.push_back(false);
+
 }
 
 //======================================================================
@@ -63,6 +82,7 @@ void EngeSort::sort(uint32_t *dADC){
   hPos1 -> inc(cPos1);
   hDE -> inc(cDE);
   hDEvsPos1 -> inc(cPos1, cDE);
+
   /*
   DataMatrix[0][int(dADC[cPos1])]++;
   DataMatrix[1][int(dADC[cDE])]++;
@@ -228,7 +248,7 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
 void MidasAnalyzerModule::Finish(){
   printf("Finish!");
   printf("Counted %d events\n",fTotalEventCounter);
-  std::cout << "number of spectra: " << eA->DataNames.size() << std::endl;
+  std::cout << "number of spectra: " << eA->getSpectrumNames().size() << std::endl;
 }
 TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
   printf("NewRunObject, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
@@ -295,7 +315,7 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2D", &EngeSort::getis2D)                // bool vector
     .def("gethasGate", &EngeSort::gethasGate)          // bool vector
-    .def_readonly("SpectrumNames", &EngeSort::DataNames)
+    .def("getSpectrumNames", &EngeSort::getSpectrumNames)
     .def("ClearData", &EngeSort::ClearData)        // void
     .def("putGate", &EngeSort::putGate)            // void
     .def("data", range(&EngeSort::begin, &EngeSort::end))
