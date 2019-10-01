@@ -82,8 +82,8 @@ class SpectrumCollection:
         sObj = SpectrumObject2D(0)
         sObj.Name = list(self.df)[0] + "vs" + list(self.df)[1]
         sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
-            x=self.df.loc[:,list(self.df)[0]],
-            y=self.df.loc[:,list(self.df)[1]],
+            x=self.df.loc[:,list(self.df)[0]]/16,
+            y=self.df.loc[:,list(self.df)[1]]/16,
             bins=sObj.nx)
         sObj.spec2d_temp[:] = sObj.spec2d
         self.spec2d.append(sObj)

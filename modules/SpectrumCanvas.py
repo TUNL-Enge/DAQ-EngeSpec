@@ -172,18 +172,19 @@ class SpectrumCanvas(FigureCanvas):
             self.a.clear()
 
             x = xe[xe>xmin]# & xe<xmax]
-            x = x[x<xmax]
+            x = x[x<xmax].astype(int)
             y = ye[ye>ymin]# & ye<ymax]
-            y = y[y<ymax]
+            y = y[y<ymax].astype(int)
             Xcut, Ycut = np.meshgrid(x,y)
+
             Hmax = H[Xcut,Ycut].max()
                         
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
             self.a.pcolormesh(X,Y,H,vmin=0,vmax=Hmax,cmap=self.cols)
 
-            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
-                self.drawGate()
+#            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
+#                self.drawGate()
 
         self.fig.canvas.draw()
     
