@@ -22,6 +22,8 @@ std::string Messages::saygoodbye( ) {
 
 //----------------------------------------------------------------------
 // HISTOGRAMS
+
+// 1D Histogram definition
 Histogram1D::Histogram1D(std::string name, int nChannels){
 
   Name = name;
@@ -31,7 +33,13 @@ Histogram1D::Histogram1D(std::string name, int nChannels){
 
   std::cout << "Make histogram: " << Name << " with " << nChannels << " channels" << std::endl;
 }
-  
+
+// Increment channel c
+void Histogram1D::inc(int c){
+  Bins[c]++;
+}
+
+// Print some bins for debugging purposes
 void Histogram1D::Print(int minBin=0, int maxBin=10){
 
   std::cout << "Histogram: " << Name << std::endl;
@@ -55,7 +63,12 @@ Histogram2D::Histogram2D(std::string name, int nChannels){
   std::cout << "Make histogram: " << Name << " with " << nChannels << "x" << nChannels
 	    << " channels" << std::endl;
 }
-  
+
+// Increment channel [cx,cy]
+void Histogram2D::inc(int cx, int cy){
+  Bins[cx][cy]++;
+}
+// Print some channels for debugging
 void Histogram2D::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=0){
 
   std::cout << "Histogram: " << Name << std::endl;

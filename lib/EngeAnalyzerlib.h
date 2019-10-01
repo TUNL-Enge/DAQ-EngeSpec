@@ -21,6 +21,7 @@ class Histogram1D{
 
   Histogram1D(std::string name, int nChannels);
 
+  void inc(int);
   void Print(int, int);
   
  private:
@@ -36,6 +37,7 @@ class Histogram2D{
 
   Histogram2D(std::string name, int nChannels);
 
+  void inc(int, int);
   void Print(int, int, int, int);
   
  private:

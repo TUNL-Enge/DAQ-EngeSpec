@@ -40,11 +40,10 @@ class EngeSort {
   int connectMidasAnalyzer();
   
   // New 2d matrix method
-  void GenerateDataMatrix(int n = 1000);
   np::ndarray getData();
   np::ndarray getData2D();
 
-  void putADC(uint32_t *dADC);
+  void sort(uint32_t *dADC);
   
   BoolVector getis2D(){return is2D;}
   BoolVector gethasGate(){return hasGate;}

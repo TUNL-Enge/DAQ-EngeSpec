@@ -15,6 +15,9 @@ std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
 }
 
+int Channels1D = 4096;
+int Channels2D = 256;
+
 Histogram1D *hPos1;
 Histogram1D *hDE;
 Histogram1D *hPos1_gDEvPos1;
@@ -25,58 +28,45 @@ void EngeSort::Initialize(){
 
   //--------------------
   // 1D Histograms
-  hPos1 = new Histogram1D("Position 1", 4096);
+  hPos1 = new Histogram1D("Position 1", Channels1D);
   //  hPos1 -> Print(0, 10);
-  hDE = new Histogram1D("Delta E", 4096);
+  hDE = new Histogram1D("Delta E", Channels1D);
 
   //--------------------
   // 2D Histograms
-  hDEvsPos1 = new Histogram2D("DE vs Pos 1", 256);
+  hDEvsPos1 = new Histogram2D("DE vs Pos 1", Channels2D);
 
   //--------------------
   // Gated Histograms
-  hPos1_gDEvPos1 = new Histogram1D("Pos. 1; GPos1vDE", 4096);
+  hPos1_gDEvPos1 = new Histogram1D("Pos. 1; GPos1vDE", Channels1D);
     
 }
 
-int EngeSort::connectMidasAnalyzer(){
-
-  MidasAnalyzerModule mAMod;
-  //TARegisterModule tarm(&mAMod);
-  TARegister tar(&mAMod);
-
-  mAMod.ConnectEngeAnalyzer(this);
-  
-  Py_BEGIN_ALLOW_THREADS
-    manalyzer_main(0,0);
-  Py_END_ALLOW_THREADS
-    
-  return 0;
-}
-
-void EngeSort::putADC(uint32_t *dADC){
+//======================================================================
+// This is the equivalent to the "sort" function in jam
+void EngeSort::sort(uint32_t *dADC){
 
   int size = sizeof(dADC)/sizeof(dADC[0]);
-  /*
-  std::cout << "Channels: " << size << std::endl;
-  for(int i=0; i<size; i++){
-    std::cout << i << ": " << dADC[i] << "  " ;
-  }
-  std::cout << std::endl;
-  */  
-  int cPos1 = 0;
-  int cDE = 1;
 
-  if(dADC[cPos1] < 200 || dADC[cPos1] > 4095)dADC[cPos1] = 0;
-  if(dADC[cDE] < 200 || dADC[cDE] > 4095)dADC[cDE] = 0;
+  // Thresholds
+  int Threshold = 200;
   
+  // Define the channels
+  int cPos1 = dADC[0];
+  int cDE = dADC[1];
+
+  // Apply software thresholds
+  if(cPos1 < Threshold || cPos1 > Channels1D)cPos1 = 0;
+  if(cDE < Threshold || cDE > Channels1D)cDE = 0;
+
+  // Increment histograms
+  hPos1 -> inc(cPos1);
+  hDE -> inc(cDE);
+  hDEvsPos1 -> inc(cPos1, cDE);
+  /*
   DataMatrix[0][int(dADC[cPos1])]++;
   DataMatrix[1][int(dADC[cDE])]++;
 
-  /*  std::cout << dADC[cPos1] << " " << dADC[cDE] << std::endl;
-  std::cout << int(dADC[cPos1]/16.0) << "  " << int(dADC[cDE]/16.0)
-	    << std::endl;
-  */
   
   DataMatrix2D[0][int(dADC[cPos1]/16.0)][int(dADC[cDE]/16.0)]++;
 
@@ -93,8 +83,26 @@ void EngeSort::putADC(uint32_t *dADC){
     DataMatrix2D[1][int(dADC[cPos1]/16.0)][int(dADC[cDE]/16.0)]++;
     DataMatrix[2][int(dADC[cPos1])]++;
   }
-  
+
+  */  
 }
+
+
+int EngeSort::connectMidasAnalyzer(){
+
+  MidasAnalyzerModule mAMod;
+  //TARegisterModule tarm(&mAMod);
+  TARegister tar(&mAMod);
+
+  mAMod.ConnectEngeAnalyzer(this);
+  
+  Py_BEGIN_ALLOW_THREADS
+    manalyzer_main(0,0);
+  Py_END_ALLOW_THREADS
+    
+  return 0;
+}
+
 
 np::ndarray EngeSort::getData(){
   
@@ -226,6 +234,23 @@ TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
   printf("NewRunObject, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
   return new MidasAnalyzerRun(runinfo, this);
 }
+TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
+				    TAFlags* flags, TAFlowEvent* flow){
+
+  if(event->event_id != 1)
+    return flow;
+
+  // Get the ADC Bank
+  TMBank* bADC = event->FindBank("ADC1");
+  uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
+
+  fRunEventCounter++;
+  fModule->fTotalEventCounter++;
+  fModule->eA->sort(dADC);
+
+  return flow;
+
+}
 
 /* 
    manalyzer run
@@ -240,27 +265,6 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
-}
-TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
-				    TAFlags* flags, TAFlowEvent* flow){
-  //printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo,
-  //	 event->serial_number, (int)event->event_id, event->data_size);
-
-  if(event->event_id != 1)
-    return flow;
-
-  // Get the ADC Bank
-  TMBank* bADC = event->FindBank("ADC1");
-
-  uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
-  //std::cout << dADC[0] << "  " << dADC[1] << "  " << dADC[2] << "  " << dADC[3] << std::endl;
-  
-  fRunEventCounter++;
-  fModule->fTotalEventCounter++;
-  fModule->eA->putADC(dADC);
-
-  return flow;
-
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
@@ -287,7 +291,6 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("saygoodbye", &EngeSort::saygoodbye)          // string
     .def("Initialize", &EngeSort::Initialize)          // void
     .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
-    .def("GenerateDataMatrix", &EngeSort::GenerateDataMatrix) // void
     .def("getData", &EngeSort::getData)                // 1D histograms
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2D", &EngeSort::getis2D)                // bool vector
