@@ -44,7 +44,9 @@ Histogram::Histogram(std::string name, int nChannels, int dims){
     //std::cout << "You have the wrong number of dimensions! " << dims << std::endl;
   }
   
-  std::cout << "Make histogram: " << Name << " with " << nChannels << " channels" << std::endl;
+  std::cout << "Made histogram: " << Name << " with " << nChannels << " channels" << std::endl;
+
+  Histograms.push_back(*this);
 }
 void Histogram::inc(int c){
   Bins1D[c]++;

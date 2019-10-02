@@ -25,17 +25,19 @@ class Histogram{
   void inc(int,int);
   void Print(int, int);
   void Print(int, int, int, int);
+  int getnDims(){return nDims;}
+
   
  private:
 
   std::string Name;
-  bool nDims;
+  int nDims;
   bool hasGate;
   std::vector<int> Bins1D;
   std::vector<std::vector<int>> Bins2D;
 
 };
-
+std::vector<Histogram> Histograms;
 //----------------------------------------------------------------------
 class Histogram1D{
 

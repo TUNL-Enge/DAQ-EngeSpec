@@ -32,36 +32,28 @@ void EngeSort::Initialize(){
   // 1D Histograms
   hPos1 = new Histogram("Position 1", Channels1D, 1);
   //  hPos1 -> Print(0, 10);
+  hDE = new Histogram("Delta E", Channels1D, 1);
 
-  // TODO
-  // http://www.cplusplus.com/forum/general/103269/
-  // http://www.cplusplus.com/reference/set/set/
-  // Make a struct that holds all of the histograms. This could then
-  // be iterated over to collect data, etc.
-
-  /*
-  hname = "Delta E";
-  hDE = new Histogram1D(hname, Channels1D);
-  SpectrumNames.push_back(hname);
-  is2D.push_back(false);
-  hasGate.push_back(false);
-  
   //--------------------
   // 2D Histograms
-  hname = "DE vs Pos 1";
-  hDEvsPos1 = new Histogram2D(hname, Channels2D);
-  SpectrumNames.push_back(hname);
-  is2D.push_back(true);
-  hasGate.push_back(false);
-  
+  hDEvsPos1 = new Histogram("DE vs Pos1", Channels2D, 2);
+
   //--------------------
   // Gated Histograms
-  hname = "Pos. 1; GPos1vDE";
-  hPos1_gDEvPos1 = new Histogram1D(hname, Channels1D);
-  SpectrumNames.push_back(hname);
-  is2D.push_back(false);
-  hasGate.push_back(false);
-  */
+  hPos1_gDEvPos1 = new Histogram("Pos 1; GDEvPos1", Channels1D, 1);
+
+  // Loop through and print all histograms
+  for(auto h: Histograms){
+    if(h.getnDims() == 1) {
+      std::cout << "Found a 1D histogram!" << std::endl;
+      h.Print(0,10);
+    } else if(h.getnDims() == 2) {
+      std::cout << "Found a 2D histogram!" << std::endl;
+      h.Print(0,10,0,10);
+    }
+    std::cout << std::endl;
+  }
+  
 }
 
 //======================================================================
