@@ -118,6 +118,34 @@ int EngeSort::connectMidasAnalyzer(){
   return 0;
 }
 
+StringVector EngeSort::getSpectrumNames(){
+
+  StringVector s;
+  for(auto h: Histograms){
+    s.push_back(h.getName());
+  }
+
+  return s;
+}
+BoolVector EngeSort::getis2Ds(){
+
+  BoolVector is2d;
+  for(auto h: Histograms){
+    bool b = (h.getnDims() < 2) ? true : false;
+    is2D.push_back(b);
+  }
+
+  return is2D;
+}
+BoolVector EngeSort::gethasGates(){
+
+  BoolVector hasgate;
+  for(auto h: Histograms){
+    hasgate.push_back(h.gethasGate());
+  }
+
+  return hasgate;
+}
 
 np::ndarray EngeSort::getData(){
   
@@ -308,8 +336,8 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
     .def("getData", &EngeSort::getData)                // 1D histograms
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
-    .def("getis2D", &EngeSort::getis2D)                // bool vector
-    .def("gethasGate", &EngeSort::gethasGate)          // bool vector
+    .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector
+    .def("gethasGates", &EngeSort::gethasGates)          // bool vector
     .def("getSpectrumNames", &EngeSort::getSpectrumNames)
     .def("ClearData", &EngeSort::ClearData)        // void
     .def("putGate", &EngeSort::putGate)            // void

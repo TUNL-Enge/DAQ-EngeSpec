@@ -229,8 +229,13 @@ class MidasThread(QThread):
         for name in self.names:
             print(" - ",name)
 
-        self.is2Ds = self.specColl.dm.getis2D()
-        self.hasGates = self.specColl.dm.gethasGate()
+        self.is2Ds = self.specColl.dm.getis2Ds()
+        self.hasGates = self.specColl.dm.gethasGates()
+        for is2D in self.is2Ds:
+            print(is2D)
+        for hasGate in self.hasGates:
+            print(hasGate)
+
         
         ## First delete the old spectra
         self.specColl.spec1d = []
@@ -279,8 +284,8 @@ class MidasCollectionThread(QThread):
         for name in self.names:
             print(" - ",name)
 
-        self.is2Ds = self.specColl.dm.getis2D()
-        self.hasGates = self.specColl.dm.gethasGate()
+        self.is2Ds = self.specColl.dm.getis2Ds()
+        self.hasGates = self.specColl.dm.gethasGates()
 
     def run(self):
         print("Collecting MIDAS data")

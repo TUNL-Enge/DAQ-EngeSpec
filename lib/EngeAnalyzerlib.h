@@ -26,7 +26,8 @@ class Histogram{
   void Print(int, int);
   void Print(int, int, int, int);
   int getnDims(){return nDims;}
-
+  bool gethasGate(){return hasGate;}
+  std::string getName(){return Name;}
   
  private:
 

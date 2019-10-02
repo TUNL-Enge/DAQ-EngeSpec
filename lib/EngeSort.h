@@ -45,8 +45,9 @@ class EngeSort {
 
   void sort(uint32_t *dADC);
   
-  BoolVector getis2D(){return is2D;}
-  BoolVector gethasGate(){return hasGate;}
+  BoolVector getis2Ds();
+  BoolVector gethasGates();
+  StringVector getSpectrumNames();
 
   // Gate passing
   void putGate(char* name, p::list x, p::list y);
@@ -59,12 +60,9 @@ class EngeSort {
     return Dat[0].end();
   }
   
-  StringVector getSpectrumNames(){return SpectrumNames;}
   
  private:
   bool isRunning = false;
-
-  StringVector SpectrumNames;
 
   std::vector<int> Dat[2];
   std::vector<bool> is2D;
