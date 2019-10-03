@@ -76,9 +76,9 @@ void EngeSort::sort(uint32_t *dADC){
   if(cDE < Threshold || cDE > Channels1D)cDE = 0;
 
   // Increment histograms
-  hPos1 -> inc(cPos1);
-  hDE -> inc(cDE);
-  hDEvsPos1 -> inc(cPos1/16, cDE/16);
+  Histograms[0].inc(cPos1);
+  Histograms[1].inc(cDE);
+  Histograms[2].inc(cPos1/16, cDE/16);
 
   
   /*
@@ -170,6 +170,7 @@ np::ndarray EngeSort::getData(){
   for(auto h: Histograms)
     {
       if(h.getnDims()==1){
+	//h.Print(1000,2000);
 	shape = p::make_tuple(h.getnChannels());
 	converted[i] = np::from_data(h.getData1D().data(), dtype, shape, stride, own);
 	i++;
@@ -202,7 +203,7 @@ np::ndarray EngeSort::getData2D(){
       for (int i = 0; i < h.getnChannels(); i++)
 	{
 	  shape = p::make_tuple(h.getnChannels());
-	  converted[t][i] = np::from_data(h.getData2D().data(), dtype, shape, stride, own);
+	  converted[t][i] = np::from_data(h.getData2D()[i].data(), dtype, shape, stride, own);
 	}
       t++;
     }

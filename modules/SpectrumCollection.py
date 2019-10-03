@@ -288,7 +288,7 @@ class MidasCollectionThread(QThread):
 #            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())
             dat2d = self.specColl.dm.getData2D()
-            
+
             ## Go through the names and fill them for the appropriate data
             counter1d=0
             counter2d=0
