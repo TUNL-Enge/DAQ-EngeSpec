@@ -28,17 +28,23 @@ class Histogram{
   int getnDims(){return nDims;}
   bool gethasGate(){return hasGate;}
   std::string getName(){return Name;}
+  int getnChannels(){return nChannels;}
+  std::vector<int> getData1D(){return Bins1D;}
+  std::vector<std::vector<int>> getData2D(){return Bins2D;}
   
  private:
 
   std::string Name;
   int nDims;
+  int nChannels;
   bool hasGate;
   std::vector<int> Bins1D;
   std::vector<std::vector<int>> Bins2D;
 
 };
 std::vector<Histogram> Histograms;
+int nHist1D = 0;
+int nHist2D = 0;
 
 //----------------------------------------------------------------------
 class Histogram1D{

@@ -42,6 +42,7 @@ void EngeSort::Initialize(){
   // Gated Histograms
   hPos1_gDEvPos1 = new Histogram("Pos 1; GDEvPos1", Channels1D, 1);
 
+  /*
   // Loop through and print all histograms
   for(auto h: Histograms){
     if(h.getnDims() == 1) {
@@ -53,6 +54,7 @@ void EngeSort::Initialize(){
     }
     std::cout << std::endl;
   }
+  */
   
 }
 
@@ -76,8 +78,9 @@ void EngeSort::sort(uint32_t *dADC){
   // Increment histograms
   hPos1 -> inc(cPos1);
   hDE -> inc(cDE);
-  hDEvsPos1 -> inc(cPos1, cDE);
+  hDEvsPos1 -> inc(cPos1/16, cDE/16);
 
+  
   /*
   DataMatrix[0][int(dADC[cPos1])]++;
   DataMatrix[1][int(dADC[cDE])]++;
@@ -133,7 +136,7 @@ BoolVector EngeSort::getis2Ds(){
 
   BoolVector is2d;
   for(auto h: Histograms){
-    bool b = (h.getnDims() < 2) ? true : false;
+    bool b = (h.getnDims() == 2) ? true : false;
     is2D.push_back(b);
   }
 
@@ -151,32 +154,26 @@ BoolVector EngeSort::gethasGates(){
 }
 
 np::ndarray EngeSort::getData(){
-  
+
   // Create the matrix to return to python
-  u_int n_rows = DataMatrix.size();
-  u_int n_cols = DataMatrix[0].size();
+  u_int n_rows = nHist1D;//Histograms.size();
+  u_int n_cols = Channels1D; //Histograms[0].getnChannels();
   p::tuple shape = p::make_tuple(n_rows, n_cols);
   p::tuple stride = p::make_tuple(sizeof(int));
   np::dtype dtype = np::dtype::get_builtin<int>();
   p::object own;
   np::ndarray converted = np::zeros(shape, dtype);
-
-  /*
-    std::cout << "DataMatrix Size = " << n_rows << "x" << n_cols << std::endl;
-    std::cout << "DataMatrix[0][0] = " << DataMatrix[0][0] << std::endl;
-  */
   
-  for (u_int i = 0; i < n_rows; i++)
+  
+  // Loop through all histograms and pack the 1D histograms into a numpy matrix
+  int i=0;
+  for(auto h: Histograms)
     {
-      shape = p::make_tuple(n_cols);
-      converted[i] = np::from_data(DataMatrix[i].data(), dtype, shape, stride, own);
-      int sum=0;
-      /*
-      for(int j=0; j<4096; j++){
-	sum += DataMatrix[i][j];
+      if(h.getnDims()==1){
+	shape = p::make_tuple(h.getnChannels());
+	converted[i] = np::from_data(h.getData1D().data(), dtype, shape, stride, own);
+	i++;
       }
-      std::cout << "Sum = " << sum << std::endl;
-      */      
     }
 
   return converted;
@@ -184,32 +181,32 @@ np::ndarray EngeSort::getData(){
 }
 
 np::ndarray EngeSort::getData2D(){
-  
+
   // Create the 3D matrix to return to python
-  u_int n_t = DataMatrix2D.size();
-  u_int n_rows = DataMatrix2D[0].size();
-  u_int n_cols = DataMatrix2D[0][0].size();
-  //std::cout << n_t << " " << n_rows << " " << n_cols << std::endl;
+  u_int n_t = nHist2D; //DataMatrix2D.size();
+  u_int n_rows = Channels2D; //DataMatrix2D[0].size();
+  u_int n_cols = Channels2D; //DataMatrix2D[0][0].size();
+
+  //  std::cout << n_t << " " << n_rows << " " << n_cols << std::endl;
+
   p::tuple shape = p::make_tuple(n_t, n_rows, n_cols);
   p::tuple stride = p::make_tuple(sizeof(int));
   np::dtype dtype = np::dtype::get_builtin<int>();
   p::object own;
   np::ndarray converted = np::zeros(shape, dtype);
 
-  for(u_int t = 0; t<n_t; t++){
-    for (u_int i = 0; i < n_rows; i++)
-      {
-	shape = p::make_tuple(n_cols);
-	converted[t][i] = np::from_data(DataMatrix2D[t][i].data(), dtype, shape, stride, own);
-	/*      int sum=0;
-		for(int j=0; j<4096; j++){
-		sum += DataMatrix[i][j];
-		}
-		std::cout << "Sum = " << sum << std::endl;
-      */
-      }
+  //  for(u_int t = 0; t<n_t; t++){
+  int t=0;
+  for(auto h: Histograms){
+    if(h.getnDims()==2){
+      for (int i = 0; i < h.getnChannels(); i++)
+	{
+	  shape = p::make_tuple(h.getnChannels());
+	  converted[t][i] = np::from_data(h.getData2D().data(), dtype, shape, stride, own);
+	}
+      t++;
+    }
   }
-
   return converted;
   
 }

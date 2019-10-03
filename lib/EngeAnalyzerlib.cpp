@@ -24,21 +24,24 @@ std::string Messages::saygoodbye( ) {
 // HISTOGRAMS
 
 // Generic Histograms
-Histogram::Histogram(std::string name, int nChannels, int dims){
+Histogram::Histogram(std::string name, int nchannels, int dims){
   Name = name;
   nDims = dims;
   hasGate = false;
+  nChannels = nchannels;
   
   // Fill an empty spectrum
   switch(dims){
   case 1:
     Bins1D.resize(nChannels);
+    nHist1D++;
     break;
   case 2:
     std::vector<int> row;
     row.resize(nChannels,0);
     for(int i=0; i<nChannels; i++)
       Bins2D.push_back(row);
+    nHist2D++;
     break;
     //  default:
     //std::cout << "You have the wrong number of dimensions! " << dims << std::endl;
