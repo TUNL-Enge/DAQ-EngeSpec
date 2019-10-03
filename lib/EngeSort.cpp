@@ -118,6 +118,7 @@ int EngeSort::connectMidasAnalyzer(){
   return 0;
 }
 
+// Return a vector of spectrum names
 StringVector EngeSort::getSpectrumNames(){
 
   StringVector s;
@@ -127,6 +128,7 @@ StringVector EngeSort::getSpectrumNames(){
 
   return s;
 }
+// Return a bool vector of whether the spectra are 2D
 BoolVector EngeSort::getis2Ds(){
 
   BoolVector is2d;
@@ -137,6 +139,7 @@ BoolVector EngeSort::getis2Ds(){
 
   return is2D;
 }
+// Return a bool vector of whether the spectra have gates
 BoolVector EngeSort::gethasGates(){
 
   BoolVector hasgate;

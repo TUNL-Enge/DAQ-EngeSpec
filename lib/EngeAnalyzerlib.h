@@ -39,6 +39,7 @@ class Histogram{
 
 };
 std::vector<Histogram> Histograms;
+
 //----------------------------------------------------------------------
 class Histogram1D{
 
