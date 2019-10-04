@@ -42,7 +42,7 @@ class Histogram{
   std::vector<std::vector<int>> Bins2D;
 
 };
-std::vector<Histogram> Histograms;
+std::vector<Histogram*> Histograms;
 int nHist1D = 0;
 int nHist2D = 0;
 

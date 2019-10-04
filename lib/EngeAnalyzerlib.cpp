@@ -49,7 +49,7 @@ Histogram::Histogram(std::string name, int nchannels, int dims){
   
   std::cout << "Made histogram: " << Name << " with " << nChannels << " channels" << std::endl;
 
-  Histograms.push_back(*this);
+  Histograms.push_back(this);
 }
 void Histogram::inc(int c){
   Bins1D[c]++;

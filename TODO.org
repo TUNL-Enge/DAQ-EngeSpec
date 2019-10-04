@@ -9,6 +9,8 @@
   - [ ] Expand tree by default
   - [ ] 1D Gates
   - [ ] Scaler display
+  - [ ] Spectra list width
+  - [ ] HiDPI scaling
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?

@@ -20,9 +20,10 @@ int Channels2D = 256;
 
 Histogram *hPos1;
 Histogram *hDE;
-Histogram *hPos1_gDEvPos1;
 
 Histogram *hDEvsPos1;
+
+Histogram *hPos1_gDEvPos1;
 
 void EngeSort::Initialize(){
 
@@ -76,9 +77,9 @@ void EngeSort::sort(uint32_t *dADC){
   if(cDE < Threshold || cDE > Channels1D)cDE = 0;
 
   // Increment histograms
-  Histograms[0].inc(cPos1);
-  Histograms[1].inc(cDE);
-  Histograms[2].inc(cPos1/16, cDE/16);
+  hPos1 -> inc(cPos1);
+  hDE -> inc(cDE);
+  hDEvsPos1 -> inc(cPos1/16, cDE/16);
 
   
   /*
@@ -126,7 +127,7 @@ StringVector EngeSort::getSpectrumNames(){
 
   StringVector s;
   for(auto h: Histograms){
-    s.push_back(h.getName());
+    s.push_back(h -> getName());
   }
 
   return s;
@@ -136,7 +137,7 @@ BoolVector EngeSort::getis2Ds(){
 
   BoolVector is2d;
   for(auto h: Histograms){
-    bool b = (h.getnDims() == 2) ? true : false;
+    bool b = (h -> getnDims() == 2) ? true : false;
     is2D.push_back(b);
   }
 
@@ -147,7 +148,7 @@ BoolVector EngeSort::gethasGates(){
 
   BoolVector hasgate;
   for(auto h: Histograms){
-    hasgate.push_back(h.gethasGate());
+    hasgate.push_back(h -> gethasGate());
   }
 
   return hasgate;
@@ -169,10 +170,10 @@ np::ndarray EngeSort::getData(){
   int i=0;
   for(auto h: Histograms)
     {
-      if(h.getnDims()==1){
+      if(h -> getnDims()==1){
 	//h.Print(1000,2000);
-	shape = p::make_tuple(h.getnChannels());
-	converted[i] = np::from_data(h.getData1D().data(), dtype, shape, stride, own);
+	shape = p::make_tuple(h -> getnChannels());
+	converted[i] = np::from_data(h -> getData1D().data(), dtype, shape, stride, own);
 	i++;
       }
     }
@@ -199,11 +200,11 @@ np::ndarray EngeSort::getData2D(){
   //  for(u_int t = 0; t<n_t; t++){
   int t=0;
   for(auto h: Histograms){
-    if(h.getnDims()==2){
-      for (int i = 0; i < h.getnChannels(); i++)
+    if(h -> getnDims()==2){
+      for (int i = 0; i < h -> getnChannels(); i++)
 	{
-	  shape = p::make_tuple(h.getnChannels());
-	  converted[t][i] = np::from_data(h.getData2D()[i].data(), dtype, shape, stride, own);
+	  shape = p::make_tuple(h -> getnChannels());
+	  converted[t][i] = np::from_data(h -> getData2D()[i].data(), dtype, shape, stride, own);
 	}
       t++;
     }
