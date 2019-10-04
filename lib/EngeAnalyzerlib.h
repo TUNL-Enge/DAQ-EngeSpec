@@ -27,6 +27,7 @@ class Histogram{
   void Print(int, int, int, int);
   int getnDims(){return nDims;}
   bool gethasGate(){return hasGate;}
+  void sethasGate(bool tf){hasGate = tf;}
   std::string getName(){return Name;}
   int getnChannels(){return nChannels;}
   std::vector<int> getData1D(){return Bins1D;}
@@ -52,7 +53,7 @@ class Gate{
   
  public:
   
-  Gate(){};
+  Gate(std::string name, Histogram* hist);
   
   void addVertex(std::vector<double> v);
   std::vector<std::vector<double>> getPoints(){return Points;}
@@ -61,7 +62,8 @@ class Gate{
   int inGate(double x, double y);
   
  private:
-  
+
+  std::string Name;
   std::vector<std::vector<double>> Points;
   double minx, maxx, miny, maxy;
   

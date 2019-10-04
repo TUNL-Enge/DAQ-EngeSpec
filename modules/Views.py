@@ -161,9 +161,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Load HDF data
         self.file_menu.addAction('&Load HDF File',
                                  self.LoadHDFData)
-        ## Connect to a simulation
-        self.file_menu.addAction('&Connect simulation',
-                                 self.connectsim)
         ## Connect to MIDAS
         self.file_menu.addAction('&Connect MIDAS',
                                  self.connectmidas)
@@ -206,11 +203,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print("Loading HDF Data")
         self.SpecCanvas.LoadHDFData()
         self.PopulateTree()
-
-    def connectsim(self):
-        self.SpecColl.connectsim()
-        self.PopulateTree()
-        self.SpecCanvas.setSpecIndex(0,False)
 
     def connectmidas(self):
         self.SpecColl.connectmidas()

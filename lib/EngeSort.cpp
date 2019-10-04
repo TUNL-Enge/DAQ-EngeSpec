@@ -20,10 +20,11 @@ int Channels2D = 256;
 
 Histogram *hPos1;
 Histogram *hDE;
-
 Histogram *hDEvsPos1;
-
 Histogram *hPos1_gDEvPos1;
+
+// 2D Gate on the DE vs Pos1 spectrum
+Gate *g2d_DEvsPos1;
 
 void EngeSort::Initialize(){
 
@@ -43,6 +44,11 @@ void EngeSort::Initialize(){
   // Gated Histograms
   hPos1_gDEvPos1 = new Histogram("Pos 1; GDEvPos1", Channels1D, 1);
 
+
+  //--------------------
+  // Gates
+  g2d_DEvsPos1 = new Gate("DE vs Pos1 Gate", hDEvsPos1);
+  
   /*
   // Loop through and print all histograms
   for(auto h: Histograms){
@@ -219,15 +225,15 @@ void EngeSort::putGate(char* name, p::list x, p::list y){
   //std::cout << "The name is " << name << std::endl;
   p::ssize_t len = p::len(x);
   // Make a vector for the gate
-  Gate G1;//std::vector<std::vector<double>> Gate;
+  //Gate G1;//std::vector<std::vector<double>> Gate;
   for(int i=0; i<len; i++){
     std::vector<double> tmp;
     tmp.push_back(p::extract<double>(x[i]));
     tmp.push_back(p::extract<double>(y[i]));
-    G1.addVertex(tmp);
+    //G1.addVertex(tmp);
   }
 
-  GateCollection.push_back(G1);
+  //GateCollection.push_back(G1);
 
   /*
   for(int i=0; i<Gate.size(); i++){

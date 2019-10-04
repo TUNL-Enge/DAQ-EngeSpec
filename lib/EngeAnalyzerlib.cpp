@@ -83,6 +83,16 @@ void Histogram::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=
 //----------------------------------------------------------------------
 // GATES
 
+Gate::Gate(std::string name, Histogram* hist){
+
+  Name = name;
+  hist -> sethasGate(true);
+
+  std::cout << "Made a gate!" << std::endl;
+
+}
+
+
 // Add a vertex to the gate
 void Gate::addVertex(std::vector<double> v){
   Points.push_back(v);
