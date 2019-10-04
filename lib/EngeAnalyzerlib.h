@@ -46,59 +46,6 @@ std::vector<Histogram> Histograms;
 int nHist1D = 0;
 int nHist2D = 0;
 
-//----------------------------------------------------------------------
-class Histogram1D{
-
- public:
-
-  Histogram1D(std::string name, int nChannels);
-
-  void inc(int);
-  void Print(int, int);
-  
- private:
-
-  std::string Name;
-  std::vector<int> Bins;
-
-};
-//----------------------------------------------------------------------
-class Histogram2D{
-
- public:
-
-  Histogram2D(std::string name, int nChannels);
-
-  void inc(int, int);
-  void Print(int, int, int, int);
-  
- private:
-
-  std::string Name;
-  std::vector<std::vector<int>> Bins;
-  double compress;                            // Compression factor for 2D histogram (unused)
-
-};
-//----------------------------------------------------------------------
-/*
-class Data{
-
- public:
-
-  // Clear all data
-  void ClearData();
-  // Make a data stream
-  int Histogram1D(std::string, int);
-  // Print all data (poorly formatted)
-  void PrintData();
-
- private:
-  
-  StringVector DataNames;
-  std::vector<std::vector<int>> DataMatrix;
-
-};
-*/
 
 //----------------------------------------------------------------------
 class Gate{
