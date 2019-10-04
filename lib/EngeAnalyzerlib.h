@@ -15,6 +15,28 @@ class Messages{
 };
 
 //----------------------------------------------------------------------
+class Gate{
+  
+ public:
+  
+  Gate(std::string name);
+  
+  void addVertex(std::vector<double> v);
+  std::vector<std::vector<double>> getPoints(){return Points;}
+  bool inBound(double x, double y);
+  int pnpoly(double testx, double testy);
+  int inGate(double x, double y);
+  void Print();
+  
+ private:
+
+  std::string Name;
+  std::vector<std::vector<double>> Points;
+  double minx, maxx, miny, maxy;
+  
+};
+
+//----------------------------------------------------------------------
 class Histogram{
 
  public:
@@ -32,6 +54,8 @@ class Histogram{
   int getnChannels(){return nChannels;}
   std::vector<int> getData1D(){return Bins1D;}
   std::vector<std::vector<int>> getData2D(){return Bins2D;}
+  void addGate(std::string name);
+  Gate* getGates(int i){return &GateCollection[i];}
   
  private:
 
@@ -41,33 +65,13 @@ class Histogram{
   bool hasGate;
   std::vector<int> Bins1D;
   std::vector<std::vector<int>> Bins2D;
+  std::vector<Gate> GateCollection;
 
 };
 std::vector<Histogram*> Histograms;
 int nHist1D = 0;
 int nHist2D = 0;
 
-
-//----------------------------------------------------------------------
-class Gate{
-  
- public:
-  
-  Gate(std::string name, Histogram* hist);
-  
-  void addVertex(std::vector<double> v);
-  std::vector<std::vector<double>> getPoints(){return Points;}
-  bool inBound(double x, double y);
-  int pnpoly(double testx, double testy);
-  int inGate(double x, double y);
-  
- private:
-
-  std::string Name;
-  std::vector<std::vector<double>> Points;
-  double minx, maxx, miny, maxy;
-  
-};
 
 
 

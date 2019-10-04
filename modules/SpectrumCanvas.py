@@ -347,19 +347,20 @@ class SpectrumCanvas(FigureCanvas):
         self.UpdatePlot()
         
     def getGate(self):
-        tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
-        x = [i[0] for i in tup]
-        x.append(x[0])
-        y = [i[1] for i in tup]
-        y.append(y[0])
-        self.a.plot(x,y, 'r-')
-        self.fig.canvas.draw()
-        self.Spec2D.hasGate = True
-        self.Spec2D.gate = (x,y)
-        ##        print(self.Spec2D.gate)
+        if self.is2D:
+            tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
+            x = [i[0] for i in tup]
+            x.append(x[0])
+            y = [i[1] for i in tup]
+            y.append(y[0])
+            self.a.plot(x,y, 'r-')
+            self.fig.canvas.draw()
+            self.Spec2D.hasGate = True
+            self.Spec2D.gate = (x,y)
+            ##        print(self.Spec2D.gate)
         
-        ## Send the gate over to c++
-        self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gate[0],self.Spec2D.gate[1])
+            ## Send the gate over to c++
+            self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gate[0],self.Spec2D.gate[1])
 
     def drawGate(self):
         x = self.Spec2D.gate[0]

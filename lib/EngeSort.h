@@ -50,7 +50,7 @@ class EngeSort {
   StringVector getSpectrumNames();
 
   // Gate passing
-  void putGate(char* name, p::list x, p::list y);
+  void putGate(std::string name, p::list x, p::list y);
   
   // For returning the old data arrays (clean this up later)
   std::vector<int>::iterator begin(){

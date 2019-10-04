@@ -77,24 +77,37 @@ void Histogram::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=
 
 }
 
+void Histogram::addGate(std::string name){
 
+  std::cout << "Adding gate: " << name << " to histogram " << Name << std::endl;
+  Gate G1(name);
+  GateCollection.push_back(G1);
+  hasGate = true;
+}
 
 
 //----------------------------------------------------------------------
 // GATES
 
-Gate::Gate(std::string name, Histogram* hist){
+Gate::Gate(std::string name){
 
   Name = name;
-  hist -> sethasGate(true);
-
-  std::cout << "Made a gate!" << std::endl;
+  std::cout << "Made a gate called " << name << std::endl;
 
 }
 
+void Gate::Print(){
+
+  std::cout << "This is the gate called " << Name << std::endl;
+  std::cout << "Number of vertices: " << Points.size() << std::endl;
+  
+}
 
 // Add a vertex to the gate
 void Gate::addVertex(std::vector<double> v){
+
+  //  std::cout << "Adding vertex: " << v[0] << ", " << v[1] << std::endl;
+  
   Points.push_back(v);
 
   // Set the rough bound of the gate

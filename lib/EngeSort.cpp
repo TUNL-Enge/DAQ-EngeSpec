@@ -47,7 +47,7 @@ void EngeSort::Initialize(){
 
   //--------------------
   // Gates
-  g2d_DEvsPos1 = new Gate("DE vs Pos1 Gate", hDEvsPos1);
+  hDEvsPos1 -> addGate("DE vs Pos1 Gate");
   
   /*
   // Loop through and print all histograms
@@ -88,28 +88,17 @@ void EngeSort::sort(uint32_t *dADC){
   hDEvsPos1 -> inc(cPos1/16, cDE/16);
 
   
-  /*
-  DataMatrix[0][int(dADC[cPos1])]++;
-  DataMatrix[1][int(dADC[cDE])]++;
-
   
-  DataMatrix2D[0][int(dADC[cPos1]/16.0)][int(dADC[cDE]/16.0)]++;
-
   // The gated spectrum
   
-  Gate G1;
-  if(GateCollection.size()>0){
-    G1 = GateCollection[0];
-  }
-  
+  Gate *G1 = hDEvsPos1->getGates(0);
+  //G1->Print();
   // Is the gate defined?
-  if(G1.inGate(dADC[0]/16,dADC[1]/16)){
+  if(G1->inGate(dADC[0]/16,dADC[1]/16)){
     igated++;
-    DataMatrix2D[1][int(dADC[cPos1]/16.0)][int(dADC[cDE]/16.0)]++;
-    DataMatrix[2][int(dADC[cPos1])]++;
+    hPos1_gDEvPos1->inc(cPos1);
   }
 
-  */  
 }
 
 
@@ -220,16 +209,34 @@ np::ndarray EngeSort::getData2D(){
 }
 
 
-void EngeSort::putGate(char* name, p::list x, p::list y){
+void EngeSort::putGate(std::string name, p::list x, p::list y){
 
-  //std::cout << "The name is " << name << std::endl;
-  p::ssize_t len = p::len(x);
-  // Make a vector for the gate
-  //Gate G1;//std::vector<std::vector<double>> Gate;
-  for(int i=0; i<len; i++){
-    std::vector<double> tmp;
-    tmp.push_back(p::extract<double>(x[i]));
-    tmp.push_back(p::extract<double>(y[i]));
+  // First find the spectrum that corresponds to the name
+  for(auto h:Histograms){
+    if(h -> getName() == name){
+      //std::cout << "Found the histogram! With name: " << h->getName() << " " << name << std::endl;
+
+      // Make sure this histogram has gates defined
+      if(h -> gethasGate()){
+	//std::cout << "Yes, this histogram has gates!" << std::endl;
+	
+	p::ssize_t len = p::len(x);
+	/*
+	for(auto g:h->getGates()){
+	  g.Print();
+	}
+	*/
+	Gate *G1 = h->getGates(0);
+	
+	// Make a vector for the gate
+	for(int i=0; i<len; i++){
+	  std::vector<double> tmp;
+	  tmp.push_back(p::extract<double>(x[i]));
+	  tmp.push_back(p::extract<double>(y[i]));
+	  G1->addVertex(tmp);
+	}
+      }
+    }
     //G1.addVertex(tmp);
   }
 
