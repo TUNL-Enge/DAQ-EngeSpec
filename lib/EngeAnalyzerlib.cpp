@@ -85,6 +85,16 @@ void Histogram::addGate(std::string name){
   hasGate = true;
 }
 
+// Clear the histogram
+void Histogram::Clear(){
+
+  //  std::cout << "Clearing histogram: " << Name << std::endl;
+  if(nDims == 1){
+    std::fill(Bins1D.begin(), Bins1D.end(),0);
+  } else {
+    for(auto& elem : Bins2D)std::fill(elem.begin(), elem.end(), 0);
+  }
+}
 
 //----------------------------------------------------------------------
 // GATES

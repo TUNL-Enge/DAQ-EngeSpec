@@ -56,6 +56,7 @@ class Histogram{
   std::vector<std::vector<int>> getData2D(){return Bins2D;}
   void addGate(std::string name);
   Gate* getGates(int i){return &GateCollection[i];}
+  void Clear();
   
  private:
 

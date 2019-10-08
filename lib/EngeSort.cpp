@@ -26,6 +26,10 @@ Histogram *hPos1_gDEvPos1;
 // 2D Gate on the DE vs Pos1 spectrum
 Gate *g2d_DEvsPos1;
 
+// Counters
+int totalCounter=0;
+int gateCounter=0;
+
 void EngeSort::Initialize(){
 
   std::string hname;
@@ -87,15 +91,15 @@ void EngeSort::sort(uint32_t *dADC){
   hDE -> inc(cDE);
   hDEvsPos1 -> inc(cPos1/16, cDE/16);
 
-  
+  totalCounter++;
   
   // The gated spectrum
   
   Gate *G1 = hDEvsPos1->getGates(0);
   //G1->Print();
   // Is the gate defined?
-  if(G1->inGate(dADC[0]/16,dADC[1]/16)){
-    igated++;
+  if(G1->inGate(dADC[0]/16.0,dADC[1]/16.0)){
+    gateCounter++;;
     hPos1_gDEvPos1->inc(cPos1);
   }
 
@@ -221,11 +225,6 @@ void EngeSort::putGate(std::string name, p::list x, p::list y){
 	//std::cout << "Yes, this histogram has gates!" << std::endl;
 	
 	p::ssize_t len = p::len(x);
-	/*
-	for(auto g:h->getGates()){
-	  g.Print();
-	}
-	*/
 	Gate *G1 = h->getGates(0);
 	
 	// Make a vector for the gate
@@ -237,35 +236,18 @@ void EngeSort::putGate(std::string name, p::list x, p::list y){
 	}
       }
     }
-    //G1.addVertex(tmp);
   }
-
-  //GateCollection.push_back(G1);
-
-  /*
-  for(int i=0; i<Gate.size(); i++){
-    std::cout << Gate[i][0] << " " << Gate[i][1] << std::endl;
-  }
-  */
   
 }
 
 void EngeSort::ClearData(){
 
-  // Clear the 1D data
-  std::vector<int> row;
-  row.resize(4096,0);
-  for(int k=0; k<DataMatrix.size(); k++)
-    DataMatrix[k] = row;
-  
-  // Clear the 2D data
-  row.resize(256,0);
-  for(int k=0; k<DataMatrix2D.size(); k++){
-    for(int i=0; i<256; i++)
-      DataMatrix2D[k][i] = row;
+  for(auto h:Histograms){
+    h->Clear();
   }
-
-  ipeak1 = ipeak2 = igated = 0;
+  
+  totalCounter=0;
+  gateCounter=0;
   
 }
 
@@ -323,6 +305,7 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
+  std::cout << "Total counts: " << totalCounter << "   Gated counts: " << gateCounter << std::endl;
 }
 
 BOOST_PYTHON_MODULE(EngeSort)

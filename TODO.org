@@ -11,6 +11,8 @@
   - [ ] Scaler display
   - [ ] Spectra list width
   - [ ] HiDPI scaling
+  - [ ] More than one gate per histogram
+  - [ ] 1D gates
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
