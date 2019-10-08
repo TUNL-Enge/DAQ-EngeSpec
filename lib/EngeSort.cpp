@@ -18,10 +18,30 @@ std::string EngeSort::saygoodbye( ) {
 int Channels1D = 4096;
 int Channels2D = 256;
 
+// 1D Spectra
 Histogram *hPos1;
+Histogram *hPos2;
 Histogram *hDE;
-Histogram *hTDC1;
+Histogram *hE;
+Histogram *hTheta;
+
+Histogram *hSiE;
+Histogram *hSiDE;
+
+Histogram *hTDC_E;
+Histogram *hTDC_DE;
+Histogram *hTDC_PosSum;
+
+// 2D Spectra
 Histogram *hDEvsPos1;
+Histogram *hEvsPos1;
+Histogram *hDEvsE;
+Histogram *hPos2vsPos1;
+Histogram *hThetavsPos1;
+
+Histogram *hSiDEvsSiE;
+
+// Gated Spectra
 Histogram *hPos1_gDEvPos1;
 
 // 2D Gate on the DE vs Pos1 spectrum
@@ -39,13 +59,28 @@ void EngeSort::Initialize(){
   // 1D Histograms
   hPos1 = new Histogram("Position 1", Channels1D, 1);
   //  hPos1 -> Print(0, 10);
+  hPos2 = new Histogram("Position 2", Channels1D, 1);
   hDE = new Histogram("Delta E", Channels1D, 1);
-  hTDC1 = new Histogram("TDC Signal", Channels1D, 1);
+  hE = new Histogram("E", Channels1D, 1);
+  hTheta = new Histogram("Theta", Channels1D, 1);
+
+  hSiE = new Histogram("Silicon E", Channels1D, 1);
+  hSiDE = new Histogram("Silicon DE", Channels1D, 1);
+
+  hTDC_E = new Histogram("TDC E", Channels1D, 1);
+  hTDC_DE = new Histogram("TDC DE", Channels1D, 1);
+  hTDC_PosSum = new Histogram("TDC Position Sum", Channels1D, 1);
   
   //--------------------
   // 2D Histograms
   hDEvsPos1 = new Histogram("DE vs Pos1", Channels2D, 2);
+  hEvsPos1 = new Histogram("E vs Pos1", Channels2D, 2);
+  hDEvsE = new Histogram("DE vs E", Channels2D, 2);
+  hPos2vsPos1 = new Histogram("Pos 2 vs Pos 1", Channels2D, 2);
+  hThetavsPos1 = new Histogram("Theta vs Pos 1", Channels2D, 2);
 
+  hSiDEvsSiE = new Histogram("Si DE vs Si E", Channels2D, 2);
+  
   //--------------------
   // Gated Histograms
   hPos1_gDEvPos1 = new Histogram("Pos 1; GDEvPos1", Channels1D, 1);
@@ -75,34 +110,80 @@ void EngeSort::Initialize(){
 // This is the equivalent to the "sort" function in jam
 void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
-  int size = sizeof(dADC)/sizeof(dADC[0]);
-
-  // Thresholds
-  int Threshold = 200;
-  
-  // Define the channels
-  int cPos1 = dADC[0];
-  int cDE = dADC[1];
-  int cTDC1 = dTDC[0];
-
-  // Apply software thresholds
-  if(cPos1 < Threshold || cPos1 > Channels1D)cPos1 = 0;
-  if(cDE < Threshold || cDE > Channels1D)cDE = 0;
-
-  // Increment histograms
-  hPos1 -> inc(cPos1);
-  hDE -> inc(cDE);
-  hTDC1 -> inc(cTDC1);
-  hDEvsPos1 -> inc(cPos1/16, cDE/16);
-
   totalCounter++;
+
+  //double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
+  //double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
+
+  //std::cout << ADCsize << "  " << TDCsize << std::endl;
+  
+  // Thresholds
+  int Threshold = 10;
+  for(int i=0; i<32; i++)
+    if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
+  for(int i=0; i<32; i++)
+    if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
+    
+  // Define the channels
+  int cE = dADC[0];
+  int cDE = dADC[1];
+  int cPos1 = dADC[2];
+  int cPos2 = dADC[3];
+  int cSiE = dADC[5];
+  int cSiDE = dADC[7];
+
+  int cTDC_E = dTDC[0];
+  int cTDC_DE = dTDC[1];
+  int cTDC_Pos1 = dTDC[2];
+  int cTDC_Pos2 = dTDC[3];
+
+  // Calculate some things
+  int cTheta = (int)std::round(10000.0*atan((cPos2-cPos1)/100.)/3.1415 - 4000.);
+  cTheta = std::max(0,cTheta);
+  int cTDC_PosSum = (int)std::round((cTDC_Pos1 + cTDC_Pos2)/2.);
+
+  // ------------------------------------------------------------
+  // Compressed versions for 2D spectra
+  // ------------------------------------------------------------
+  double compression = (double)Channels1D/ (double)Channels2D;
+  int cEcomp = (int) std::round(cE / compression);
+  int cDEcomp = (int) std::round(cDE / compression);
+  int cPos1comp = (int) std::round(cPos1 / compression);
+  int cPos2comp = (int) std::round(cPos2 / compression);
+  int cThetacomp = (int) std::round(cTheta / compression);
+  
+  int cSiEcomp = (int) std::round(cSiE / compression);
+  int cSiDEcomp = (int) std::round(cSiDE / compression);
+	
+  
+  // Increment 1D histograms
+  hPos1 -> inc(cPos1);
+  hPos2 -> inc(cPos2);
+  hDE -> inc(cDE);
+  hE -> inc(cE);
+  hTheta -> inc(cTheta);
+
+  hSiE -> inc(cSiE);
+  hSiDE -> inc(cSiDE);
+
+  hTDC_E -> inc(cTDC_E);
+  hTDC_DE -> inc(cTDC_DE);
+  hTDC_PosSum -> inc(cTDC_PosSum);
+
+  // Increment 2D histograms
+  hDEvsPos1 -> inc(cPos1comp, cDEcomp);
+  hEvsPos1 -> inc(cPos1comp, cEcomp);
+  hDEvsE -> inc(cEcomp, cDEcomp);
+  hPos2vsPos1 -> inc(cPos1comp, cPos2comp);
+  hThetavsPos1 -> inc(cPos1comp, cThetacomp);
+
+  hSiDEvsSiE -> inc(cSiEcomp, cSiDEcomp);
+
   
   // The gated spectrum
-  
   Gate *G1 = hDEvsPos1->getGates(0);
   //G1->Print();
-  // Is the gate defined?
-  if(G1->inGate(dADC[0]/16.0,dADC[1]/16.0)){
+  if(G1->inGate(cPos1comp,cDEcomp)){
     gateCounter++;;
     hPos1_gDEvPos1->inc(cPos1);
   }

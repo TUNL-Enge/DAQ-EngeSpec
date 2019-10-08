@@ -52,10 +52,12 @@ Histogram::Histogram(std::string name, int nchannels, int dims){
   Histograms.push_back(this);
 }
 void Histogram::inc(int c){
-  Bins1D[c]++;
+  if(c>0)
+    Bins1D[c]++;
 }
 void Histogram::inc(int cx, int cy){
-  Bins2D[cx][cy]++;
+  if(cx > 0 && cy > 0)
+    Bins2D[cx][cy]++;
 }
 void Histogram::Print(int minBin=0, int maxBin=10){
 
