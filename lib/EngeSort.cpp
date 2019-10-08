@@ -20,6 +20,7 @@ int Channels2D = 256;
 
 Histogram *hPos1;
 Histogram *hDE;
+Histogram *hTDC1;
 Histogram *hDEvsPos1;
 Histogram *hPos1_gDEvPos1;
 
@@ -39,7 +40,8 @@ void EngeSort::Initialize(){
   hPos1 = new Histogram("Position 1", Channels1D, 1);
   //  hPos1 -> Print(0, 10);
   hDE = new Histogram("Delta E", Channels1D, 1);
-
+  hTDC1 = new Histogram("TDC Signal", Channels1D, 1);
+  
   //--------------------
   // 2D Histograms
   hDEvsPos1 = new Histogram("DE vs Pos1", Channels2D, 2);
@@ -71,7 +73,7 @@ void EngeSort::Initialize(){
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
-void EngeSort::sort(uint32_t *dADC){
+void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
   int size = sizeof(dADC)/sizeof(dADC[0]);
 
@@ -81,6 +83,7 @@ void EngeSort::sort(uint32_t *dADC){
   // Define the channels
   int cPos1 = dADC[0];
   int cDE = dADC[1];
+  int cTDC1 = dTDC[0];
 
   // Apply software thresholds
   if(cPos1 < Threshold || cPos1 > Channels1D)cPos1 = 0;
@@ -89,6 +92,7 @@ void EngeSort::sort(uint32_t *dADC){
   // Increment histograms
   hPos1 -> inc(cPos1);
   hDE -> inc(cDE);
+  hTDC1 -> inc(cTDC1);
   hDEvsPos1 -> inc(cPos1/16, cDE/16);
 
   totalCounter++;
@@ -283,10 +287,13 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   // Get the ADC Bank
   TMBank* bADC = event->FindBank("ADC1");
   uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
+  TMBank* bTDC = event->FindBank("TDC1");
+  uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
 
+  
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
-  fModule->eA->sort(dADC);
+  fModule->eA->sort(dADC, dTDC);
 
   return flow;
 
