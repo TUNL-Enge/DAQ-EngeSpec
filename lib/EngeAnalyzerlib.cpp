@@ -47,7 +47,7 @@ Histogram::Histogram(std::string name, int nchannels, int dims){
     //std::cout << "You have the wrong number of dimensions! " << dims << std::endl;
   }
   
-  std::cout << "Made histogram: " << Name << " with " << nChannels << " channels" << std::endl;
+  //  std::cout << "Made histogram: " << Name << " with " << nChannels << " channels" << std::endl;
 
   Histograms.push_back(this);
 }
@@ -79,7 +79,7 @@ void Histogram::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=
 
 void Histogram::addGate(std::string name){
 
-  std::cout << "Adding gate: " << name << " to histogram " << Name << std::endl;
+  //  std::cout << "Adding gate: " << name << " to histogram " << Name << std::endl;
   Gate G1(name);
   GateCollection.push_back(G1);
   hasGate = true;
@@ -102,7 +102,7 @@ void Histogram::Clear(){
 Gate::Gate(std::string name){
 
   Name = name;
-  std::cout << "Made a gate called " << name << std::endl;
+  //  std::cout << "Made a gate called " << name << std::endl;
 
 }
 

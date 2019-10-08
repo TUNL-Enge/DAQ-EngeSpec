@@ -149,9 +149,9 @@ class MidasThread(QThread):
         
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
-        print(len(self.names)," Spectra have been made:")
-        for name in self.names:
-            print(" - ",name)
+        ##        print(len(self.names)," Spectra have been made:")
+        ##        for name in self.names:
+        ##            print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.hasGates = self.specColl.dm.gethasGates()
@@ -199,9 +199,9 @@ class MidasCollectionThread(QThread):
         self.specColl = specColl
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
-        print(len(self.names)," Spectra have been made:")
-        for name in self.names:
-            print(" - ",name)
+        ##print(len(self.names)," Spectra have been made:")
+        ##for name in self.names:
+        ##    print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.hasGates = self.specColl.dm.gethasGates()
