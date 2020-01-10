@@ -35,11 +35,17 @@ add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 
 # Build our Sort Routine
 add_library( EngeSort SHARED EngeSort.cpp)
- 
+
+# Build our Sort Routine
+add_library( v1730Sort SHARED v1730Sort.cpp)
+
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  )
 
+target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  )
+
 # don't prepend wrapper library name with lib
-set_target_properties( EngeSort PROPERTIES PREFIX "../" )
+# set_target_properties( EngeSort PROPERTIES PREFIX "../" )
 
