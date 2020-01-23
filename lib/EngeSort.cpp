@@ -112,8 +112,8 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
   totalCounter++;
 
-  //double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
-  //double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
+  //  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
+  // double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
 
   //std::cout << ADCsize << "  " << TDCsize << std::endl;
   
@@ -123,7 +123,9 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
     if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
   for(int i=0; i<32; i++)
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
-    
+
+  //std::cout << "Done thresholding" << std::endl;
+  
   // Define the channels
   int cE = dADC[0];
   int cDE = dADC[1];
@@ -137,6 +139,8 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   int cTDC_Pos1 = dTDC[2];
   int cTDC_Pos2 = dTDC[3];
 
+  //std::cout << cPos1 << std::endl;
+  
   // Calculate some things
   int cTheta = (int)std::round(10000.0*atan((cPos2-cPos1)/100.)/3.1415 - 4000.);
   cTheta = std::max(0,cTheta);
@@ -146,15 +150,17 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
   double compression = (double)Channels1D/ (double)Channels2D;
-  int cEcomp = (int) std::round(cE / compression);
-  int cDEcomp = (int) std::round(cDE / compression);
-  int cPos1comp = (int) std::round(cPos1 / compression);
-  int cPos2comp = (int) std::round(cPos2 / compression);
-  int cThetacomp = (int) std::round(cTheta / compression);
+  int cEcomp = (int) std::floor(cE / compression);
+  int cDEcomp = (int) std::floor(cDE / compression);
+  int cPos1comp = (int) std::floor(cPos1 / compression);
+  int cPos2comp = (int) std::floor(cPos2 / compression);
+  int cThetacomp = (int) std::floor(cTheta / compression);
   
-  int cSiEcomp = (int) std::round(cSiE / compression);
-  int cSiDEcomp = (int) std::round(cSiDE / compression);
+  int cSiEcomp = (int) std::floor(cSiE / compression);
+  int cSiDEcomp = (int) std::floor(cSiDE / compression);
 	
+  // std::cout << "Compressed data" << std::endl;
+
   
   // Increment 1D histograms
   hPos1 -> inc(cPos1);
@@ -166,11 +172,17 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   hSiE -> inc(cSiE);
   hSiDE -> inc(cSiDE);
 
+  //std::cout << "Incremented 1d spec" << std::endl;
+  
   hTDC_E -> inc(cTDC_E);
   hTDC_DE -> inc(cTDC_DE);
   hTDC_PosSum -> inc(cTDC_PosSum);
 
+  //std::cout << "Incremented TDC" << std::endl;
+  
   // Increment 2D histograms
+  //std::cout << cPos1comp << " " << cDEcomp <<
+  //  " " << cEcomp << " " << cPos2comp << " " << cThetacomp << std::endl;
   hDEvsPos1 -> inc(cPos1comp, cDEcomp);
   hEvsPos1 -> inc(cPos1comp, cEcomp);
   hDEvsE -> inc(cEcomp, cDEcomp);
@@ -179,6 +191,7 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
   hSiDEvsSiE -> inc(cSiEcomp, cSiDEcomp);
 
+  //std::cout << "2D spect" << std::endl;
   
   // The gated spectrum
   Gate *G1 = hDEvsPos1->getGates(0);
@@ -188,6 +201,8 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
     hPos1_gDEvPos1->inc(cPos1);
   }
 
+  //std::cout << "gated spec" << std::endl; 
+  
 }
 
 
