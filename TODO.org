@@ -1,5 +1,11 @@
+* Release blocks
+  - [ ] 2D histograms
+  - [ ] Saving data
+  - [ ] Scalers
+  - [ ] Jam-like zooming
+  - [ ] Reloading data
 * Current
-  - [ ] Separate out sort routines
+  - [X] Separate out sort routines
   - [ ] Fix updating on 2D histograms
   - [ ] Color scheme in 2D for small number of counts
   - [ ] 2D z-zooming
@@ -12,7 +18,6 @@
   - [ ] Spectra list width
   - [ ] HiDPI scaling
   - [ ] More than one gate per histogram
-  - [ ] 1D gates
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
