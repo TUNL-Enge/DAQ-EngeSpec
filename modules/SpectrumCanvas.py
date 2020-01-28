@@ -54,7 +54,11 @@ class SpectrumCanvas(FigureCanvas):
                                    QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+        self.fc = FigureCanvas
 
+##        self.cid = FigureCanvas.mpl_connect(self, 'button_press_event', self.onclick)
+
+        
         ## This shouldn't happen, but check that we don't have a zeros spectrum
         if not self.Spec.spec.any():
             print("WARNING: Spectrum hasn't been initialized!")
@@ -62,6 +66,14 @@ class SpectrumCanvas(FigureCanvas):
         else:
             print("Filling default data")
             self.PlotData()
+
+    def getNClicks(self,n):
+        self.NClicks = n
+        self.cdata = []
+        global cid
+        cid = self.fc.mpl_connect(self, 'button_press_event', self.onclick)
+        #print("entering a blocking loop")
+        self.fc.start_event_loop(self)#,timeout=-1)
         
     def setSpecIndex(self,i,is2D,drawGate=False):
         if is2D:
@@ -241,6 +253,44 @@ class SpectrumCanvas(FigureCanvas):
                 self.isLogPlot=False
             self.fig.canvas.draw()
 
+    def onclick(self,event):
+        '''
+        Event handler for button_press_event
+        @param event MouseEvent
+        '''
+        ## Count down from NClicks to zero
+        self.NClicks = self.NClicks-1
+        global ix
+        ix = event.xdata
+        if ix is not None:
+            #print('x = %f' %(ix))
+            self.cdata.append(ix) 
+        else:
+            #print('in margin')
+            self.cdata.append(-1)        
+            
+        if self.NClicks == 0:
+            #print("disconnecting clicker")
+            self.fc.mpl_disconnect(self,cid)
+            self.fc.stop_event_loop(self)
+            #print("now we're unblocked")
+
+            
+    def JamZoom(self):
+        print("Click on the x-limits\n")
+        #x = self.fig.ginput(2)
+        #print(x)
+        self.getNClicks(2)
+        xlow,xhigh = self.a.get_xlim()
+        if self.cdata[0] == -1:
+            self.cdata[0] = xlow
+        if self.cdata[1] == -1:
+            self.cdata[1] = xhigh
+        newlowx,newhighx = min(self.cdata),max(self.cdata)
+        self.a.set_xlim(newlowx,newhighx)
+        ## Save to spectrum
+        self.Spec.xzoom = self.a.get_xlim()
+        self.fig.canvas.draw()
     def xZoomIn(self):
         ## Get the current settings
         xlow,xhigh = self.a.get_xlim()

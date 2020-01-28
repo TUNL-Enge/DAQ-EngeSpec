@@ -294,6 +294,12 @@ class MyCustomToolbar(NavigationToolbar):
         self.a.setToolTip("Auto-scale the y-direction")
         self._actions['autoscale'] = self.a
 
+        ## Jam-like zoom button
+        self.a = self.addAction(QtGui.QIcon(iconDir + "JamZoomIcon.ico"),
+                                "Zoom", plotCanvas.JamZoom)
+        self.a.setToolTip("Zoom in with clicks")
+        self._actions['zoom'] = self.a
+        
         ## XRange
         self.a = self.addAction(QtGui.QIcon(iconDir + "XRangeIcon.ico"),
                                 "X Range", plotCanvas.xInteractiveZoom)
