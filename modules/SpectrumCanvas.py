@@ -9,6 +9,7 @@ from matplotlib.figure import Figure
 from matplotlib.widgets import SpanSelector
 from matplotlib.backend_tools import ToolBase, ToolToggleBase
 import matplotlib.colors as colors
+from matplotlib.colors import BoundaryNorm
 import matplotlib.cm as cm
 from matplotlib.colors import ListedColormap
 import copy
@@ -33,7 +34,7 @@ class SpectrumCanvas(FigureCanvas):
         ## Colormaps
         basecolormap = cm.get_cmap('inferno',256)
         newcolors = basecolormap(np.linspace(0,1,256))
-        newcolors[:5,:] = np.array([0.99,0.99,0.99,1])
+        newcolors[:1,:] = np.array([0.99,0.99,0.99,1])
         self.cols = ListedColormap(newcolors)
 
         self.a.set_xlim(self.Spec.xzoom)
@@ -128,12 +129,35 @@ class SpectrumCanvas(FigureCanvas):
         ymax = self.Spec2D.yzoom[1]
 
         H = self.Spec2D.spec2d.T
+        ##        xe = self.Spec2D.xedges
+        ##        ye = self.Spec2D.yedges
+        ###        print(xe,ye)
+        ##        X, Y = np.meshgrid(xe,ye)
+        ##        self.a.clear()
+        ##        self.a.pcolormesh(X,Y,H,cmap=self.cols)
+        ##        self.a.set_xlim([xmin,xmax])
+        ##        self.a.set_ylim([ymin,ymax])
+        ##
+        ##        if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
+        ##            self.drawGate()
+        ##        
+        ##        self.fig.canvas.draw()
+        ##        ##        self.Resize()
+        Hmax = H.max()
+        Nc = 256
+        cbreak = np.zeros(Nc)
+        cbreak[1] = 1.0
+        for i in range(1,Nc-1):
+            cbreak[i+1] = i* Hmax/(Nc-2)
+        norm = BoundaryNorm(cbreak,Nc)
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
 #        print(xe,ye)
         X, Y = np.meshgrid(xe,ye)
         self.a.clear()
-        self.a.pcolormesh(X,Y,H,cmap=self.cols)
+        self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols)
+        #self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
+        #self.logcb = 0
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
 
@@ -190,10 +214,18 @@ class SpectrumCanvas(FigureCanvas):
             Xcut, Ycut = np.meshgrid(x,y)
 
             Hmax = H[Xcut,Ycut].max()
-                        
+            #Hmax = H.max()
+            Nc = 256
+            cbreak = np.zeros(Nc)
+            cbreak[1] = 1.0
+            for i in range(1,Nc-1):
+                cbreak[i+1] = i* Hmax/(Nc-2)
+            #print(cbreak)
+            norm = BoundaryNorm(cbreak,Nc)                
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
-            self.a.pcolormesh(X,Y,H,vmin=0,vmax=Hmax,cmap=self.cols)
+            #self.a.pcolormesh(X,Y,H,vmin=0,vmax=Hmax,cmap=self.cols)
+            self.a.pcolormesh(X,Y,H,norm=norm,cmap=self.cols)
 
 #            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
 #                self.drawGate()

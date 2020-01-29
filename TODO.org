@@ -7,7 +7,7 @@
 * Current
   - [X] Separate out sort routines
   - [ ] Fix updating on 2D histograms
-  - [ ] Color scheme in 2D for small number of counts
+  - [X] Color scheme in 2D for small number of counts
   - [ ] 2D z-zooming
   - [ ] Scroll-bars!
   - [ ] SpanSelector outside the spectrum range
