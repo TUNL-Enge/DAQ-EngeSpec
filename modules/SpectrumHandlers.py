@@ -14,11 +14,13 @@ class SpectrumObject:
         self.isVisible = True
         self.is2D = False
 
-        self.spec = np.zeros(4096)
-        self.spec_temp = np.zeros(4096)   ## The temporary spectrum in memory
+        self.NBins = 2**12
+        
+        self.spec = np.zeros(self.NBins)
+        self.spec_temp = np.zeros(self.NBins)   ## The temporary spectrum in memory
         self.Name = "Test Spectrum"
 
-        self.xzoom = [0,4096]
+        self.xzoom = [0,self.NBins]
         self.yzoom = [0,1]
 
         ## Load the data library
@@ -46,7 +48,7 @@ class SpectrumObject:
 
     ## Initial sine-wave histogram
     def initialize(self):
-        t = np.arange(0.0, 4096, 1)
+        t = np.arange(0.0, self.NBins, 1)
         s = 200+100*np.sin(2*np.pi*t/1000.0)
         self.spec = s
         self.spec_temp[:] = self.spec

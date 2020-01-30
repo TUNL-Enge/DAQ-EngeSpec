@@ -73,7 +73,7 @@ class SpectrumCollection:
         for i in range(len(list(self.df))):
             sObj = SpectrumObject(i)
             sObj.Name = list(self.df)[i]
-            h, edges = np.histogram(self.df.loc[:,sObj.Name],bins=range(0,4097))
+            h, edges = np.histogram(self.df.loc[:,sObj.Name],bins=range(0,sObj.NBins+1))
             sObj.spec = h
             sObj.spec_temp[:] = h
             self.spec1d.append(sObj)
@@ -168,7 +168,7 @@ class MidasThread(QThread):
                 sObj = SpectrumObject(counter1d)
                 sObj.Name = self.names[i]
                 sObj.hasGate = self.hasGates[i]
-                sObj.spec = np.zeros(4096)
+                sObj.spec = np.zeros(sObj.NBins)
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec[0] = 1
                 sObj.spec_temp[:] = sObj.spec

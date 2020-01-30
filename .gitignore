@@ -5,6 +5,7 @@
 *.bak
 *#
 *~
+.Rhistory
 
 ## Data
 *.hdf

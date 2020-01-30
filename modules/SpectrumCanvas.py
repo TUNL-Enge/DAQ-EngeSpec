@@ -42,7 +42,7 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlabel("channel")
         self.a.set_ylabel("counts")
 
-        self.maximumX    = 4095
+        self.maximumX    = self.Spec.NBins-1
         self.isLogPlot  = False
         self.isReslot   = False
 
@@ -106,7 +106,7 @@ class SpectrumCanvas(FigureCanvas):
         ##self.PlotData2D()
         
     def PlotData(self,drawGate=False):
-        x = np.array([x for x in range(0,4096)],dtype=int)
+        x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
 
         xmin = self.Spec.xzoom[0]
@@ -186,7 +186,7 @@ class SpectrumCanvas(FigureCanvas):
             ymin = self.Spec.yzoom[0]
             ymax = self.Spec.yzoom[1]
 
-            x = np.array([x for x in range(0,4096)],dtype=int)
+            x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
 
@@ -235,7 +235,7 @@ class SpectrumCanvas(FigureCanvas):
 
     def GetMax(self):
         binlow = max(1,int(self.a.get_xlim()[0]))
-        binhigh= min(4095,int(self.a.get_xlim()[1]))
+        binhigh= min(self.Spec.NBins-1,int(self.a.get_xlim()[1]))
         maxarray=self.Spec.spec[binlow:binhigh]
         return max(maxarray)
 
@@ -335,11 +335,11 @@ class SpectrumCanvas(FigureCanvas):
         newlowx,newhighx = (midbinx-0.80*(midbinx-xlow),midbinx+0.80*(xhigh-midbinx))
         ## Check that it's not out of bounds
         newlowx = max(newlowx,0)
-        newhighx = min(newhighx,4096)
+        newhighx = min(newhighx,self.Spec.NBins)
         ## Same for y
         newlowy,newhighy = (midbiny-0.80*(midbiny-ylow),midbiny+0.80*(yhigh-midbiny))
         newlowy = max(newlowy,0)
-        newhighy = min(newhighy,4096)
+        newhighy = min(newhighy,self.Spec.NBins)
         
         ## Apply to the spectrum
         self.a.set_xlim(newlowx,newhighx)
@@ -361,13 +361,13 @@ class SpectrumCanvas(FigureCanvas):
         midbinx =xlow+numbinsx/2
         newlowx,newhighx = (midbinx-1.20*(midbinx-xlow),midbinx+1.20*(xhigh-midbinx))
         newlowx = max(newlowx,0)
-        newhighx = min(newhighx,4096)
+        newhighx = min(newhighx,self.Spec.NBins)
         ## now for y
         numbinsy=yhigh-ylow
         midbiny =ylow+numbinsy/2
         newlowy,newhighy = (midbiny-1.20*(midbiny-ylow),midbiny+1.20*(yhigh-midbiny))
         newlowy = max(newlowy,0)
-        newhighy = min(newhighy,4096)
+        newhighy = min(newhighy,self.Spec.NBins)
 
         ##if( newlow >= 0 and newhigh <= 4096):
         self.a.set_xlim(newlowx,newhighx)
