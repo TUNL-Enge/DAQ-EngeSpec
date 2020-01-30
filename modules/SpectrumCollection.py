@@ -68,6 +68,21 @@ class SpectrumCollection:
 
             self.Sort()
 
+    ## Save events from an HDF file
+    def SaveHDFData(self):
+        filename = QFileDialog.getSaveFileName(None,
+                                               "Save Data Collection", "./",
+                                               "Data Files (*.hdf)")
+        print("Saving: ",filename[0])
+
+        ## First make a dataframe out of all of the spectra
+        ## Compare "Sort" below with "Create2D.py" script.
+        
+        ##if filename != '':
+        ##    self.df = pd.read_hdf(filename[0])
+        ##
+        ##    self.Sort()
+
     def Sort(self):
         ## First delete the old spectra
         self.spec1d = []

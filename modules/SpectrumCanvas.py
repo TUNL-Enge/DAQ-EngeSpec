@@ -104,7 +104,10 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.PlotData()
         ##self.PlotData2D()
-        
+
+    def SaveHDFData(self):
+        self.SpecColl.SaveHDFData()
+
     def PlotData(self,drawGate=False):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
