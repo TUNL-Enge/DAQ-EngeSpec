@@ -5,11 +5,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
+import os.path
 
 from SpectrumHandlers import *
 
 ## Import my own c++ library!
-import EngeSort
+if os.path.exists('EngeSort.so'):
+    import EngeSort
 
 class SpectrumCollection:
     def __init__(self, num):
@@ -21,7 +23,8 @@ class SpectrumCollection:
         self.Name = "Test Collection of Spectra"
 
         ## Load the data library
-        self.dm = EngeSort.EngeSort()
+        if os.path.exists('EngeSort.so'):
+            self.dm = EngeSort.EngeSort()
 
         self.isRunning = False
         self.MIDASisRunning = False

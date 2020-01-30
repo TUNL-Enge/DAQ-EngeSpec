@@ -3,9 +3,11 @@ from PySide2.QtWidgets import QFileDialog
 import numpy as np
 import pandas as pd
 import matplotlib as plt
+import os.path
 
 ## Import my own c++ library!
-import EngeSort
+if os.path.exists('EngeSort.so'):
+    import EngeSort
 
 class SpectrumObject:
     def __init__(self, num):
@@ -24,7 +26,8 @@ class SpectrumObject:
         self.yzoom = [0,1]
 
         ## Load the data library
-        self.dm = EngeSort.EngeSort()
+        if os.path.exists('EngeSort.so'):
+            self.dm = EngeSort.EngeSort()
 
         self.gate = None
         self.hasGate = False
