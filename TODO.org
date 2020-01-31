@@ -1,6 +1,9 @@
 * Release blocks
   - [ ] 2D histograms
   - [ ] Saving data
+    - SpectrumObject has EngeSort object embedded, which shouldn't be
+      saved...
+    - Split EngeSort out from spectra. Put in a separate sort object?
   - [ ] Scalers
   - [ ] Jam-like zooming
   - [ ] Reloading data

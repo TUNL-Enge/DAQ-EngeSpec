@@ -77,12 +77,28 @@ class SpectrumCollection:
 
         ## First make a dataframe out of all of the spectra
         ## Compare "Sort" below with "Create2D.py" script.
-        
-        ##if filename != '':
-        ##    self.df = pd.read_hdf(filename[0])
-        ##
-        ##    self.Sort()
+        self.printSummary()
 
+        #### Make simplified 1D and 2D spectra
+        ##df = pd.DataFrame()
+        ##for i in range(len(self.spec1d)):
+        ##    df[self.spec1d[i].Name] = self.spec1d[i].spec
+        ##    
+        ##df.to_hdf(filename[0], key='df', mode='w')
+        ##
+        ##for i in range(len(self.spec2d)):
+        ##    df2d = pd.DataFrame(self.spec2d[i].spec2d)
+        ##    df2d.to_hdf(filename[0], key='df', mode='a')
+        my_list = list(self.spec1d)
+        print(my_list)
+
+        spec_pd = pd.DataFrame([p for p in my_list])
+        print(spec_pd.dtypes)
+        print(spec_pd)
+        #spec_pd.to_hdf(filename[0], key='df', mode='w')
+        save
+
+        
     def Sort(self):
         ## First delete the old spectra
         self.spec1d = []
