@@ -308,14 +308,15 @@ class MyCustomToolbar(NavigationToolbar):
         self._actions['zoom'] = self.a
         
         ## XRange
-        self.a = self.addAction(QtGui.QIcon(iconDir + "XRangeIcon.ico"),
-                                "X Range", plotCanvas.xInteractiveZoom)
-        self.a.setToolTip("Adjust the x-range")
-        self._actions['xrange'] = self.a
+        ##self.a = self.addAction(QtGui.QIcon(iconDir + "XRangeIcon.ico"),
+        ##                        "X Range", plotCanvas.xInteractiveZoom)
+        ##self.a.setToolTip("Adjust the x-range")
+        ##self._actions['xrange'] = self.a
 
         ## YRange
         self.a = self.addAction(QtGui.QIcon(iconDir + "YRangeIcon.ico"),
-                                "Y Range", plotCanvas.yInteractiveZoom)
+                                "Y Range", plotCanvas.JamZoomy)
+#                                "Y Range", plotCanvas.yInteractiveZoom)
         self.a.setToolTip("Adjust the y-range")
         self._actions['yrange'] = self.a
 

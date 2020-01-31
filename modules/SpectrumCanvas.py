@@ -70,7 +70,8 @@ class SpectrumCanvas(FigureCanvas):
 
     def getNClicks(self,n):
         self.NClicks = n
-        self.cdata = []
+        self.cxdata = []
+        self.cydata = []
         global cid
         cid = self.fc.mpl_connect(self, 'button_press_event', self.onclick)
         #print("entering a blocking loop")
@@ -295,14 +296,21 @@ class SpectrumCanvas(FigureCanvas):
         '''
         ## Count down from NClicks to zero
         self.NClicks = self.NClicks-1
-        global ix
+        global ix, iy
         ix = event.xdata
+        iy = event.ydata
         if ix is not None:
             #print('x = %f' %(ix))
-            self.cdata.append(ix) 
+            self.cxdata.append(ix) 
         else:
             #print('in margin')
-            self.cdata.append(-1)        
+            self.cxdata.append(-1)  
+        if iy is not None:
+            #print('x = %f' %(ix))
+            self.cydata.append(iy) 
+        else:
+            #print('in margin')
+            self.cydata.append(-1)       
             
         if self.NClicks == 0:
             #print("disconnecting clicker")
@@ -317,15 +325,32 @@ class SpectrumCanvas(FigureCanvas):
         #print(x)
         self.getNClicks(2)
         xlow,xhigh = self.a.get_xlim()
-        if self.cdata[0] == -1:
-            self.cdata[0] = xlow
-        if self.cdata[1] == -1:
-            self.cdata[1] = xhigh
-        newlowx,newhighx = min(self.cdata),max(self.cdata)
+        if self.cxdata[0] == -1:
+            self.cxdata[0] = xlow
+        if self.cxdata[1] == -1:
+            self.cxdata[1] = xhigh
+        newlowx,newhighx = min(self.cxdata),max(self.cxdata)
         self.a.set_xlim(newlowx,newhighx)
         ## Save to spectrum
         self.Spec.xzoom = self.a.get_xlim()
         self.fig.canvas.draw()
+
+    def JamZoomy(self):
+        print("Click on the y-limits\n")
+        #x = self.fig.ginput(2)
+        #print(x)
+        self.getNClicks(2)
+        ylow,yhigh = self.a.get_ylim()
+        if self.cydata[0] == -1:
+            self.cydata[0] = ylow
+        if self.cydata[1] == -1:
+            self.cydata[1] = yhigh
+        newlowy,newhighy = min(self.cydata),max(self.cydata)
+        self.a.set_ylim(newlowy,newhighy)
+        ## Save to spectrum
+        self.Spec.yzoom = self.a.get_ylim()
+        self.fig.canvas.draw()
+        
     def xZoomIn(self):
         ## Get the current settings
         xlow,xhigh = self.a.get_xlim()
