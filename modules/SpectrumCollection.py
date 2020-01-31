@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import os.path
+import pickle
 
 from SpectrumHandlers import *
 
@@ -92,11 +93,17 @@ class SpectrumCollection:
         my_list = list(self.spec1d)
         print(my_list)
 
-        spec_pd = pd.DataFrame([p for p in my_list])
-        print(spec_pd.dtypes)
-        print(spec_pd)
-        #spec_pd.to_hdf(filename[0], key='df', mode='w')
-        save
+        def save_object(obj, filename):
+            with open(filename, 'wb') as output:  # Overwrites any existing file.
+                pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+
+        save_object(my_list, filename[0])
+        ##spec_pd = pd.DataFrame([p for p in my_list])
+        ##print(spec_pd.dtypes)
+        ##print(spec_pd)
+        ##spec_pd.to_hdf(filename[0], key='df', mode='w')
+        
 
         
     def Sort(self):

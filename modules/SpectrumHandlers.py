@@ -26,8 +26,8 @@ class SpectrumObject:
         self.yzoom = [0,1]
 
         ## Load the data library
-        if os.path.exists('EngeSort.so'):
-            self.dm = EngeSort.EngeSort()
+        ##if os.path.exists('EngeSort.so'):
+        ##    self.dm = EngeSort.EngeSort()
 
         self.gate = None
         self.hasGate = False
