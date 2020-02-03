@@ -64,10 +64,20 @@ class SpectrumCollection:
                                                "Open Data Collection", "./",
                                                "Data Files (*.hdf)")
         print("Loading: ",filename[0])
-        if filename != '':
-            self.df = pd.read_hdf(filename[0])
-
-            self.Sort()
+        #if filename != '':
+        #    self.df = pd.read_hdf(filename[0])
+        #
+        #    self.Sort()
+        with open(filename[0], 'rb') as input:
+            data = pickle.load(input)
+        print(data)
+        self.spec1d = []
+        self.spec2d = []
+        for i in range(len(data)):
+            if(data[i].is2D):
+                self.spec2d.append(data[i])
+            else:
+                self.spec1d.append(data[i])
 
     ## Save events from an HDF file
     def SaveHDFData(self):

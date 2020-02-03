@@ -5,8 +5,9 @@
       saved...
     - Split EngeSort out from spectra. Put in a separate sort object?
   - [ ] Scalers
-  - [ ] Jam-like zooming
+  - [X] Jam-like zooming
   - [ ] Reloading data
+  - [ ] Jiggling icons
 * Current
   - [X] Separate out sort routines
   - [ ] Fix updating on 2D histograms
