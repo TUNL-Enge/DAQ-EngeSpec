@@ -58,32 +58,39 @@ class SpectrumCollection:
         self.spec1d.append(sObj)
 
         
-    ## Load raw events from an HDF file
+    ## Load spectra from a "pickle" file
     def LoadHDFData(self):
         filename = QFileDialog.getOpenFileName(None,
                                                "Open Data Collection", "./",
                                                "Data Files (*.hdf)")
         print("Loading: ",filename[0])
-        #if filename != '':
-        #    self.df = pd.read_hdf(filename[0])
-        #
-        #    self.Sort()
+        if filename != '':
+            self.df = pd.read_hdf(filename[0])
+        
+            self.Sort()
+
+    def LoadPickleData(self):
+        filename = QFileDialog.getOpenFileName(None,
+                                               "Open Data Collection", "./",
+                                               "Data Files (*.pkl)")
+        print("Loading: ",filename[0])
         with open(filename[0], 'rb') as input:
             data = pickle.load(input)
-        print(data)
         self.spec1d = []
         self.spec2d = []
         for i in range(len(data)):
-            if(data[i].is2D):
-                self.spec2d.append(data[i])
-            else:
-                self.spec1d.append(data[i])
+            data2 = data[i]
+            for j in range(len(data2)):
+                if(data2[j].is2D):
+                    self.spec2d.append(data2[j])
+                else:
+                    self.spec1d.append(data2[j])
 
-    ## Save events from an HDF file
-    def SaveHDFData(self):
+    ## Save events to a "pickle" file
+    def SavePickleData(self):
         filename = QFileDialog.getSaveFileName(None,
                                                "Save Data Collection", "./",
-                                               "Data Files (*.hdf)")
+                                               "Data Files (*.pkl)")
         print("Saving: ",filename[0])
 
         ## First make a dataframe out of all of the spectra
@@ -100,7 +107,7 @@ class SpectrumCollection:
         ##for i in range(len(self.spec2d)):
         ##    df2d = pd.DataFrame(self.spec2d[i].spec2d)
         ##    df2d.to_hdf(filename[0], key='df', mode='a')
-        my_list = list(self.spec1d)
+        my_list = list([self.spec1d,self.spec2d])
         print(my_list)
 
         def save_object(obj, filename):

@@ -161,9 +161,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Load HDF data
         self.file_menu.addAction('&Load HDF File',
                                  self.LoadHDFData)
+        ## Load pickle data
+        self.file_menu.addAction('&Load Pickle File',
+                                 self.LoadPickleData)
         ## Save HDF data
-        self.file_menu.addAction('&Save HDF File',
-                                 self.SaveHDFData)
+        self.file_menu.addAction('&Save Pickle File',
+                                 self.SavePickleData)
         ## Connect to MIDAS
         self.file_menu.addAction('&Connect MIDAS',
                                  self.connectmidas)
@@ -207,9 +210,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecCanvas.LoadHDFData()
         self.PopulateTree()
 
-    def SaveHDFData(self):
-        print("Saving HDF Data")
-        self.SpecCanvas.SaveHDFData()
+    def LoadPickleData(self):
+        print("Loading Pickle Data")
+        self.SpecCanvas.LoadPickleData()
+        self.PopulateTree()
+
+    def SavePickleData(self):
+        print("Saving Pickle Data")
+        self.SpecCanvas.SavePickleData()
 
     def connectmidas(self):
         self.SpecColl.connectmidas()

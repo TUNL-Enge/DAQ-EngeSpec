@@ -106,8 +106,15 @@ class SpectrumCanvas(FigureCanvas):
         self.PlotData()
         ##self.PlotData2D()
 
-    def SaveHDFData(self):
-        self.SpecColl.SaveHDFData()
+    def LoadPickleData(self):
+        self.SpecColl.LoadPickleData()
+        self.sindex1d = 0
+        self.Spec = self.SpecColl.spec1d[self.sindex1d]
+        self.PlotData()
+        ##self.PlotData2D()
+
+    def SavePickleData(self):
+        self.SpecColl.SavePickleData()
 
     def PlotData(self,drawGate=False):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
