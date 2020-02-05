@@ -397,9 +397,7 @@ class SpectrumCanvas(FigureCanvas):
 
             
     def JamZoom(self):
-        print("Click on the x-limits\n")
-        #x = self.fig.ginput(2)
-        #print(x)
+        print("Click on the zoom limits")
         self.getNClicks(2)
         xlow,xhigh = self.a.get_xlim()
         if self.cxdata[0] == -1:
@@ -410,6 +408,18 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim(newlowx,newhighx)
         ## Save to spectrum
         self.Spec.xzoom = self.a.get_xlim()
+
+        if self.is2D:
+            ylow,yhigh = self.a.get_ylim()
+            if self.cydata[0] == -1:
+                self.cydata[0] = ylow
+            if self.cydata[1] == -1:
+                self.cydata[1] = yhigh
+            newlowy,newhighy = min(self.cydata),max(self.cydata)
+            self.a.set_ylim(newlowy,newhighy)
+            ## Save to spectrum
+            self.Spec.yzoom = self.a.get_ylim()
+            
         self.fig.canvas.draw()
 
     def JamZoomy(self):
