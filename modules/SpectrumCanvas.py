@@ -31,6 +31,8 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
         self.a = self.fig.add_subplot(111)
 
+        #self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
+        
         ## Colormaps
         basecolormap = cm.get_cmap('inferno',256)
         newcolors = basecolormap(np.linspace(0,1,256))
@@ -125,6 +127,7 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec.yzoom[0]
         ymax = self.Spec.yzoom[1]
 
+        self.a.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
         self.a.clear()
         self.a.step(x,y,'k',where='mid')
         self.a.set_xlim([xmin,xmax])
@@ -163,8 +166,16 @@ class SpectrumCanvas(FigureCanvas):
         norm = BoundaryNorm(cbreak,Nc)
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
-#        print(xe,ye)
         X, Y = np.meshgrid(xe,ye)
+
+        def format_coord(x, y):
+            col = int(x)
+            row = int(y)
+            if col >= 0 and col < 256 and row >= 0 and row < 256:
+                z = H[row, col]
+                return "x = {0:<4.0f}, y = {1:>4.0f} \nz = {2:>8.0f}".format(x, y, z)
+
+        self.a.format_coord = format_coord
         self.a.clear()
         self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols)
         #self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
@@ -174,7 +185,7 @@ class SpectrumCanvas(FigureCanvas):
 
         if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
             self.drawGate()
-        
+            
         self.fig.canvas.draw()
         ##        self.Resize()
 

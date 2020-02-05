@@ -23,10 +23,18 @@ np.random.shuffle(arr)
 x = x[arr]
 y = y[arr]
 
+xgo = x>0
+x = x[xgo]
+y = y[xgo]
+
+ygo = y>0
+x = x[ygo]
+y = y[ygo]
+
 ## Make a pandas data frame and save
 df = pd.DataFrame(np.array([x,y]).T, columns=['Pos1','DE'])
 df.to_hdf('2Ddata.hdf', key='df', mode='w')
-df.to_pickle("2Ddata.pkl")
+#df.to_pickle("2Ddata.pkl")
 
 plt.hist2d(x, y,bins=[256,256],range=[[0,4096],[0,4096]])
 #plt.axis('equal')
