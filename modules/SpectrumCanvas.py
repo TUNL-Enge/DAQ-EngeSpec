@@ -173,7 +173,7 @@ class SpectrumCanvas(FigureCanvas):
             row = int(y)
             if col >= 0 and col < 256 and row >= 0 and row < 256:
                 z = H[row, col]
-                return "x = {0:<4.0f}, y = {1:>4.0f} \nz = {2:>8.0f}".format(x, y, z)
+                return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(x, y, z)
 
         self.a.format_coord = format_coord
         self.a.clear()
