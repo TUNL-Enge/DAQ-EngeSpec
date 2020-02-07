@@ -134,8 +134,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         commandWidget.setText("Welcome to EngeSpec!\n")
         commandWidget.setMaximumHeight(100)
         ## Add the output streams to the text editor
-        sys.stdout = OutLog(commandWidget, sys.stdout)
-        sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
+        ##sys.stdout = OutLog(commandWidget, sys.stdout)
+        ##sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
 
         
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
@@ -183,6 +183,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Connect to MIDAS
         self.file_menu.addAction('&Connect MIDAS',
                                  self.connectmidas)
+        ## Connect to MIDAS offline
+        self.file_menu.addAction('&Offline MIDAS',
+                                 self.offlinemidas)
         ## Quit
         self.file_menu.addAction('&Quit', self.fileQuit,
            QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
@@ -239,7 +242,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
-        
+
+    def offlinemidas(self):
+        self.SpecColl.offlinemidas()
+        self.PopulateTree()
+        self.SpecCanvas.setSpecIndex(0,False)
+
     def startmidas(self):
         print("Running midas")
         os.system("odbedit -c start")

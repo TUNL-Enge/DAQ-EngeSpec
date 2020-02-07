@@ -205,17 +205,21 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   
 }
 
-
-int EngeSort::connectMidasAnalyzer(){
+//#include <cstring>
+int EngeSort::connectMidasAnalyzer(std::string filename){
+//int EngeSort::connectMidasAnalyzer(){
 
   MidasAnalyzerModule mAMod;
   //TARegisterModule tarm(&mAMod);
   TARegister tar(&mAMod);
 
   mAMod.ConnectEngeAnalyzer(this);
-  
+
+  char* cstr[filename.size()+1];
+  strcpy(cstr[0], filename.c_str());
   Py_BEGIN_ALLOW_THREADS
-    manalyzer_main(0,0);
+    manalyzer_main(1,cstr);
+    //    manalyzer_main(0,0);
   Py_END_ALLOW_THREADS
     
   return 0;

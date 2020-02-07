@@ -37,7 +37,8 @@ class EngeSort {
   void SimulateData();
 
   // Connect the midas analyzer
-  int connectMidasAnalyzer();
+  int connectMidasAnalyzer(std::string filename);
+  //  int connectMidasAnalyzer();
   
   // New 2d matrix method
   np::ndarray getData();
