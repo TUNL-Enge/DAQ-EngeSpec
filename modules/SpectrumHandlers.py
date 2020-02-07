@@ -46,8 +46,11 @@ class SpectrumObject:
                 Bin,Content=line.split()
                 TempHistogramArray.append( float(Content) ) 
             input.close()
+            self.NBins = len(TempHistogramArray)
             self.spec = TempHistogramArray
+            self.spec_temp = self.spec
             self.spec_temp[:] = self.spec
+            self.xzoom = [0,self.NBins]
 
     ## Initial sine-wave histogram
     def initialize(self):
