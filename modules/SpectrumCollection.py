@@ -30,7 +30,7 @@ class SpectrumCollection:
         self.isRunning = False
         self.MIDASisRunning = False
 
-        self.offlinefile = ""
+        self.offlinefiles = ""
         
     def __str__(self):
         return 'Spectrum Collection Name: {}'.format(self.Name)
@@ -194,9 +194,10 @@ class SpectrumCollection:
         self.midas_collection_thread.start()
 
     def offlinemidas(self):
-        self.offlinefile = "run00031.mid.lz4"
+        self.offlinefiles = "run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
         self.midas_thread.start()
+        print("MIDAS Thread Started")
         self.MIDASisRunning = True
         self.midas_collection_thread = MidasCollectionThread(self)
         self.midas_collection_thread.start()
@@ -208,7 +209,7 @@ class MidasThread(QThread):
         
         self.specColl = specColl
 
-        print(self.specColl.offlinefile)
+        print(self.specColl.offlinefiles)
         
         print(self.specColl.dm.sayhello())
         ## Initialize the DataMaker
@@ -257,7 +258,7 @@ class MidasThread(QThread):
                 
     def run(self):
         print("Connecting MIDAS")
-        self.specColl.dm.connectMidasAnalyzer(self.specColl.offlinefile)
+        self.specColl.dm.connectMidasAnalyzer(self.specColl.offlinefiles)
 #        self.specColl.dm.connectMidasAnalyzer()
 
 class MidasCollectionThread(QThread):
@@ -275,9 +276,9 @@ class MidasCollectionThread(QThread):
         self.hasGates = self.specColl.dm.gethasGates()
 
     def run(self):
-#        print("Collecting MIDAS data")
+        print("Collecting MIDAS data")
         while self.specColl.MIDASisRunning:
-#            print("isRunning!")
+            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())
             dat2d = self.specColl.dm.getData2D()
 

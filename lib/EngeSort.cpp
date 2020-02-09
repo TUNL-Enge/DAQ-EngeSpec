@@ -93,12 +93,12 @@ void EngeSort::Initialize(){
   /*
   // Loop through and print all histograms
   for(auto h: Histograms){
-    if(h.getnDims() == 1) {
+    if(h->getnDims() == 1) {
       std::cout << "Found a 1D histogram!" << std::endl;
-      h.Print(0,10);
-    } else if(h.getnDims() == 2) {
+      h->Print(0,10);
+    } else if(h->getnDims() == 2) {
       std::cout << "Found a 2D histogram!" << std::endl;
-      h.Print(0,10,0,10);
+      h->Print(0,10,0,10);
     }
     std::cout << std::endl;
   }
@@ -215,10 +215,26 @@ int EngeSort::connectMidasAnalyzer(std::string filename){
 
   mAMod.ConnectEngeAnalyzer(this);
 
-  char* cstr[filename.size()+1];
-  strcpy(cstr[0], filename.c_str());
+  std::cout << "connectMidasAnalyzer " << filename.size() << " " << filename << std::endl;
+
+  // We need to send a dummy argument to manalyzer, which gets ignored
+  filename = "dummy " + filename;
+  
+  enum { kMaxArgs = 64 };
+  int ac=0;
+  char *av[kMaxArgs];
+
+  char *dup = strdup(filename.c_str());
+  char *p2 = strtok(dup, " ");
+  while (p2 && ac < kMaxArgs-1)
+    {
+      av[ac++] = p2;
+      p2=strtok(0, " ");
+    }
+  av[ac]=0;
+  
   Py_BEGIN_ALLOW_THREADS
-    manalyzer_main(1,cstr);
+    manalyzer_main(ac,av);
     //    manalyzer_main(0,0);
   Py_END_ALLOW_THREADS
     
