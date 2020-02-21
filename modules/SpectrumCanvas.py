@@ -281,7 +281,7 @@ class SpectrumCanvas(FigureCanvas):
 
     def Resize(self):
         if not self.is2D:
-            self.a.set_xlim(0,self.maximumX)
+            self.a.set_xlim(0,self.Spec.NBins-1)
             if(self.isLogPlot==True):
                 self.a.set_ylim([1,1.20*self.GetMax()])
             else:                    
