@@ -259,6 +259,7 @@ class MidasThread(QThread):
     def run(self):
         print("Connecting MIDAS")
         self.specColl.dm.connectMidasAnalyzer(self.specColl.offlinefiles)
+#        self.specColl.MIDASisRunning = False
 #        self.specColl.dm.connectMidasAnalyzer()
 
 class MidasCollectionThread(QThread):
@@ -278,7 +279,7 @@ class MidasCollectionThread(QThread):
     def run(self):
         print("Collecting MIDAS data")
         while self.specColl.MIDASisRunning:
-            print("isRunning!")
+##            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())
             dat2d = self.specColl.dm.getData2D()
 

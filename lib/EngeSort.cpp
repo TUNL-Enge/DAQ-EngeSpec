@@ -115,7 +115,7 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
   double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
 
-  std::cout << ADCsize << "  " << TDCsize << std::endl;
+  //  std::cout << ADCsize << "  " << TDCsize << std::endl;
   
   // Thresholds
   int Threshold = 10;
@@ -124,7 +124,7 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   for(int i=0; i<TDCsize; i++)
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
 
-  std::cout << "Done thresholding" << std::endl;
+  //  std::cout << "Done thresholding" << std::endl;
   
   // Define the channels
   int cE = dADC[0];
@@ -139,7 +139,7 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   int cTDC_Pos1 = dTDC[2];
   int cTDC_Pos2 = dTDC[3];
 
-  std::cout << cPos1 << std::endl;
+  //  std::cout << cPos1 << std::endl;
   
   // Calculate some things
   int cTheta = (int)std::round(10000.0*atan((cPos2-cPos1)/100.)/3.1415 - 4000.);
@@ -400,7 +400,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id != 1)
     return flow;
 
-  std::cout << "Analyzing" << std::endl;
+  //  std::cout << "Analyzing" << std::endl;
   
   // Get the ADC Bank
   TMBank* bADC = event->FindBank("ADC1");
@@ -410,7 +410,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
-  std::cout << "Calling sort" << std::endl;
+  //  std::cout << "Calling sort" << std::endl;
   fModule->eA->sort(dADC, dTDC);
 
   return flow;
