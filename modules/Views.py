@@ -157,7 +157,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.file_menu = QtWidgets.QMenu('&File', self)
         ## Load ascii spectrum
         self.file_menu.addAction('&Load Spectrum File (ascii)',
-                                 self.LoadData)
+                                 self.LoadASCIIData)
+        ## Save ascii spectrum
+        self.file_menu.addAction('&Save Spectrum File (ascii)',
+                                 self.SaveASCIIData)
         ## Load HDF data
         self.file_menu.addAction('&Load HDF File',
                                  self.LoadHDFData)
@@ -202,9 +205,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.runControlsToolbar.addAction(gateAction)
 
         
-    def LoadData(self):
-        self.SpecCanvas.LoadData()
-        
+    def LoadASCIIData(self):
+        self.SpecCanvas.LoadASCIIData()
+
+    def SaveASCIIData(self):
+        self.SpecCanvas.SaveASCIIData()
+
     def LoadHDFData(self):
         print("Loading HDF Data")
         self.SpecCanvas.LoadHDFData()

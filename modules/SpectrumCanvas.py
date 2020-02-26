@@ -97,10 +97,13 @@ class SpectrumCanvas(FigureCanvas):
         else:
             self.PlotData2D(drawGate)
             
-    def LoadData(self):
-        self.Spec.LoadData()
+    def LoadASCIIData(self):
+        self.Spec.LoadASCIIData()
         self.PlotData()
-        
+
+    def SaveASCIIData(self):
+        self.Spec.SaveASCIIData()
+
     def LoadHDFData(self):
         self.SpecColl.LoadHDFData()
         self.sindex1d = 0

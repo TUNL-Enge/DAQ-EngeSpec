@@ -2,6 +2,7 @@
 from PySide2.QtWidgets import QFileDialog
 import numpy as np
 import pandas as pd
+import csv
 import matplotlib as plt
 import os.path
 
@@ -34,7 +35,7 @@ class SpectrumObject:
 
         
     ## Load ascii file
-    def LoadData(self):
+    def LoadASCIIData(self):
         filename = QFileDialog.getOpenFileName(None,
                                                "Open Spectrum", "./",
                                                "Spectrum Files (*.dat)")
@@ -51,6 +52,21 @@ class SpectrumObject:
             self.spec_temp = self.spec
             self.spec_temp[:] = self.spec
             self.xzoom = [0,self.NBins]
+
+    ## Save ascii file
+    def SaveASCIIData(self):
+        print("Save ASCII Data!")
+        filename = QFileDialog.getSaveFileName(None,
+                                               "Save Spectrum", "./",
+                                               "Spectrum Files (*.dat)")
+        print("Saving: ",filename[0])
+        if filename != '':
+            with open(filename[0], "w") as ofile:
+                writer = csv.writer(ofile, delimiter='\t')
+                writer.writerows(zip(range(len(self.spec)),self.spec))
+                #for bin in range(len(self.spec)):
+                #ofile.write([bin,self.spec[bin]])
+            #ofile.close()
 
     ## Initial sine-wave histogram
     def initialize(self):
