@@ -13,6 +13,7 @@
 .DS_Store
 *.out
 *.root
+*.mid*
 
 ## Folders we don't need
 modules/backup
@@ -21,6 +22,7 @@ modules/backup
 conversioncommand
 *.tar.gz
 tmp
+test.dat
 
 ## CMake stuff
 CMakeFiles
