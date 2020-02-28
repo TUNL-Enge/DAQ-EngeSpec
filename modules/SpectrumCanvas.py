@@ -422,7 +422,9 @@ class SpectrumCanvas(FigureCanvas):
             self.a.set_ylim(newlowy,newhighy)
             ## Save to spectrum
             self.Spec.yzoom = self.a.get_ylim()
-            
+
+
+        self.updateSlider()
         self.fig.canvas.draw()
 
     def JamZoomy(self):
@@ -542,6 +544,34 @@ class SpectrumCanvas(FigureCanvas):
         x = self.fig.ginput(n)
         print(x)
 
+    def setupSlider(self,scroll):
+        self.scroll = scroll
+        self.scroll.setRange(0,self.Spec.NBins)
+        self.scroll.setValue(self.Spec.NBins/2)
+        self.scroll.setPageStep(self.Spec.NBins)
+        self.scroll.actionTriggered.connect(self.sliderUpdate)
+        self.sliderUpdate()
+
+    def updateSlider(self):
+        xmin = self.Spec.xzoom[0]
+        xmax = self.Spec.xzoom[1]
+        self.scroll.setPageStep((xmax-xmin)/2)
+        self.scroll.setValue(xmin+(xmax-xmin/2))
+
+    def sliderUpdate(self, evt=None):
+        v = self.scroll.value()
+        xmin = self.Spec.xzoom[0]
+        xmax = self.Spec.xzoom[1]
+        dspan=(xmax-xmin)/2
+        newlowx = v-dspan
+        newhighx = v+dspan
+        self.a.set_xlim(newlowx,newhighx)
+        ## Save to spectrum
+        self.Spec.xzoom = self.a.get_xlim()
+        self.Spec.yzoom = self.a.get_ylim()
+        ## And plot!
+        self.fig.canvas.draw()
+        
     def ZeroAll(self):
         self.SpecColl.ZeroAll()
         self.UpdatePlot()

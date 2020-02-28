@@ -110,6 +110,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         toolbar = MyCustomToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
         l.addWidget(self.SpecCanvas)
+        scroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
+        self.SpecCanvas.setupSlider(scroll)
+        l.addWidget(scroll)
         tab1.setLayout(l)
         
         tabWidget.addTab(tab1,"")
