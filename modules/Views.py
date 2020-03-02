@@ -109,10 +109,24 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         l = QtWidgets.QVBoxLayout()
         toolbar = MyCustomToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
-        l.addWidget(self.SpecCanvas)
-        scroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
-        self.SpecCanvas.setupSlider(scroll)
-        l.addWidget(scroll)
+
+        h = QtWidgets.QHBoxLayout()
+        h.addWidget(self.SpecCanvas)
+        vscroll = QtWidgets.QScrollBar(QtCore.Qt.Vertical)
+        h.addWidget(vscroll)
+        l.addLayout(h)
+        #        vscroll = QtWidgets.QScrollArea()
+#        vscroll.setWidgetResizable(True)
+#        l.addWidget(vscroll)
+#        vscroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+#        vscroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+#
+#        scroll_widget = QtWidgets.QWidget()
+#        vscroll.setWidget(scroll_widget)
+        
+        hscroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
+        self.SpecCanvas.setupSlider(hscroll)
+        l.addWidget(hscroll)
         tab1.setLayout(l)
         
         tabWidget.addTab(tab1,"")
