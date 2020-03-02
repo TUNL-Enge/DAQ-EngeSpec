@@ -252,9 +252,10 @@ class SpectrumCanvas(FigureCanvas):
             #self.a.pcolormesh(X,Y,H,vmin=0,vmax=Hmax,cmap=self.cols)
             self.a.pcolormesh(X,Y,H,norm=norm,cmap=self.cols)
 
-#            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
-#                self.drawGate()
+            #            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
+            #                self.drawGate()
 
+        self.updateSlider()
         self.fig.canvas.draw()
     
 
@@ -296,6 +297,7 @@ class SpectrumCanvas(FigureCanvas):
             self.a.set_ylim([0,256])#self.maximumX)
             self.Spec2D.yzoom = [0,256]#self.a.get_ylim()
             self.Spec2D.xzoom = [0,256]#self.a.get_xlim()
+        self.updateSlider()
         self.fig.canvas.draw()
 
     def ToggleLog(self):
@@ -546,7 +548,7 @@ class SpectrumCanvas(FigureCanvas):
 
     def setupSlider(self,scroll):
         self.scroll = scroll
-        self.scroll.setRange(0,self.Spec.NBins)
+        self.scroll.setRange(self.Spec.NBins/2,self.Spec.NBins/2)
         self.scroll.setValue(self.Spec.NBins/2)
         self.scroll.setPageStep(self.Spec.NBins)
         self.scroll.actionTriggered.connect(self.sliderUpdate)
@@ -555,8 +557,10 @@ class SpectrumCanvas(FigureCanvas):
     def updateSlider(self):
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
-        self.scroll.setPageStep((xmax-xmin)/2)
-        self.scroll.setValue(xmin+(xmax-xmin/2))
+        page = (xmax-xmin)
+        self.scroll.setPageStep(page)
+        self.scroll.setRange(page/2, self.Spec.NBins-page/2)
+        self.scroll.setValue(round((xmax+xmin)/2))
 
     def sliderUpdate(self, evt=None):
         v = self.scroll.value()
