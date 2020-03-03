@@ -113,16 +113,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         h = QtWidgets.QHBoxLayout()
         h.addWidget(self.SpecCanvas)
         vscroll = QtWidgets.QScrollBar(QtCore.Qt.Vertical)
+        self.SpecCanvas.setupVSlider(vscroll)
         h.addWidget(vscroll)
         l.addLayout(h)
-        #        vscroll = QtWidgets.QScrollArea()
-#        vscroll.setWidgetResizable(True)
-#        l.addWidget(vscroll)
-#        vscroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-#        vscroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-#
-#        scroll_widget = QtWidgets.QWidget()
-#        vscroll.setWidget(scroll_widget)
         
         hscroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
         self.SpecCanvas.setupSlider(hscroll)

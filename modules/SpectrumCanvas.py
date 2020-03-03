@@ -575,7 +575,34 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
         self.fig.canvas.draw()
+
+    def setupVSlider(self,vscroll):
+        print("Setting up vslider")
+        self.vscroll = vscroll
+        self.vscroll.setRange(20,80)
+        self.vscroll.setValue(50)
+        self.vscroll.setPageStep(20)
+#        self.vscroll.actionTriggered.connect(self.vsliderUpdate)
+        self.vscroll.valueChanged.connect(self.vsliderUpdate)
+
+
+    def vsliderUpdate(self, evt=None):
+        v = self.vscroll.value()
+        ymin = self.Spec.yzoom[0]
+        ymax = self.Spec.yzoom[1]
+        dspan=(ymax-ymin)
+        newymin = ymin
+        newymax = ymin+dspan*(50+v)/100
+
+        self.a.set_ylim(newymin,newymax)
+        ## Save to spectrum
+        self.Spec.xzoom = self.a.get_xlim()
+        self.Spec.yzoom = self.a.get_ylim()
+        ## And plot!
+        self.fig.canvas.draw()
+        self.vscroll.setValue(50)
         
+
     def ZeroAll(self):
         self.SpecColl.ZeroAll()
         self.UpdatePlot()
