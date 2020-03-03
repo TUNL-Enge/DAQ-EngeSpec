@@ -37,7 +37,8 @@ class EngeSort {
   void SimulateData();
 
   // Connect the midas analyzer
-  int connectMidasAnalyzer(std::string filename);
+  //  int connectMidasAnalyzer(std::vector<std::string> filenames);
+  int connectMidasAnalyzer(boost::python::list file_list);
   //  int connectMidasAnalyzer();
   
   // New 2d matrix method

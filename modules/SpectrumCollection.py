@@ -191,7 +191,7 @@ class SpectrumCollection:
 
     ## Replay midas
     def offlinemidas(self):
-        filename = QFileDialog.getOpenFileName(None,
+        filename = QFileDialog.getOpenFileNames(None,
                                                "Sort MIDAS File(s)", "./",
                                                "MIDAS Files (*.mid *.mid.*)")
         self.offlinefiles = filename[0]#"run00031.mid.lz4"

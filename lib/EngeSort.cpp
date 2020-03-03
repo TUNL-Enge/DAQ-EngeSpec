@@ -206,7 +206,8 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 }
 
 //#include <cstring>
-int EngeSort::connectMidasAnalyzer(std::string filename){
+//int EngeSort::connectMidasAnalyzer(std::vector<std::string> filenames){
+int EngeSort::connectMidasAnalyzer(boost::python::list file_list){
 //int EngeSort::connectMidasAnalyzer(){
 
   MidasAnalyzerModule mAMod;
@@ -215,10 +216,17 @@ int EngeSort::connectMidasAnalyzer(std::string filename){
 
   mAMod.ConnectEngeAnalyzer(this);
 
-  std::cout << "connectMidasAnalyzer " << filename.size() << " " << filename << std::endl;
-
+  std::cout << "connectMidasAnalyzer " << len(file_list);
   // We need to send a dummy argument to manalyzer, which gets ignored
-  filename = "dummy " + filename;
+  std::string filename = "dummy ";
+  for(int i=0; i<len(file_list); i++){
+    std::string file = boost::python::extract<std::string>(file_list[i]);
+    std::cout << " " << file;
+    filename += file + " ";
+  }
+  std::cout << std::endl;
+  
+  std::cout << filename << std::endl;
   
   enum { kMaxArgs = 64 };
   int ac=0;
