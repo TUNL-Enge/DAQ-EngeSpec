@@ -204,7 +204,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                "..", "images", "icons", "")
         exitAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Exit.ico'), 'Exit', self)
         exitAction.triggered.connect(self.close)
-        startAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run', self)
+        startAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run/Sort', self)
         startAction.triggered.connect(self.startmidas)
         stopAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Stop.ico'), 'Stop Run', self)
         stopAction.triggered.connect(self.stopmidas)
@@ -250,7 +250,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def startmidas(self):
         print("Running midas")
-        os.system("odbedit -c start")
+        self.SpecColl.startmidas()
+        
         
     def stopmidas(self):
         print("Stopping midas")

@@ -173,35 +173,38 @@ class SpectrumCollection:
         rough = x>min(G[:,1]) & x<max(G[:,1]) 
         return rough
     
-    ## Start a simulation of data
-    def connectsim(self):
-        self.simulator_thread = SimulatorThread(self)
+##    ## Start a simulation of data
+##    def connectsim(self):
+##        self.simulator_thread = SimulatorThread(self)
+##
+##    def startsim(self):
+##        self.isRunning = True
+##        self.simulator_thread.start()
+##        
+##    def stopsim(self):
+##        self.isRunning = False
+##        print(self.dm.saygoodbye())
 
-    def startsim(self):
-        self.isRunning = True
-        self.simulator_thread.start()
-        
-    def stopsim(self):
-        self.isRunning = False
-        print(self.dm.saygoodbye())
-
-    ## Start a simulation of data
+    ## Connect midas for data collection
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
-        self.midas_thread.start()
-        self.MIDASisRunning = True
-        self.midas_collection_thread = MidasCollectionThread(self)
-        self.midas_collection_thread.start()
 
+    ## Replay midas
     def offlinemidas(self):
-        self.offlinefiles = "run00031.mid.lz4"
+        filename = QFileDialog.getOpenFileName(None,
+                                               "Sort MIDAS File(s)", "./",
+                                               "MIDAS Files (*.mid *.mid.*)")
+        self.offlinefiles = filename[0]#"run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
+
+    ## Actually run the analyzer
+    def startmidas(self):
         self.midas_thread.start()
-        print("MIDAS Thread Started")
         self.MIDASisRunning = True
         self.midas_collection_thread = MidasCollectionThread(self)
         self.midas_collection_thread.start()
-
+        os.system("odbedit -c start")
+        
 ## Run MIDAS in a separate thread so it doesn't lock up the GUI
 class MidasThread(QThread):
     def __init__(self,specColl):
