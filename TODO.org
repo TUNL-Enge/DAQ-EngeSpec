@@ -13,9 +13,10 @@
   - [ ] Fix updating on 2D histograms
   - [X] Color scheme in 2D for small number of counts
   - [ ] 2D z-zooming
-  - [ ] Scroll-bars!
-  - [ ] SpanSelector outside the spectrum range
-  - [ ] Click-to-zoom
+  - [X] Scroll-bars!
+  - [ ] Scroll-bars in 2D
+  - [X] SpanSelector outside the spectrum range
+  - [X] Click-to-zoom
   - [ ] Expand tree by default
   - [ ] 1D Gates
   - [ ] Scaler display

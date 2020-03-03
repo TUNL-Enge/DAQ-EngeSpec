@@ -577,7 +577,6 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def setupVSlider(self,vscroll):
-        print("Setting up vslider")
         self.vscroll = vscroll
         self.vscroll.setRange(20,80)
         self.vscroll.setValue(50)
