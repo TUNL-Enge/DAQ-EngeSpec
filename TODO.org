@@ -6,7 +6,7 @@
     - Split EngeSort out from spectra. Put in a separate sort object?
   - [ ] Scalers
   - [X] Jam-like zooming
-  - [ ] Reloading data
+  - [X] Reloading data
   - [X] Jiggling icons
 * Current
   - [X] Separate out sort routines
@@ -26,6 +26,7 @@
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
+  - [ ] List of files being sorted
 * 2D Histograms
   - [X] Color scheme
 * Fitting
