@@ -713,14 +713,14 @@ class SpectrumCanvas(FigureCanvas):
             ## rounding
             dprecis = self.getprecis(ucentroid)
             nprecis = self.getprecis(centroid)
-            #print(centroid, ucentroid)
+            print(centroid, ucentroid)
             #print(dprecis,nprecis)
             print("Peak at ",self.round_to_n(centroid,1+nprecis), "+/-",
                   self.round_to_n(ucentroid,dprecis))
             ## rounding
             dprecis = self.getprecis(unet)
             nprecis = self.getprecis(net)
-            #            print(net,unet)
+            print(net,unet)
             print("Net Area =",self.round_to_n(net,1+nprecis),"+/-",
                   self.round_to_n(unet,dprecis))
 
