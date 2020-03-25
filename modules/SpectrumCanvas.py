@@ -146,31 +146,33 @@ class SpectrumCanvas(FigureCanvas):
         ymax = self.Spec2D.yzoom[1]
 
         H = self.Spec2D.spec2d.T
-        ##        xe = self.Spec2D.xedges
-        ##        ye = self.Spec2D.yedges
-        ###        print(xe,ye)
-        ##        X, Y = np.meshgrid(xe,ye)
-        ##        self.a.clear()
-        ##        self.a.pcolormesh(X,Y,H,cmap=self.cols)
-        ##        self.a.set_xlim([xmin,xmax])
-        ##        self.a.set_ylim([ymin,ymax])
-        ##
-        ##        if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
-        ##            self.drawGate()
-        ##        
-        ##        self.fig.canvas.draw()
-        ##        ##        self.Resize()
-        Hmax = H.max()
-        Nc = 256
-        cbreak = np.zeros(Nc)
-        cbreak[1] = 1.0
-        for i in range(1,Nc-1):
-            cbreak[i+1] = i* Hmax/(Nc-2)
-        norm = BoundaryNorm(cbreak,Nc)
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
         X, Y = np.meshgrid(xe,ye)
+        
+        x = xe[xe>xmin]# & xe<xmax]
+        x = x[x<xmax].astype(int)
+        y = ye[ye>ymin]# & ye<ymax]
+        y = y[y<ymax].astype(int)
+        Xcut, Ycut = np.meshgrid(x,y)
 
+        Hmax = H[Xcut,Ycut].max()
+        #Hmax = H.max()
+        Nc = 256
+        cbreak = np.zeros(Nc)
+        if not self.isLogPlot:
+            cbreak[1] = 1.0
+            for i in range(1,Nc-1):
+                cbreak[i+1] = i* Hmax/(Nc-2)
+        else:
+            cbreak[1] = 0
+            for i in range(1,Nc-1):
+                cbreak[i+1] = i* np.log10(Hmax)/(Nc-2)
+            cbreak = 10**(cbreak)
+            cbreak[0]=0
+
+        norm = BoundaryNorm(cbreak,Nc)
+        
         def format_coord(x, y):
             col = int(x)
             row = int(y)
@@ -180,7 +182,7 @@ class SpectrumCanvas(FigureCanvas):
 
         self.a.format_coord = format_coord
         self.a.clear()
-        self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols)
+        self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
         #self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
         #self.logcb = 0
         self.a.set_xlim([xmin,xmax])
@@ -188,7 +190,8 @@ class SpectrumCanvas(FigureCanvas):
 
         if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
             self.drawGate()
-            
+
+        self.updateSlider()
         self.fig.canvas.draw()
         ##        self.Resize()
 
@@ -221,39 +224,8 @@ class SpectrumCanvas(FigureCanvas):
             self.a.set_ylim([ymin,ymax])
             
         else:
-            xmin = self.Spec2D.xzoom[0]
-            xmax = self.Spec2D.xzoom[1]
-            ymin = self.Spec2D.yzoom[0]
-            ymax = self.Spec2D.yzoom[1]
-            
-            H = self.Spec2D.spec2d.T
-            xe = self.Spec2D.xedges
-            ye = self.Spec2D.yedges
-            X, Y = np.meshgrid(xe,ye)
-            self.a.clear()
-
-            x = xe[xe>xmin]# & xe<xmax]
-            x = x[x<xmax].astype(int)
-            y = ye[ye>ymin]# & ye<ymax]
-            y = y[y<ymax].astype(int)
-            Xcut, Ycut = np.meshgrid(x,y)
-
-            Hmax = H[Xcut,Ycut].max()
-            #Hmax = H.max()
-            Nc = 256
-            cbreak = np.zeros(Nc)
-            cbreak[1] = 1.0
-            for i in range(1,Nc-1):
-                cbreak[i+1] = i* Hmax/(Nc-2)
-            #print(cbreak)
-            norm = BoundaryNorm(cbreak,Nc)                
-            self.a.set_xlim([xmin,xmax])
-            self.a.set_ylim([ymin,ymax])
-            #self.a.pcolormesh(X,Y,H,vmin=0,vmax=Hmax,cmap=self.cols)
-            self.a.pcolormesh(X,Y,H,norm=norm,cmap=self.cols)
-
-            #            if self.Spec2D.hasGate and self.Spec2D.gate is not None:
-            #                self.drawGate()
+            self.PlotData2D()
+           #self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
 
         self.updateSlider()
         self.fig.canvas.draw()
@@ -310,66 +282,15 @@ class SpectrumCanvas(FigureCanvas):
             else:
                 self.a.set_yscale('linear')
                 self.isLogPlot=False
+            self.fig.canvas.draw()
+            
         else:
-            if self.isLogPlot == False:
-                xmin = self.Spec2D.xzoom[0]
-                xmax = self.Spec2D.xzoom[1]
-                ymin = self.Spec2D.yzoom[0]
-                ymax = self.Spec2D.yzoom[1]
-                H = self.Spec2D.spec2d.T
-                xe = self.Spec2D.xedges
-                ye = self.Spec2D.yedges
-                X, Y = np.meshgrid(xe,ye)
-                x = xe[xe>xmin]# & xe<xmax]
-                x = x[x<xmax].astype(int)
-                y = ye[ye>ymin]# & ye<ymax]
-                y = y[y<ymax].astype(int)
-                Xcut, Ycut = np.meshgrid(x,y)
-                Hmax = H[Xcut,Ycut].max()
-                Nc = 256
-                cbreak = np.zeros(Nc)
-                cbreak[1] = np.log(1.0)
-                for i in range(1,Nc-1):
-                    cbreak[i+1] = i* Hmax/(Nc-2)
-                cbreak = np.log(cbreak)
-                norm = BoundaryNorm(cbreak,Nc)
-                #self.lincb.remove()
-                #self.fig.axes[0].remove()
-                #self.fig.subplots_adjust(right = 0.90)
-                self.a.pcolormesh(X,Y,np.log(H),vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
-                #self.logcb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
-                print ("This is log")
+            if not self.isLogPlot:
                 self.isLogPlot = True
+                self.PlotData2D()
             else:
                 self.isLogPlot = False
-                xmin = self.Spec2D.xzoom[0]
-                xmax = self.Spec2D.xzoom[1]
-                ymin = self.Spec2D.yzoom[0]
-                ymax = self.Spec2D.yzoom[1]
-                H = self.Spec2D.spec2d.T
-                xe = self.Spec2D.xedges
-                ye = self.Spec2D.yedges
-                X, Y = np.meshgrid(xe,ye)
-                x = xe[xe>xmin]# & xe<xmax]
-                x = x[x<xmax].astype(int)
-                y = ye[ye>ymin]# & ye<ymax]
-                y = y[y<ymax].astype(int)
-                Xcut, Ycut = np.meshgrid(x,y)
-                Hmax = H[Xcut,Ycut].max()
-                Nc = 256
-                cbreak = np.zeros(Nc)
-                cbreak[1] = np.log(1.0)
-                for i in range(1,Nc-1):
-                    cbreak[i+1] = i* Hmax/(Nc-2)
-                norm = BoundaryNorm(cbreak,Nc)
-                #self.logcb.remove()
-                #self.fig.axes[0].remove()
-                #self.fig.subplots_adjust(right = 0.90) 
-                self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
-                #self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
-                print ("This is linear")
-                
-        self.fig.canvas.draw()
+                self.PlotData2D()
 
     def onclick(self,event):
         '''
