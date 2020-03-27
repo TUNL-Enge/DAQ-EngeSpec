@@ -16,6 +16,7 @@ class SpectrumObject:
         self.isSpectrum = True
         self.isVisible = True
         self.is2D = False
+        self.isLog = False
 
         self.NBins = 2**12
         
@@ -86,6 +87,7 @@ class SpectrumObject2D:
         self.isSpectrum = True
         self.isVisible = True
         self.is2D = True
+        self.isLog = False
 
         self.nx = 256
         self.ny = 256

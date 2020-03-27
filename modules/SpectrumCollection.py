@@ -87,6 +87,7 @@ class SpectrumCollection:
                     self.spec2d.append(data2[j])
                 else:
                     self.spec1d.append(data2[j])
+                
 
     ## Save events to a "pickle" file
     def SavePickleData(self):
