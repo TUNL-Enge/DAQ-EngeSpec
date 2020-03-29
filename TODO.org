@@ -24,6 +24,7 @@
   - [ ] Scaler display
   - [ ] Spectra list width
   - [ ] More than one gate per histogram
+  - [ ] Arbitrary 2D histogram size
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
