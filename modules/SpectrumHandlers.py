@@ -99,6 +99,7 @@ class SpectrumObject2D:
 
         self.xzoom = [1,256]
         self.yzoom = [1,256]
+        self.zmax = 0
 
         self.gate = None
         self.hasGate = False

@@ -1,27 +1,28 @@
 * Release blocks
-  - [ ] 2D histograms
+  - [X] 2D histograms
   - [X] Saving data
     - SpectrumObject has EngeSort object embedded, which shouldn't be
       saved...
     - Split EngeSort out from spectra. Put in a separate sort object?
-  - [ ] Scalers
   - [X] Jam-like zooming
   - [X] Reloading data
   - [X] Jiggling icons
+  - [ ] Scalers
+  - [ ] segfault on exit
 * Current
   - [X] Separate out sort routines
-  - [ ] Fix updating on 2D histograms
+  - [X] Fix updating on 2D histograms
   - [X] Color scheme in 2D for small number of counts
-  - [ ] 2D z-zooming
+  - [X] 2D z-zooming
   - [X] Scroll-bars!
-  - [ ] Scroll-bars in 2D
+  - [X] Scroll-bars in 2D
   - [X] SpanSelector outside the spectrum range
   - [X] Click-to-zoom
+  - [X] HiDPI scaling
   - [ ] Expand tree by default
   - [ ] 1D Gates
   - [ ] Scaler display
   - [ ] Spectra list width
-  - [ ] HiDPI scaling
   - [ ] More than one gate per histogram
 * GUI
   - [ ] Some feedback numbers
@@ -32,9 +33,10 @@
 * Fitting
   - [ ] Reimplement MCMCGaus
     - Note that my R version is actually a minimization + sampling
-    - Start my re-implementing that
+    - Start by re-implementing that
 * Misc
-  - [ ] Data frames
+  - [X] Data frames
+    - Using pickle files
     - HDF Data frames?
     - just binary dataframes?
     - https://stackoverflow.com/questions/17098654/how-to-store-a-dataframe-using-pandas

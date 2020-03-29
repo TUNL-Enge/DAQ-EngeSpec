@@ -149,7 +149,6 @@ class SpectrumCanvas(FigureCanvas):
             #        self.Resize()
         self.fig.canvas.draw()
 
-
     def PlotData2D(self,drawGate=False):
         xmin = self.Spec2D.xzoom[0]
         xmax = self.Spec2D.xzoom[1]
@@ -167,8 +166,12 @@ class SpectrumCanvas(FigureCanvas):
         y = y[y<ymax].astype(int)
         Xcut, Ycut = np.meshgrid(x,y)
 
-        Hmax = H[Xcut,Ycut].max()
-        #Hmax = H.max()
+        if self.Spec2D.zmax == 0:
+            Hmax = H[Xcut,Ycut].max()
+            self.Spec2D.zmax = Hmax
+        else:
+            Hmax = self.Spec2D.zmax
+        #Hmax = self.Spec2D.zmax
         Nc = 256
         cbreak = np.zeros(Nc)
         if not self.Spec2D.isLog:
@@ -256,16 +259,19 @@ class SpectrumCanvas(FigureCanvas):
     
     def Autosize(self):
         if not self.is2D:
-            if self.Spec2D.isLog == True:
+            if self.Spec.isLog == True:
                 ymin = 0.1 #max(0.1,0.9*self.GetMin())
                 self.a.set_ylim([ymin,1.10*self.GetMax()])
             else:
                 ymin = 0 #max(0,0.9*self.GetMin())
                 self.a.set_ylim([ymin,1.10*self.GetMax()])
-        
-        self.Spec.yzoom = self.a.get_ylim()
-        self.fig.canvas.draw()
-
+            self.Spec.yzoom = self.a.get_ylim()
+            self.fig.canvas.draw()
+        else:
+            zmax = 0
+            self.Spec2D.zmax = zmax 
+            self.PlotData2D()
+            
     def Resize(self):
         if not self.is2D:
             self.a.set_xlim(0,self.Spec.NBins-1)
@@ -536,22 +542,29 @@ class SpectrumCanvas(FigureCanvas):
 
     def vsliderUpdate(self, evt=None):
         v = self.vscroll.value()
-        ymin = self.Spec.yzoom[0]
-        ymax = self.Spec.yzoom[1]
-        dspan=(ymax-ymin)
-        newymin = ymin
-        newymax = ymin+dspan*(50+v)/100
+        if not self.is2D:
+            ymin = self.Spec.yzoom[0]
+            ymax = self.Spec.yzoom[1]
+            dspan=(ymax-ymin)
+            newymin = ymin
+            newymax = ymin+dspan*(50+v)/100
 
-        self.a.set_ylim(newymin,newymax)
-        ## Save to spectrum
-        if self.is2D:
-            self.Spec2D.xzoom = self.a.get_xlim()
-            self.Spec2D.yzoom = self.a.get_ylim()
-        else:
+            self.a.set_ylim(newymin,newymax)
+            ## Save to spectrum
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
-        ## And plot!
-        self.fig.canvas.draw()
+
+            ## And plot!
+            self.fig.canvas.draw()
+        else:
+            scale = (100+(v-50)/2)/100
+            self.Spec2D.zmax = self.Spec2D.zmax*scale
+            ##print(self.Spec2D.zmax)
+            ## Save to spectrum
+            self.Spec2D.xzoom = self.a.get_xlim()
+            self.Spec2D.yzoom = self.a.get_ylim()
+            self.PlotData2D()
+            
         self.vscroll.setValue(50)
         
 
