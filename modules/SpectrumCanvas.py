@@ -12,6 +12,7 @@ import matplotlib.colors as colors
 from matplotlib.colors import BoundaryNorm
 import matplotlib.cm as cm
 from matplotlib.colors import ListedColormap
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import copy
 
 class SpectrumCanvas(FigureCanvas):
@@ -52,6 +53,8 @@ class SpectrumCanvas(FigureCanvas):
         self.key=0
 
         self.lincb = False
+        self.colorbar_axes = None
+        self.original_loc = self.a.get_axes_locator()
         
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -137,8 +140,14 @@ class SpectrumCanvas(FigureCanvas):
 
         ## delete the 2D colorbar
         if self.lincb:
-            ##self.lincb.remove()
+            self.image.remove()
+            #self.lincb.remove()
             self.lincb = False
+            self.fig.delaxes(self.colorbar_axes)
+            self.colorbar_axes = None
+            self.a.set_axes_locator(self.original_loc)
+
+        ##self.a.set_axes_locator(self.original_loc)
         
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
@@ -203,27 +212,35 @@ class SpectrumCanvas(FigureCanvas):
 
         self.a.format_coord = format_coord
         self.a.clear()
-        self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
+        self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
         if self.lincb:
-            ##print("test")
-            ##self.lincb.remove()
-            self.lincb.update_normal(cm.ScalarMappable(norm=norm,cmap= self.cols))
+            self.lincb.update_normal(self.image)
         else:
-            self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols),use_gridspec=True)
-        #self.logcb = 0
+            ##self.sm = cm.ScalarMappable(norm=norm,cmap= self.cols)
+            divider = make_axes_locatable(self.a)
+            cax = divider.append_axes("right", size="3%", pad="5%")
+            blah = divider.append_axes("right",size="5%",pad="5%",add_to_figure=False)
+            ##cax = make_axes_locatable(self.a).new_horizontal(size="3%", pad="1%")
+            self.lincb = self.fig.colorbar(self.image,cax=cax)
+            ##self.lincb = matplotlib.pyplot.colorbar(image)#,cax=cax)
+        ##self.lincb = self.fig.colorbar(self.image,cax=self.colorbar_axes)
+        self.a, self.colorbar_axes = self.fig.get_axes()
+
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
 
-        ##self.lincb.remove()
-        ##self.lincb = False
-        ##self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
-        ##self.a = self.fig.add_subplot(111)
+        #self.lincb.remove()
+        #self.lincb = False
+        #self.a.set_axes_locator(self.original_loc)
         
         if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
             self.drawGate()
 
         self.updateSlider()
         self.fig.canvas.draw()
+
+        
+        
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
