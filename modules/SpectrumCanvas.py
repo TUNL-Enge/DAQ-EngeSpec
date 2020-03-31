@@ -135,6 +135,11 @@ class SpectrumCanvas(FigureCanvas):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
 
+        ## delete the 2D colorbar
+        if self.lincb:
+            ##self.lincb.remove()
+            self.lincb = False
+        
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
         ymin = self.Spec.yzoom[0]
@@ -204,17 +209,21 @@ class SpectrumCanvas(FigureCanvas):
             ##self.lincb.remove()
             self.lincb.update_normal(cm.ScalarMappable(norm=norm,cmap= self.cols))
         else:
-            self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
+            self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols),use_gridspec=True)
         #self.logcb = 0
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
 
+        ##self.lincb.remove()
+        ##self.lincb = False
+        ##self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
+        ##self.a = self.fig.add_subplot(111)
+        
         if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
             self.drawGate()
 
         self.updateSlider()
         self.fig.canvas.draw()
-        ##        self.Resize()
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
