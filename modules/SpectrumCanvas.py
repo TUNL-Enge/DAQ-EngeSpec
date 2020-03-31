@@ -50,6 +50,8 @@ class SpectrumCanvas(FigureCanvas):
 
         self.stream=None
         self.key=0
+
+        self.lincb = False
         
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -197,7 +199,12 @@ class SpectrumCanvas(FigureCanvas):
         self.a.format_coord = format_coord
         self.a.clear()
         self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
-        #self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
+        if self.lincb:
+            ##print("test")
+            ##self.lincb.remove()
+            self.lincb.update_normal(cm.ScalarMappable(norm=norm,cmap= self.cols))
+        else:
+            self.lincb = self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
         #self.logcb = 0
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
