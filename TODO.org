@@ -19,12 +19,13 @@
   - [X] SpanSelector outside the spectrum range
   - [X] Click-to-zoom
   - [X] HiDPI scaling
-  - [ ] Expand tree by default
+  - [X] Expand tree by default
+  - [X] Spectra list width
   - [ ] 1D Gates
   - [ ] Scaler display
-  - [ ] Spectra list width
   - [ ] More than one gate per histogram
   - [ ] Arbitrary 2D histogram size
+  - [ ] OutLog fixes with threads?
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?

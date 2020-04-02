@@ -59,10 +59,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## - dataFrame holds the spectrum tabs and command window
         treeFrame = QtWidgets.QFrame()
         treeFrame.setMinimumSize(260,720)
-        treeFrame.setMaximumWidth(260)
-        ##        treeFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        ##treeFrame.setMaximumWidth(260)
+        ##treeFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         dataFrame = QtWidgets.QFrame()
         dataFrame.setMinimumSize(900,600)
+        ##
+        scalerFrame = QtWidgets.QFrame()
+        scalerFrame.setMinimumSize(100,720)
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -90,12 +93,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         treeFrame.setLayout(treeFramevbox)
 
         ##----------------------------------------------------------------------
+        ## The scaler window
+        scalertitle = QtWidgets.QLabel()
+        scalertitle.setText("Scalers")
+        scalertitle.setAlignment(QtCore.Qt.AlignCenter)
+        scalerFramevbox = QtWidgets.QVBoxLayout()
+        scalerFramevbox.addWidget(scalertitle)
+        scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
+        
+        scalerFrame.setLayout(scalerFramevbox)
+        
+        ##----------------------------------------------------------------------
         ## Layout the mainFrame grid
         gridmainFrame = QtWidgets.QGridLayout(mainFrame)
         gridmainFrame.setSpacing(10)
-        gridmainFrame.addWidget(treeFrame,1,0)
-        gridmainFrame.addWidget(dataFrame,1,1)
 
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)##
+        splitter.addWidget(treeFrame)#,1,0)
+        splitter.addWidget(dataFrame)#,1,1)
+        splitter.addWidget(scalerFrame)
+        ##splitter.setSizes([200,600])
+        gridmainFrame.addWidget(splitter,1,0)
         ## Make a third grid for the spectrum and command window
         ## - tabWidget holds the spectra
         ## - commandWidget is the command editor
@@ -291,6 +309,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
                 subitem.spec = spec.gate
             self.treeWidget.addTopLevelItem(item)
+
+        self.treeWidget.expandAll()
 
     def itemclicked(self,it,col):
         if it.parent() is None:
