@@ -8,7 +8,7 @@
   - [X] Reloading data
   - [X] Jiggling icons
   - [ ] Scalers
-  - [ ] segfault on exit
+  - [X] segfault on exit
 * Current
   - [X] Separate out sort routines
   - [X] Fix updating on 2D histograms

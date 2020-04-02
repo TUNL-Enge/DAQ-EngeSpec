@@ -304,6 +304,8 @@ class SpectrumCanvas(FigureCanvas):
             zmax = 0
             self.Spec2D.zmax = zmax 
             self.PlotData2D()
+
+        self.updateSlider()
             
     def Resize(self):
         if not self.is2D:
@@ -449,6 +451,7 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
         self.fig.canvas.draw()
+        self.updateSlider()
      
     def xZoomOut(self):
         xlow,xhigh = self.a.get_xlim()
@@ -476,6 +479,7 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
         self.fig.canvas.draw()
+        self.updateSlider()
 
     def yZoomIn(self):
         ylow,yhigh = self.a.get_ylim()
@@ -499,32 +503,6 @@ class SpectrumCanvas(FigureCanvas):
 
         self.fig.canvas.draw()
 
-    def xZoomRange(self, minx, maxx):
-        self.a.set_xlim(int(minx),int(maxx))
-        if self.is2D:
-            self.Spec2D.xzoom = self.a.get_xlim()
-        else:
-            self.Spec.xzoom = self.a.get_xlim()
-        self.fig.canvas.draw()
-        self.span.set_visible(False)
-            
-    def xInteractiveZoom(self):
-        self.span = SpanSelector(self.a, self.xZoomRange, 'horizontal', useblit=False,
-                    rectprops=dict(alpha=0.5, facecolor='red'))
-        
-    def yZoomRange(self, miny, maxy):
-        self.a.set_ylim(miny,maxy)
-        if self.is2D:
-            self.Spec2D.yzoom = self.a.get_ylim()
-        else:
-            self.Spec.yzoom = self.a.get_ylim()
-        self.fig.canvas.draw()
-        self.span.set_visible(False)
-            
-    def yInteractiveZoom(self):
-        self.span = SpanSelector(self.a, self.yZoomRange, 'vertical', useblit=False,
-                    rectprops=dict(alpha=0.5, facecolor='red'))
-        
     def getClicks(self,n=1):
         print("Click ",n," times\n")
         x = self.fig.ginput(n)
