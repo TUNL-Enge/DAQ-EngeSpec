@@ -1,4 +1,4 @@
-#!/opt/anaconda3/bin/python
+#!/usr/bin/python3
 
 from PySide2.QtWidgets import QApplication
 import sys

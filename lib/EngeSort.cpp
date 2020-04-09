@@ -93,12 +93,12 @@ void EngeSort::Initialize(){
   /*
   // Loop through and print all histograms
   for(auto h: Histograms){
-    if(h.getnDims() == 1) {
+    if(h->getnDims() == 1) {
       std::cout << "Found a 1D histogram!" << std::endl;
-      h.Print(0,10);
-    } else if(h.getnDims() == 2) {
+      h->Print(0,10);
+    } else if(h->getnDims() == 2) {
       std::cout << "Found a 2D histogram!" << std::endl;
-      h.Print(0,10,0,10);
+      h->Print(0,10,0,10);
     }
     std::cout << std::endl;
   }
@@ -112,19 +112,19 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
   totalCounter++;
 
-  //  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
-  // double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
+  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
+  double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
 
-  //std::cout << ADCsize << "  " << TDCsize << std::endl;
+  //  std::cout << ADCsize << "  " << TDCsize << std::endl;
   
   // Thresholds
   int Threshold = 10;
-  for(int i=0; i<32; i++)
+  for(int i=0; i<ADCsize; i++)
     if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
-  for(int i=0; i<32; i++)
+  for(int i=0; i<TDCsize; i++)
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
 
-  //std::cout << "Done thresholding" << std::endl;
+  //  std::cout << "Done thresholding" << std::endl;
   
   // Define the channels
   int cE = dADC[0];
@@ -139,7 +139,7 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   int cTDC_Pos1 = dTDC[2];
   int cTDC_Pos2 = dTDC[3];
 
-  //std::cout << cPos1 << std::endl;
+  //  std::cout << cPos1 << std::endl;
   
   // Calculate some things
   int cTheta = (int)std::round(10000.0*atan((cPos2-cPos1)/100.)/3.1415 - 4000.);
@@ -205,17 +205,45 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   
 }
 
-
-int EngeSort::connectMidasAnalyzer(){
+//#include <cstring>
+//int EngeSort::connectMidasAnalyzer(std::vector<std::string> filenames){
+int EngeSort::connectMidasAnalyzer(boost::python::list file_list){
+//int EngeSort::connectMidasAnalyzer(){
 
   MidasAnalyzerModule mAMod;
   //TARegisterModule tarm(&mAMod);
   TARegister tar(&mAMod);
 
   mAMod.ConnectEngeAnalyzer(this);
+
+  std::cout << "connectMidasAnalyzer " << len(file_list);
+  // We need to send a dummy argument to manalyzer, which gets ignored
+  std::string filename = "dummy ";
+  for(int i=0; i<len(file_list); i++){
+    std::string file = boost::python::extract<std::string>(file_list[i]);
+    std::cout << " " << file;
+    filename += file + " ";
+  }
+  std::cout << std::endl;
+  
+  std::cout << filename << std::endl;
+  
+  enum { kMaxArgs = 64 };
+  int ac=0;
+  char *av[kMaxArgs];
+
+  char *dup = strdup(filename.c_str());
+  char *p2 = strtok(dup, " ");
+  while (p2 && ac < kMaxArgs-1)
+    {
+      av[ac++] = p2;
+      p2=strtok(0, " ");
+    }
+  av[ac]=0;
   
   Py_BEGIN_ALLOW_THREADS
-    manalyzer_main(0,0);
+    manalyzer_main(ac,av);
+    //    manalyzer_main(0,0);
   Py_END_ALLOW_THREADS
     
   return 0;
@@ -380,15 +408,17 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id != 1)
     return flow;
 
+  //  std::cout << "Analyzing" << std::endl;
+  
   // Get the ADC Bank
   TMBank* bADC = event->FindBank("ADC1");
   uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
   TMBank* bTDC = event->FindBank("TDC1");
   uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
-
   
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
+  //  std::cout << "Calling sort" << std::endl;
   fModule->eA->sort(dADC, dTDC);
 
   return flow;

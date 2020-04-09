@@ -59,10 +59,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## - dataFrame holds the spectrum tabs and command window
         treeFrame = QtWidgets.QFrame()
         treeFrame.setMinimumSize(260,720)
-        treeFrame.setMaximumWidth(260)
-        ##        treeFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        ##treeFrame.setMaximumWidth(260)
+        ##treeFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         dataFrame = QtWidgets.QFrame()
         dataFrame.setMinimumSize(900,600)
+        ##
+        scalerFrame = QtWidgets.QFrame()
+        scalerFrame.setMinimumSize(100,720)
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -90,12 +93,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         treeFrame.setLayout(treeFramevbox)
 
         ##----------------------------------------------------------------------
+        ## The scaler window
+        scalertitle = QtWidgets.QLabel()
+        scalertitle.setText("Scalers")
+        scalertitle.setAlignment(QtCore.Qt.AlignCenter)
+        scalerFramevbox = QtWidgets.QVBoxLayout()
+        scalerFramevbox.addWidget(scalertitle)
+        scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
+        
+        scalerFrame.setLayout(scalerFramevbox)
+        
+        ##----------------------------------------------------------------------
         ## Layout the mainFrame grid
         gridmainFrame = QtWidgets.QGridLayout(mainFrame)
         gridmainFrame.setSpacing(10)
-        gridmainFrame.addWidget(treeFrame,1,0)
-        gridmainFrame.addWidget(dataFrame,1,1)
 
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)##
+        splitter.addWidget(treeFrame)#,1,0)
+        splitter.addWidget(dataFrame)#,1,1)
+        splitter.addWidget(scalerFrame)
+        ##splitter.setSizes([200,600])
+        gridmainFrame.addWidget(splitter,1,0)
         ## Make a third grid for the spectrum and command window
         ## - tabWidget holds the spectra
         ## - commandWidget is the command editor
@@ -109,7 +127,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         l = QtWidgets.QVBoxLayout()
         toolbar = MyCustomToolbar(self.SpecCanvas, self)
         l.addWidget(toolbar)
-        l.addWidget(self.SpecCanvas)
+
+        h = QtWidgets.QHBoxLayout()
+        h.addWidget(self.SpecCanvas)
+        vscroll = QtWidgets.QScrollBar(QtCore.Qt.Vertical)
+        self.SpecCanvas.setupVSlider(vscroll)
+        h.addWidget(vscroll)
+        l.addLayout(h)
+        
+        hscroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
+        self.SpecCanvas.setupSlider(hscroll)
+        l.addWidget(hscroll)
         tab1.setLayout(l)
         
         tabWidget.addTab(tab1,"")
@@ -124,8 +152,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         commandWidget.setText("Welcome to EngeSpec!\n")
         commandWidget.setMaximumHeight(100)
         ## Add the output streams to the text editor
-        sys.stdout = OutLog(commandWidget, sys.stdout)
-        sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
+        ##sys.stdout = OutLog(commandWidget, sys.stdout)
+        ##sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
 
         
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
@@ -157,7 +185,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.file_menu = QtWidgets.QMenu('&File', self)
         ## Load ascii spectrum
         self.file_menu.addAction('&Load Spectrum File (ascii)',
-                                 self.LoadData)
+                                 self.LoadASCIIData)
+        ## Save ascii spectrum
+        self.file_menu.addAction('&Save Spectrum File (ascii)',
+                                 self.SaveASCIIData)
         ## Load HDF data
         self.file_menu.addAction('&Load HDF File',
                                  self.LoadHDFData)
@@ -170,6 +201,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Connect to MIDAS
         self.file_menu.addAction('&Connect MIDAS',
                                  self.connectmidas)
+        ## Connect to MIDAS offline
+        self.file_menu.addAction('&Offline MIDAS',
+                                 self.offlinemidas)
         ## Quit
         self.file_menu.addAction('&Quit', self.fileQuit,
            QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
@@ -188,7 +222,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                "..", "images", "icons", "")
         exitAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Exit.ico'), 'Exit', self)
         exitAction.triggered.connect(self.close)
-        startAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run', self)
+        startAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run/Sort', self)
         startAction.triggered.connect(self.startmidas)
         stopAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Stop.ico'), 'Stop Run', self)
         stopAction.triggered.connect(self.stopmidas)
@@ -202,9 +236,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.runControlsToolbar.addAction(gateAction)
 
         
-    def LoadData(self):
-        self.SpecCanvas.LoadData()
-        
+    def LoadASCIIData(self):
+        self.SpecCanvas.LoadASCIIData()
+
+    def SaveASCIIData(self):
+        self.SpecCanvas.SaveASCIIData()
+
     def LoadHDFData(self):
         print("Loading HDF Data")
         self.SpecCanvas.LoadHDFData()
@@ -223,10 +260,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
-        
+
+    def offlinemidas(self):
+        self.SpecColl.offlinemidas()
+        self.PopulateTree()
+        self.SpecCanvas.setSpecIndex(0,False)
+
     def startmidas(self):
         print("Running midas")
-        os.system("odbedit -c start")
+        self.SpecColl.startmidas()
+        
         
     def stopmidas(self):
         print("Stopping midas")
@@ -266,6 +309,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
                 subitem.spec = spec.gate
             self.treeWidget.addTopLevelItem(item)
+
+        self.treeWidget.expandAll()
 
     def itemclicked(self,it,col):
         if it.parent() is None:
