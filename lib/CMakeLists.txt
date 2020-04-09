@@ -5,6 +5,7 @@ project( BoostPythonMakeData )
 # Find necessary packages
 find_package( PythonInterp 3 REQUIRED )
 find_package( PythonLibs 3 REQUIRED )
+#set(PYTHON_LIBRARIES /opt/anaconda3/lib/libpython3.7m.so)
 include_directories( ${PYTHON_INCLUDE_DIRS} )
 MESSAGE(STATUS "Pythonlibs: " ${PYTHON_INCLUDE_DIRS})
 
