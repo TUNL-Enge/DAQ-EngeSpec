@@ -1,3 +1,6 @@
+
+
+
 #include <iostream>
 #include <vector>
 #include <random>
@@ -39,24 +42,31 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
   totalCounter++;
 
-  //double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
-  //double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
+  //  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
+  //  double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
 
-  //std::cout << ADCsize << "  " << TDCsize << std::endl;
+  // std::cout << ADCsize << "  " << TDCsize << std::endl;
   
   // Thresholds
+  /*
   int Threshold = 10;
   for(int i=0; i<32; i++)
     if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
   for(int i=0; i<32; i++)
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
-    
-  // Define the channels
-  int cDet1 = dADC[0];
+  */
 
-  // Increment 1D histograms
-  hDet1 -> inc(cDet1);
+  for(int i = 0; i<1023; i++){
+    // Define the channels
+    uint32_t dat = dADC[i] & 0xFFFF;
+    int cDet1 = (int)std::floor(dat/8.0);
 
+    //std::cout << i << " " << cDet1 << std::endl;
+  
+    // Increment 1D histograms
+    if(cDet1 > 20 && cDet1 < 4096)
+      hDet1 -> inc(cDet1);
+  }
 }
 
 
@@ -234,11 +244,24 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id != 1)
     return flow;
 
+  //printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo, event->serial_number, (int)event->event_id, event->data_size);
+
+  
   // Get the ADC Bank
-  TMBank* bADC = event->FindBank("ADC1");
+  TMBank* bADC = event->FindBank("V730");
   uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
   TMBank* bTDC = event->FindBank("TDC1");
   uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
+
+  //printf("V1730 Bank: Name = %s, Type = %d, Size = %d\n",&bADC->name[0],
+  //	 bADC->type,bADC->data_size); 
+
+  //printf("Size of data = %lu\n",sizeof(dADC)/sizeof(dADC[0]));
+
+  uint64_t dat;
+  dat = dADC[0] & 0xFFFF;
+  //  printf("dADC[0] = 0x%x\n",dat);
+  //  printf("dADC[0] = %d\n",dat);
   
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
