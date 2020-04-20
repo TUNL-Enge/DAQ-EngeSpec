@@ -21,6 +21,7 @@
   - [X] HiDPI scaling
   - [X] Expand tree by default
   - [X] Spectra list width
+  - [ ] replace curve_fit with lmfit for fitting spectra
   - [ ] 1D Gates
   - [ ] Scaler display
   - [ ] More than one gate per histogram
