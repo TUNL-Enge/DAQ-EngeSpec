@@ -74,6 +74,32 @@ int nHist1D = 0;
 int nHist2D = 0;
 
 
+//----------------------------------------------------------------------
+// SCALERS
+
+// A class to hold scalers. When a scaler is added it should have an
+// index to where in the scaler bank it should be grabbed from, a
+// number that's incremented, and a name
+class Scaler{
+
+ public:
+
+  Scaler(std::string name, int index);
+
+  void inc(int);
+  void Print();
+  std::string getName(){return Name;}
+  int getIndex(){return index;}
+  int getValue(){return count;}
+  void Clear();
+  
+ private:
+
+  std::string Name;
+  int index;
+  int count;
+
+};
 
 
 

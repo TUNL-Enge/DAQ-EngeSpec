@@ -175,3 +175,31 @@ int Gate::inGate(double testx, double testy){
   }
   return c;
 }
+
+//----------------------------------------------------------------------
+// SCALERS
+
+// Make a scaler
+Scaler::Scaler(std::string name, int index){
+
+  Name = name;
+  index = index;
+  std::cout << "Made a scaler called " << name << " with index: " << index << std::endl;
+
+}
+
+// Increment a scaler
+void Scaler::inc(int i){
+  count = count+i;
+}
+
+// Print the Scaler
+void Scaler::Print(){
+  std::cout << "Scaler: " << Name << " is mapped to index " << index <<
+    " and has count: " << count << std::endl;
+}
+
+// Clear the scaler
+void Scaler::Clear(){
+  count = 0;
+}
