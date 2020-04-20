@@ -45,7 +45,7 @@ class EngeSort {
   np::ndarray getData();
   np::ndarray getData2D();
 
-  void sort(uint32_t *dADC, uint32_t *dTDC);
+  void sort(uint32_t *dADC, uint32_t *dTDC, uint32_t *dSCAL);
   
   BoolVector getis2Ds();
   BoolVector gethasGates();
@@ -76,6 +76,9 @@ class EngeSort {
   //  std::vector<std::vector<std::vector<double>>> GateCollection;
   std::vector<Gate> GateCollection;
 
+  // Scaler list
+  std::vector<int> Scalers;
+  
   // Some counters
   int ipeak1 = 0;
   int ipeak2 = 0;

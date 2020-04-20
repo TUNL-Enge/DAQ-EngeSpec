@@ -51,6 +51,9 @@ Gate *g2d_DEvsPos1;
 int totalCounter=0;
 int gateCounter=0;
 
+// Scalers
+int sGates=0;
+
 void EngeSort::Initialize(){
 
   std::string hname;
@@ -103,18 +106,23 @@ void EngeSort::Initialize(){
     std::cout << std::endl;
   }
   */
+
+
+  // Build a vector of scalers
+  //Scalers -> addScalers(sGates);
   
 }
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
-void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
+void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC, uint32_t *dSCAL){
 
   totalCounter++;
 
   double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
   double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
 
+  double SCALsize = sizeof(dSCAL)/sizeof(dSCAL[0]);
   //  std::cout << ADCsize << "  " << TDCsize << std::endl;
   
   // Thresholds
@@ -415,11 +423,15 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
   TMBank* bTDC = event->FindBank("TDC1");
   uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
+
+  // Get the Scaler Bank
+  TMBank* bSCAL = event->FindBank("SCAL");
+  uint32_t* dSCAL = (uint32_t*)event->GetBankData(bSCAL);
   
   fRunEventCounter++;
   fModule->fTotalEventCounter++;
   //  std::cout << "Calling sort" << std::endl;
-  fModule->eA->sort(dADC, dTDC);
+  fModule->eA->sort(dADC, dTDC, dSCAL);
 
   return flow;
 
