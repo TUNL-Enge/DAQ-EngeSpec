@@ -45,7 +45,8 @@ class EngeSort {
   np::ndarray getData();
   np::ndarray getData2D();
 
-  void sort(uint32_t *dADC, uint32_t *dTDC, uint32_t *dSCAL);
+  void sort(uint32_t *dADC, uint32_t *dTDC);
+  void incScalers(uint32_t *dSCAL);
   
   BoolVector getis2Ds();
   BoolVector gethasGates();

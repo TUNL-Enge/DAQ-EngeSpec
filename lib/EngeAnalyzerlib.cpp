@@ -183,19 +183,20 @@ int Gate::inGate(double testx, double testy){
 Scaler::Scaler(std::string name, int index){
 
   Name = name;
-  index = index;
+  Index = index;
   std::cout << "Made a scaler called " << name << " with index: " << index << std::endl;
 
 }
 
 // Increment a scaler
-void Scaler::inc(int i){
-  count = count+i;
+void Scaler::inc(uint32_t *scal){
+  std::cout << "incrementing " << Name << " at index " << Index << " by " << scal[Index] << std::endl;
+  count = count+scal[Index];
 }
 
 // Print the Scaler
 void Scaler::Print(){
-  std::cout << "Scaler: " << Name << " is mapped to index " << index <<
+  std::cout << "Scaler: " << Name << " is mapped to index " << Index <<
     " and has count: " << count << std::endl;
 }
 

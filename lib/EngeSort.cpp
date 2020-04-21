@@ -52,7 +52,7 @@ int totalCounter=0;
 int gateCounter=0;
 
 // Scalers
-int sGates=0;
+Scaler *sGates;
 
 void EngeSort::Initialize(){
 
@@ -108,22 +108,22 @@ void EngeSort::Initialize(){
   */
 
 
-  // Build a vector of scalers
-  //Scalers -> addScalers(sGates);
+  // Build the scalers
+  sGates = new Scaler("Total Gates", 0);    // Name, index
   
 }
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
-void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC, uint32_t *dSCAL){
+void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 
   totalCounter++;
 
-  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
+  double ADCsize = sizeof(&dADC)/sizeof(&dADC[0]);
   double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
 
-  double SCALsize = sizeof(dSCAL)/sizeof(dSCAL[0]);
-  //  std::cout << ADCsize << "  " << TDCsize << std::endl;
+  //std::cout << ADCsize << "  " << TDCsize << std::endl;
+  //std::cout << dADC << "  " << dTDC << std::endl;
   
   // Thresholds
   int Threshold = 10;
@@ -210,7 +210,14 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC, uint32_t *dSCAL){
   }
 
   //std::cout << "gated spec" << std::endl; 
-  
+
+}
+
+// Increment the scalers
+void EngeSort::incScalers(uint32_t *dSCAL){
+
+      sGates -> inc(dSCAL);
+
 }
 
 //#include <cstring>
@@ -413,25 +420,36 @@ TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 				    TAFlags* flags, TAFlowEvent* flow){
 
-  if(event->event_id != 1)
-    return flow;
-
   //  std::cout << "Analyzing" << std::endl;
-  
-  // Get the ADC Bank
-  TMBank* bADC = event->FindBank("ADC1");
-  uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
-  TMBank* bTDC = event->FindBank("TDC1");
-  uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
 
-  // Get the Scaler Bank
-  TMBank* bSCAL = event->FindBank("SCAL");
-  uint32_t* dSCAL = (uint32_t*)event->GetBankData(bSCAL);
+  if(event->event_id == 1){
+
+    //event->FindAllBanks();
+    //std::cout << event->BankListToString() << std::endl;
+    
+    // Get the ADC Bank
+    TMBank* bADC = event->FindBank("ADC1");
+    uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
+    TMBank* bTDC = event->FindBank("TDC1");
+    uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
+    
+    //  std::cout << "ADC Size: " << bADC->data_size << std::endl;
   
-  fRunEventCounter++;
-  fModule->fTotalEventCounter++;
-  //  std::cout << "Calling sort" << std::endl;
-  fModule->eA->sort(dADC, dTDC, dSCAL);
+    fRunEventCounter++;
+    fModule->fTotalEventCounter++;
+    //  std::cout << "Calling sort" << std::endl;
+    fModule->eA->sort(dADC, dTDC);
+
+  } else if(event->event_id == 2){
+
+    // Get the Scaler Bank
+    TMBank* bSCAL = event->FindBank("SCLR");
+    uint32_t *dSCAL = (uint32_t*)event->GetBankData(bSCAL);
+
+    fModule->eA->incScalers(dSCAL);
+  }
+
+  //  std::cout << bSCAL << "  " << dSCAL << std::endl;
 
   return flow;
 

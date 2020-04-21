@@ -86,17 +86,17 @@ class Scaler{
 
   Scaler(std::string name, int index);
 
-  void inc(int);
+  void inc(uint32_t*);
   void Print();
   std::string getName(){return Name;}
-  int getIndex(){return index;}
+  int getIndex(){return Index;}
   int getValue(){return count;}
   void Clear();
   
  private:
 
   std::string Name;
-  int index;
+  int Index;
   int count;
 
 };
