@@ -216,8 +216,8 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 // Increment the scalers
 void EngeSort::incScalers(uint32_t *dSCAL){
 
-      sGates -> inc(dSCAL);
-
+  //sGates -> inc(dSCAL[sGates->getIndex()]);
+  sGates -> inc(dSCAL);
 }
 
 //#include <cstring>
@@ -270,6 +270,16 @@ StringVector EngeSort::getSpectrumNames(){
   StringVector s;
   for(auto h: Histograms){
     s.push_back(h -> getName());
+  }
+
+  return s;
+}
+// Return a vector of spectrum names
+StringVector EngeSort::getScalerNames(){
+
+  StringVector s;
+  for(auto Sclr: Scalers){
+    s.push_back(Sclr -> getName());
   }
 
   return s;
@@ -499,7 +509,8 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector
     .def("gethasGates", &EngeSort::gethasGates)          // bool vector
-    .def("getSpectrumNames", &EngeSort::getSpectrumNames)
+    .def("getSpectrumNames", &EngeSort::getSpectrumNames) // string vector
+    .def("getScalerNames", &EngeSort::getScalerNames)     // string vector
     .def("ClearData", &EngeSort::ClearData)        // void
     .def("putGate", &EngeSort::putGate)            // void
     .def("data", range(&EngeSort::begin, &EngeSort::end))

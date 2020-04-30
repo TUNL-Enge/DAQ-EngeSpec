@@ -101,6 +101,7 @@ class Scaler{
 
 };
 
+std::vector<Scaler*> Scalers;
 
 
 //#endif

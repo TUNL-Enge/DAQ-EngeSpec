@@ -107,7 +107,16 @@ class SpectrumObject2D:
     def __str__(self):
         return '2D Spectrum Name: {}'.format(self.Name)
 
-            
+class ScalerObject:
+    def __init__(self, num):
+        self.num = num
+        self.Name = "Test Scaler"
+        self.N = 0
+
+    def __str__(self):
+        return 'Scaler Name: {}'.format(self.Name)
+
+    
 if __name__ == '__main__':
     #Spec = SpectrumObject()
     #print(Spec)

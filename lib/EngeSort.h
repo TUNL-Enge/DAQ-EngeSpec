@@ -18,6 +18,7 @@ namespace p = boost::python;
 namespace np = boost::python::numpy;
 
 typedef std::vector<double> vec;
+typedef std::vector<int> ivec;
 typedef std::vector<vec> mat;
 typedef std::vector<mat> mat2d;
 typedef std::vector<std::string> StringVector;
@@ -51,6 +52,7 @@ class EngeSort {
   BoolVector getis2Ds();
   BoolVector gethasGates();
   StringVector getSpectrumNames();
+  StringVector getScalerNames();
 
   // Gate passing
   void putGate(std::string name, p::list x, p::list y);
@@ -78,7 +80,7 @@ class EngeSort {
   std::vector<Gate> GateCollection;
 
   // Scaler list
-  std::vector<int> Scalers;
+  //std::vector<int> Scalers;
   
   // Some counters
   int ipeak1 = 0;

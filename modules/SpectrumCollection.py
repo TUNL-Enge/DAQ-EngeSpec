@@ -23,6 +23,8 @@ class SpectrumCollection:
         self.spec2d = [SpectrumObject2D(0)]
         self.Name = "Test Collection of Spectra"
 
+        self.sclr = [ScalerObject(0)]
+
         ## Load the data library
         if os.path.exists('EngeSort.so'):
             self.dm = EngeSort.EngeSort()
@@ -221,9 +223,14 @@ class MidasThread(QThread):
         
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
-        ##        print(len(self.names)," Spectra have been made:")
-        ##        for name in self.names:
-        ##            print(" - ",name)
+        self.sclrnames = self.specColl.dm.getScalerNames()
+        ##self.sclr = [0] * len(self.sclrnames)   ## fill the scalers with 0
+        print(len(self.sclrnames)," scalers have been made:")
+        for name in self.sclrnames:
+            print(" - ",name)
+        print(len(self.names)," Spectra have been made:")
+        for name in self.names:
+            print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.hasGates = self.specColl.dm.gethasGates()
@@ -231,6 +238,9 @@ class MidasThread(QThread):
         ## First delete the old spectra
         self.specColl.spec1d = []
         self.specColl.spec2d = []
+
+        ## Delete the old scalers
+        self.specColl.sclr = []
 
         ## Make the empty spectra
         counter1d=0
@@ -258,6 +268,12 @@ class MidasThread(QThread):
                 sObj.spec2d_temp[:] = sObj.spec2d
                 self.specColl.spec2d.append(sObj)
                 counter2d = counter2d+1
+
+        ## Make the empty scalers
+        for i in range(len(self.sclrnames)):
+            scObj = ScalerObject(i)
+            scObj.Name = self.sclrnames[i]
+            self.specColl.sclr.append(scObj)
                 
                 
     def run(self):

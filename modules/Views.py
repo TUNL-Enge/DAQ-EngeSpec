@@ -65,7 +65,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dataFrame.setMinimumSize(900,600)
         ##
         scalerFrame = QtWidgets.QFrame()
-        scalerFrame.setMinimumSize(100,720)
+        scalerFrame.setMinimumSize(150,720)
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -97,11 +97,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         scalertitle = QtWidgets.QLabel()
         scalertitle.setText("Scalers")
         scalertitle.setAlignment(QtCore.Qt.AlignCenter)
-        scalerFramevbox = QtWidgets.QVBoxLayout()
-        scalerFramevbox.addWidget(scalertitle)
-        scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
+        self.scalerFramevbox = QtWidgets.QVBoxLayout()
+        self.scalerFramevbox.addWidget(scalertitle)
+        self.scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
         
-        scalerFrame.setLayout(scalerFramevbox)
+        scalerFrame.setLayout(self.scalerFramevbox)
         
         ##----------------------------------------------------------------------
         ## Layout the mainFrame grid
@@ -264,6 +264,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def offlinemidas(self):
         self.SpecColl.offlinemidas()
         self.PopulateTree()
+        self.PopulateScalers()
         self.SpecCanvas.setSpecIndex(0,False)
 
     def startmidas(self):
@@ -311,13 +312,33 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.treeWidget.addTopLevelItem(item)
 
         self.treeWidget.expandAll()
+           
 
     def itemclicked(self,it,col):
         if it.parent() is None:
             self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D,False)
         else:
             self.SpecCanvas.setSpecIndex(it.parent().spec.num,it.parent().spec.is2D,True)
-        
+
+    ## Build the list of scalers
+    def PopulateScalers(self):
+        ## Build a bunch of labels in the right-hand scaler frame
+        SpecColl = self.SpecCanvas.SpecColl
+
+        lsclr = len(SpecColl.sclr)
+        isclr = 0
+        self.sclrlab = []
+        for sc in SpecColl.sclr:
+            txt = "{name:<}:  {num:>12}"
+            lab = QtWidgets.QLabel()
+            self.sclrlab.append(lab)
+            self.sclrlab[isclr].setText(txt.format(name=sc.Name,num=sc.N))
+            self.scalerFramevbox.addWidget(self.sclrlab[isclr])
+            isclr = isclr+1
+
+    ## Update scaler values
+    def UpdateScalers(self):
+        print("updating scalers")
 
 class MyCustomToolbar(NavigationToolbar): 
     def __init__(self, plotCanvas, parent=None):
