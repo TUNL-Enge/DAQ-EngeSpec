@@ -1,9 +1,10 @@
 import sys, os
 import matplotlib
+##from PyQt5.QtCore import Qt, QThread, QTimer
 from PySide2 import QtCore, QtWidgets, QtGui
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
-
+import time
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, SpecCanvas):
@@ -65,7 +66,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dataFrame.setMinimumSize(900,600)
         ##
         scalerFrame = QtWidgets.QFrame()
-        scalerFrame.setMinimumSize(150,720)
+        scalerFrame.setMinimumSize(200,720)
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -100,6 +101,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.scalerFramevbox = QtWidgets.QVBoxLayout()
         self.scalerFramevbox.addWidget(scalertitle)
         self.scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
+        ## now two vboxes in the gbox
+        ##self.scalerlabvbox = QtWidgets.QVBoxLayout()
+        ##self.scalerlabvbox.setAlignment(QtCore.Qt.AlignTop)
+        ##self.scalervalvbox = QtWidgets.QVBoxLayout()
+        ##self.scalervalvbox.setAlignment(QtCore.Qt.AlignTop)
+        
+        ##scalerFramegbox.addWidget(self.scalerlabvbox,1,0,1,0)
+        ##scalerFramegbox.addWidget(self.scalervalvbox,1,1,1,1)
         
         scalerFrame.setLayout(self.scalerFramevbox)
         
@@ -260,17 +269,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
+        ## make a scaler update thread
+        self.scaler_thread = ScalerCollectionThread(self)
+##        self.scaler_thread.start()
 
     def offlinemidas(self):
         self.SpecColl.offlinemidas()
         self.PopulateTree()
         self.PopulateScalers()
         self.SpecCanvas.setSpecIndex(0,False)
+        ## make a scaler update thread
+        self.scaler_thread = ScalerCollectionThread(self)
 
     def startmidas(self):
         print("Running midas")
         self.SpecColl.startmidas()
-        
+        self.scaler_thread.start()
         
     def stopmidas(self):
         print("Stopping midas")
@@ -320,6 +334,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.SpecCanvas.setSpecIndex(it.parent().spec.num,it.parent().spec.is2D,True)
 
+ 
     ## Build the list of scalers
     def PopulateScalers(self):
         ## Build a bunch of labels in the right-hand scaler frame
@@ -328,17 +343,46 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         lsclr = len(SpecColl.sclr)
         isclr = 0
         self.sclrlab = []
+        self.sclrval = []
         for sc in SpecColl.sclr:
-            txt = "{name:<}:  {num:>12}"
+            hbox = QtWidgets.QHBoxLayout()
             lab = QtWidgets.QLabel()
+            val = QtWidgets.QLabel()
             self.sclrlab.append(lab)
-            self.sclrlab[isclr].setText(txt.format(name=sc.Name,num=sc.N))
-            self.scalerFramevbox.addWidget(self.sclrlab[isclr])
+            self.sclrval.append(val)
+            self.sclrlab[isclr].setText(sc.Name)
+            self.sclrval[isclr].setText(format(sc.N))
+            hbox.addWidget(self.sclrlab[isclr])
+            hbox.addWidget(self.sclrval[isclr])
+            self.scalerFramevbox.addLayout(hbox)
             isclr = isclr+1
 
+        
     ## Update scaler values
     def UpdateScalers(self):
-        print("updating scalers")
+        SpecColl = self.SpecCanvas.SpecColl
+        isclr = 0
+        for sc in SpecColl.sclr:
+            ##txt = "{name:<17}:  {num:>8}"
+            self.sclrval[isclr].setText(format(sc.N))
+            isclr = isclr+1
+        
+class ScalerCollectionThread(QtCore.QThread):
+    def __init__(self,view):
+        super().__init__()
+
+        self.view = view
+        self.specColl = view.SpecCanvas.SpecColl
+        self.names = self.specColl.dm.getScalerNames()
+        print(len(self.names)," scalers have been made:")
+        for name in self.names:
+            print(" - ",name)
+
+    def run(self):
+        print("Collecting Scalers")
+        while self.specColl.MIDASisRunning:
+            self.view.UpdateScalers()
+            time.sleep(1)
 
 class MyCustomToolbar(NavigationToolbar): 
     def __init__(self, plotCanvas, parent=None):

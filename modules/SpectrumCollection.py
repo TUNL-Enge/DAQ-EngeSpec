@@ -199,6 +199,7 @@ class SpectrumCollection:
                                                "MIDAS Files (*.mid *.mid.*)")
         self.offlinefiles = filename[0]#"run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
+        
 
     ## Actually run the analyzer
     def startmidas(self):
@@ -302,6 +303,11 @@ class MidasCollectionThread(QThread):
 ##            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())
             dat2d = self.specColl.dm.getData2D()
+
+            ## Update the scalers
+            sclrvals = self.specColl.dm.getScalers()
+            for i in range(len(self.specColl.sclr)):
+                self.specColl.sclr[i].N = sclrvals[i]
 
             ## Go through the names and fill them for the appropriate data
             counter1d=0

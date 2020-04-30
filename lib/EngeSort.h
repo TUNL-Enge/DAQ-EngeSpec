@@ -18,11 +18,11 @@ namespace p = boost::python;
 namespace np = boost::python::numpy;
 
 typedef std::vector<double> vec;
-typedef std::vector<int> ivec;
 typedef std::vector<vec> mat;
 typedef std::vector<mat> mat2d;
 typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
+typedef std::vector<int> IntVector;
 
 
 //class EngeAnalyzer: public TRootanaEventLoop {
@@ -53,7 +53,9 @@ class EngeSort {
   BoolVector gethasGates();
   StringVector getSpectrumNames();
   StringVector getScalerNames();
+  IntVector getScalers();
 
+  
   // Gate passing
   void putGate(std::string name, p::list x, p::list y);
   

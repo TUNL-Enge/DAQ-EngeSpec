@@ -53,6 +53,17 @@ int gateCounter=0;
 
 // Scalers
 Scaler *sGates;
+Scaler *sGatesLive;
+Scaler *sClock;
+Scaler *sClockLive;
+Scaler *sFrontLE;
+Scaler *sFrontHE;
+Scaler *sBackLE;
+Scaler *sBackHE;
+Scaler *sE;
+Scaler *sDE;
+Scaler *BCI;
+
 
 void EngeSort::Initialize(){
 
@@ -110,7 +121,19 @@ void EngeSort::Initialize(){
 
   // Build the scalers
   sGates = new Scaler("Total Gates", 0);    // Name, index
+  sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
   
+  sClock = new Scaler("Clock",2);
+  sClockLive = new Scaler("Clock Live",3);
+  sFrontLE = new Scaler("Front HE",4);
+  sFrontHE = new Scaler("Front LE",5);
+  sBackLE = new Scaler("Back HE",6);
+  sBackHE = new Scaler("Back LE",7);
+  sE = new Scaler("E",8);
+  sDE = new Scaler("DE",9);
+  BCI = new Scaler("BCI",15);
+
+ 
 }
 
 //======================================================================
@@ -214,10 +237,22 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 }
 
 // Increment the scalers
+// TODO: make this automatic. If the scaler is
+// defined we should assume that the user wants to increment it
 void EngeSort::incScalers(uint32_t *dSCAL){
 
   //sGates -> inc(dSCAL[sGates->getIndex()]);
   sGates -> inc(dSCAL);
+  sGatesLive -> inc(dSCAL);
+  sClock-> inc(dSCAL);
+  sClockLive -> inc(dSCAL);
+  sFrontLE -> inc(dSCAL);
+  sFrontHE -> inc(dSCAL);
+  sBackLE -> inc(dSCAL);
+  sBackHE -> inc(dSCAL);
+  sE -> inc(dSCAL);
+  sDE -> inc(dSCAL);
+  BCI -> inc(dSCAL);
 }
 
 //#include <cstring>
@@ -305,6 +340,18 @@ BoolVector EngeSort::gethasGates(){
 
   return hasgate;
 }
+
+// Return a vector of scalers
+IntVector EngeSort::getScalers(){
+
+  IntVector sclr;
+  for(auto sc: Scalers){
+    sclr.push_back(sc -> getValue());
+  }
+
+  return sclr;
+}
+
 
 np::ndarray EngeSort::getData(){
 
@@ -499,6 +546,8 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def(vector_indexing_suite<StringVector>());
   class_<BoolVector>("BoolVector")
     .def(vector_indexing_suite<BoolVector>());
+  class_<IntVector>("IntVector")
+    .def(vector_indexing_suite<IntVector>());
     
   class_<EngeSort>("EngeSort")
     .def("sayhello", &EngeSort::sayhello)          // string
@@ -511,6 +560,7 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("gethasGates", &EngeSort::gethasGates)          // bool vector
     .def("getSpectrumNames", &EngeSort::getSpectrumNames) // string vector
     .def("getScalerNames", &EngeSort::getScalerNames)     // string vector
+    .def("getScalers", &EngeSort::getScalers)             // IntVector of scaler values
     .def("ClearData", &EngeSort::ClearData)        // void
     .def("putGate", &EngeSort::putGate)            // void
     .def("data", range(&EngeSort::begin, &EngeSort::end))

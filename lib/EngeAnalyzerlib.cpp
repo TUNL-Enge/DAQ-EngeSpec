@@ -184,7 +184,7 @@ Scaler::Scaler(std::string name, int index){
 
   Name = name;
   Index = index;
-  std::cout << "Made a scaler called " << name << " with index: " << index << std::endl;
+  //std::cout << "Made a scaler called " << name << " with index: " << index << std::endl;
 
   Scalers.push_back(this);
   
@@ -192,7 +192,7 @@ Scaler::Scaler(std::string name, int index){
 
 // Increment a scaler
 void Scaler::inc(uint32_t *scal){
-  std::cout << "incrementing " << Name << " at index " << Index << " by " << scal[Index] << std::endl;
+  //std::cout << "incrementing " << Name << " at index " << Index << " by " << scal[Index] << std::endl;
   count = count+scal[Index];
 }
 
