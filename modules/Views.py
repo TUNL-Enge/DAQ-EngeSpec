@@ -348,10 +348,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             hbox = QtWidgets.QHBoxLayout()
             lab = QtWidgets.QLabel()
             val = QtWidgets.QLabel()
+            val.setAlignment(QtCore.Qt.AlignRight)
             self.sclrlab.append(lab)
             self.sclrval.append(val)
             self.sclrlab[isclr].setText(sc.Name)
-            self.sclrval[isclr].setText(format(sc.N))
+            self.sclrval[isclr].setText("{}".format(sc.N))
             hbox.addWidget(self.sclrlab[isclr])
             hbox.addWidget(self.sclrval[isclr])
             self.scalerFramevbox.addLayout(hbox)
@@ -364,7 +365,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         isclr = 0
         for sc in SpecColl.sclr:
             ##txt = "{name:<17}:  {num:>8}"
-            self.sclrval[isclr].setText(format(sc.N))
+            self.sclrval[isclr].setText("{}".format(sc.N))
+            ##self.sclrval[isclr].setText(format(sc.N))
             isclr = isclr+1
         
 class ScalerCollectionThread(QtCore.QThread):
@@ -374,9 +376,9 @@ class ScalerCollectionThread(QtCore.QThread):
         self.view = view
         self.specColl = view.SpecCanvas.SpecColl
         self.names = self.specColl.dm.getScalerNames()
-        print(len(self.names)," scalers have been made:")
-        for name in self.names:
-            print(" - ",name)
+        ##print(len(self.names)," scalers have been made:")
+        ##for name in self.names:
+        ##    print(" - ",name)
 
     def run(self):
         print("Collecting Scalers")

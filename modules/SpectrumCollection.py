@@ -226,12 +226,12 @@ class MidasThread(QThread):
         self.names = self.specColl.dm.getSpectrumNames()
         self.sclrnames = self.specColl.dm.getScalerNames()
         ##self.sclr = [0] * len(self.sclrnames)   ## fill the scalers with 0
-        print(len(self.sclrnames)," scalers have been made:")
-        for name in self.sclrnames:
-            print(" - ",name)
-        print(len(self.names)," Spectra have been made:")
-        for name in self.names:
-            print(" - ",name)
+        ## print(len(self.sclrnames)," scalers have been made:")
+        ## for name in self.sclrnames:
+        ##     print(" - ",name)
+        ## print(len(self.names)," Spectra have been made:")
+        ## for name in self.names:
+        ##     print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.hasGates = self.specColl.dm.gethasGates()
