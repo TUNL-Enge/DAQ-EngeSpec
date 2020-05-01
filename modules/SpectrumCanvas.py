@@ -672,10 +672,11 @@ class SpectrumCanvas(FigureCanvas):
             ## Find the peak position
             Chn = peakpoints[0]
             Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)# - peakpoints[1]
-            centroid = sum(Chn*Counts/sum(Counts))
-            ucentroid = sum(Counts/((Chn-centroid)**2 *sum(Counts)))
-            ucentroid = np.sqrt(ucentroid/(max(Chn)-min(Chn)))
-
+            centroid = sum(Chn*Counts)/sum(Counts)
+            ##ucentroid = sum(Counts/((Chn-centroid)**2 *sum(Counts)))
+            ##ucentroid = np.sqrt(ucentroid/(max(Chn)-min(Chn)))
+            ucentroid = sum(Counts*(Chn-centroid)**2)/(sum(Counts)-1)
+            ucentroid = np.sqrt(ucentroid)
             
             ## Calculate the number of counts
             bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
