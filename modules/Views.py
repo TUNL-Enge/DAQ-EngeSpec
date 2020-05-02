@@ -5,6 +5,7 @@ from PySide2 import QtCore, QtWidgets, QtGui
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 import time
+from queue import Queue, Empty
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, SpecCanvas):
@@ -157,9 +158,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         tabWidget.setTabText(tabWidget.indexOf(tab2), "Empty Tab")
         
         ## the command editor
-        commandWidget = QtWidgets.QTextEdit()
-        commandWidget.setText("Welcome to EngeSpec!\n")
-        commandWidget.setMaximumHeight(100)
+        self.commandWidget = QtWidgets.QTextEdit()
+        self.commandWidget.setText("Welcome to EngeSpec!\n")
+        self.commandWidget.setMaximumHeight(100)
+
         ## Add the output streams to the text editor
         ##sys.stdout = OutLog(commandWidget, sys.stdout)
         ##sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
@@ -168,7 +170,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
         gridDataFrame.setSpacing(10)
         gridDataFrame.addWidget(tabWidget,1,0)
-        gridDataFrame.addWidget(commandWidget,2,0)
+        gridDataFrame.addWidget(self.commandWidget,2,0)
         
         self.setLayout(gridmain) 
 
@@ -186,6 +188,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self, "About",
                           """This is EngeSpec!"""
         )
+
+    ## Function to write to the command editor
+    def append_text(self, text, col=None):
+        if col:
+            tc = self.commandWidget.textColor()
+            self.commandWidget.setTextColor(col)
+        self.commandWidget.moveCursor(QtGui.QTextCursor.End)
+        self.commandWidget.insertPlainText(text)
+        if col:
+            self.commandWidget.setTextColor(tc)
 
     ## Make the menus
     def createMenus(self):
@@ -489,6 +501,7 @@ class MyCustomToolbar(NavigationToolbar):
 ##
 ##if __name__ == '__main__':
 ##    main()
+
 ## Class to write stdout to the GUI rather than the terminal
 class OutLog:
     def __init__(self, edit, out=None, color=None):
@@ -515,3 +528,35 @@ class OutLog:
 
         if self.out:
             self.out.write(m)
+
+
+##----------------------------------------------------------------------
+## New method for output logging
+## See https://stackoverflow.com/questions/21071448/redirecting-stdout-and-stderr-to-a-pyqt4-qtextedit-from-a-secondary-thread
+
+# The new Stream Object which replaces the default stream associated with sys.stdout
+# This object just puts data in a queue!
+class WriteStream(object):
+    def __init__(self,queue):
+        self.queue = queue
+
+    def write(self, text):
+        self.queue.put(text)
+
+# A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
+# It blocks until data is available, and one it has got something from the queue, it sends
+# it to the "MainThread" by emitting a Qt Signal 
+class MyReceiver(QtCore.QObject):
+    mysignal = QtCore.Signal(str)
+
+    def __init__(self,queue,*args,**kwargs):
+        QtCore.QObject.__init__(self,*args,**kwargs)
+        self.queue = queue
+
+        ##    @pyqtSlot()
+    def run(self):
+        while True:
+            text = self.queue.get()
+            self.mysignal.emit(text)
+
+
