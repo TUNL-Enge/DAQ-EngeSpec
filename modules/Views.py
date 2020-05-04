@@ -79,6 +79,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         item.spec = SpecCanvas.Spec
         self.treeWidget.addTopLevelItem(item)
         self.treeWidget.itemClicked.connect(self.itemclicked)
+        self.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+
 
         ## FENRIS logo
         pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
@@ -341,10 +343,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
            
 
     def itemclicked(self,it,col):
+        ## Loop through all items to find the clicked ones
+        allitems = self.treeWidget.selectedItems()
+        ##print("Old item: ",allitems[0])
+        ##print("Selected: ",allitems)
         if it.parent() is None:
-            self.SpecCanvas.setSpecIndex(it.spec.num,it.spec.is2D,False)
+            self.SpecCanvas.setSpecIndex(allitems[0].spec.num,allitems[0].spec.is2D,False)
+            if(len(allitems)>1):
+                self.SpecCanvas.setOverlayIndex(allitems[1].spec.num)
         else:
-            self.SpecCanvas.setSpecIndex(it.parent().spec.num,it.parent().spec.is2D,True)
+            self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,allitems[0].parent().spec.is2D,True)
+        
 
  
     ## Build the list of scalers

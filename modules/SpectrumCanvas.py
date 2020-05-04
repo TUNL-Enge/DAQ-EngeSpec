@@ -21,10 +21,12 @@ class SpectrumCanvas(FigureCanvas):
 
         ## Keep track of what spectrum is currently being displayed on this canvas
         self.sindex1d = 0
+        self.sindex1dOverlay = 0
         self.sindex2d = 0
         
         self.SpecColl = SpecColl
         self.Spec = SpecColl.spec1d[self.sindex1d]
+        self.SpecOverlay = 0
         self.Spec2D = SpecColl.spec2d[self.sindex2d]
         self.is2D = False
         
@@ -94,8 +96,15 @@ class SpectrumCanvas(FigureCanvas):
             ##self.sindex2d = 0
             self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.is2D = is2D
+        self.SpecOverlay = []
         self.PlotGeneral(is2D,drawGate)
 
+    def setOverlayIndex(self, i):
+        ##print("Overlaying spectrum ",i)
+        self.sindex1dOverlay = i
+        self.SpecOverlay = self.SpecColl.spec1d[self.sindex1dOverlay]
+        self.PlotData()
+        
     def PlotGeneral(self,is2D,drawGate=False):
         if not is2D:
             self.PlotData(drawGate)
@@ -137,7 +146,7 @@ class SpectrumCanvas(FigureCanvas):
     def PlotData(self,drawGate=False):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
-
+   
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
@@ -163,6 +172,11 @@ class SpectrumCanvas(FigureCanvas):
             self.a.set_ylim([0.1,self.a.get_ylim()[1]])
             self.a.set_yscale('log')
             #        self.Resize()
+
+        ## Now the overlay spectrum
+        if self.SpecOverlay:
+            y = self.SpecOverlay.spec
+            self.a.step(x,y,'red',alpha=0.6,where='mid')
         self.fig.canvas.draw()
 
     def PlotData2D(self,drawGate=False):
