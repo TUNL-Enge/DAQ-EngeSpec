@@ -421,11 +421,13 @@ class SpectrumCanvas(FigureCanvas):
         #x = self.fig.ginput(2)
         #print(x)
         self.getNClicks(2)
+        print(self.cydata)
         ylow,yhigh = self.a.get_ylim()
         if self.cydata[0] == -1:
             self.cydata[0] = ylow
         if self.cydata[1] == -1:
-            self.cydata[1] = yhigh
+            self.cydata[1] = self.cydata[0]
+            self.cydata[0] = ylow
         newlowy,newhighy = min(self.cydata),max(self.cydata)
         self.a.set_ylim(newlowy,newhighy)
         ## Save to spectrum
