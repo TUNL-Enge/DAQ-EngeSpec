@@ -42,14 +42,13 @@ commandreceiver.moveToThread(commandthread)
 commandthread.started.connect(commandreceiver.run)
 commandthread.start()
 
-app.exit(app.exec_())
+##app.exit(app.exec_())
 
-##app.exec_()
-##
-##commandreceiver.active = False
-##
-#### 
-#### ##alivethreads = False
-##commandreceiver.quit()
-##commandreceiver.wait()
-##sys.exit(0)
+app.exec_()
+
+## A little trick to make the text printer exit nicely
+print("Exiting")
+commandthread.quit()
+commandthread.wait()
+
+app.exit(0)

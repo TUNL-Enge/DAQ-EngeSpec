@@ -558,5 +558,8 @@ class MyReceiver(QtCore.QObject):
         while True:
             text = self.queue.get()
             self.mysignal.emit(text)
+            if text is "Exiting":
+                break
+
 
 
