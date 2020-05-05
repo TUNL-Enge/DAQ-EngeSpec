@@ -16,7 +16,7 @@ std::string EngeSort::saygoodbye( ) {
 }
 
 int Channels1D = 4096;
-int Channels2D = 256;
+int Channels2D = 512;
 
 // 1D Spectra
 Histogram *hPos1;

@@ -220,7 +220,7 @@ class SpectrumCanvas(FigureCanvas):
         def format_coord(x, y):
             col = int(x)
             row = int(y)
-            if col >= 0 and col < 256 and row >= 0 and row < 256:
+            if col >= 0 and col < self.Spec2D.NBins and row >= 0 and row < self.Spec2D.NBins:
                 z = H[row, col]
                 return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(x, y, z)
 
@@ -331,10 +331,10 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.yzoom = self.a.get_ylim()
             self.Spec.xzoom = self.a.get_xlim()
         else:
-            self.a.set_xlim([0,Spec2D.NBins])
-            self.a.set_ylim([0,Spec2D.NBins])#self.maximumX)
-            self.Spec2D.yzoom = [0,Spec2D.NBins]#self.a.get_ylim()
-            self.Spec2D.xzoom = [0,Spec2D.NBins]#self.a.get_xlim()
+            self.a.set_xlim([0,self.Spec2D.NBins])
+            self.a.set_ylim([0,self.Spec2D.NBins])#self.maximumX)
+            self.Spec2D.yzoom = [0,self.Spec2D.NBins]#self.a.get_ylim()
+            self.Spec2D.xzoom = [0,self.Spec2D.NBins]#self.a.get_xlim()
         self.updateSlider()
         self.fig.canvas.draw()
 
