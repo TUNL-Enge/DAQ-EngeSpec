@@ -331,10 +331,10 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.yzoom = self.a.get_ylim()
             self.Spec.xzoom = self.a.get_xlim()
         else:
-            self.a.set_xlim([0,256])
-            self.a.set_ylim([0,256])#self.maximumX)
-            self.Spec2D.yzoom = [0,256]#self.a.get_ylim()
-            self.Spec2D.xzoom = [0,256]#self.a.get_xlim()
+            self.a.set_xlim([0,Spec2D.NBins])
+            self.a.set_ylim([0,Spec2D.NBins])#self.maximumX)
+            self.Spec2D.yzoom = [0,Spec2D.NBins]#self.a.get_ylim()
+            self.Spec2D.xzoom = [0,Spec2D.NBins]#self.a.get_xlim()
         self.updateSlider()
         self.fig.canvas.draw()
 

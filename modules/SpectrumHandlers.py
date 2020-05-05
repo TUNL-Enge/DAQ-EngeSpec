@@ -89,16 +89,15 @@ class SpectrumObject2D:
         self.is2D = True
         self.isLog = False
 
-        self.nx = 256
-        self.ny = 256
+        self.NBins = 2**9
         self.xedges = None
         self.yedges = None
-        self.spec2d = np.zeros(shape=(self.nx,self.ny))
-        self.spec2d_temp = np.zeros(shape=(self.nx,self.ny))   ## The temporary spectrum in memory
+        self.spec2d = np.zeros(shape=(self.NBins,self.NBins))
+        self.spec2d_temp = np.zeros(shape=(self.NBins,self.NBins))   ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
 
-        self.xzoom = [1,256]
-        self.yzoom = [1,256]
+        self.xzoom = [1,self.NBins]
+        self.yzoom = [1,self.NBins]
         self.zmax = 0
 
         self.gate = None

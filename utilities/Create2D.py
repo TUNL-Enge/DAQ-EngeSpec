@@ -36,7 +36,7 @@ df = pd.DataFrame(np.array([x,y]).T, columns=['Pos1','DE'])
 df.to_hdf('2Ddata.hdf', key='df', mode='w')
 #df.to_pickle("2Ddata.pkl")
 
-plt.hist2d(x, y,bins=[256,256],range=[[0,4096],[0,4096]])
+plt.hist2d(x, y,bins=[512,512],range=[[0,4096],[0,4096]])
 #plt.axis('equal')
 plt.show()
 

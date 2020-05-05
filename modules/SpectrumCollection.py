@@ -145,9 +145,9 @@ class SpectrumCollection:
         sObj = SpectrumObject2D(0)
         sObj.Name = list(self.df)[0] + "vs" + list(self.df)[1]
         sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
-            x=self.df.loc[:,list(self.df)[0]]/16,
-            y=self.df.loc[:,list(self.df)[1]]/16,
-            bins=sObj.nx, range=[[0,256],[0,256]])
+            x=self.df.loc[:,list(self.df)[0]]/8,
+            y=self.df.loc[:,list(self.df)[1]]/8,
+            bins=sObj.NBins, range=[[0,sObj.NBins],[0,sObj.NBins]])
         sObj.spec2d_temp[:] = sObj.spec2d
         self.spec2d.append(sObj)
 
@@ -261,11 +261,11 @@ class MidasThread(QThread):
                 sObj = SpectrumObject2D(counter2d)
                 sObj.Name = self.names[i]
                 sObj.hasGate = self.hasGates[i]
-                sObj.xedges = np.array([x for x in range(0,256)])
-                sObj.yedges = np.array([y for y in range(0,256)])
+                sObj.xedges = np.array([x for x in range(0,sObj.NBins)])
+                sObj.yedges = np.array([y for y in range(0,sObj.NBins)])
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec2d[0,0] = 1
-                sObj.spec2d[254,254] = 1
+                sObj.spec2d[sObj.NBins-1,sObj.NBins-1] = 1
                 sObj.spec2d_temp[:] = sObj.spec2d
                 self.specColl.spec2d.append(sObj)
                 counter2d = counter2d+1
