@@ -53,6 +53,7 @@ class SpectrumObject:
             self.spec_temp = self.spec
             self.spec_temp[:] = self.spec
             self.xzoom = [0,self.NBins]
+            self.Name = os.path.basename(filename[0])
 
     ## Save ascii file
     def SaveASCIIData(self):
@@ -90,18 +91,34 @@ class SpectrumObject2D:
         self.isLog = False
 
         self.NBins = 2**9
-        self.xedges = None
-        self.yedges = None
+        #self.xedges = None
+        #self.yedges = None
+        self.xedges = np.array([x for x in range(0,self.NBins)])
+        self.yedges = np.array([y for y in range(0,self.NBins)])
         self.spec2d = np.zeros(shape=(self.NBins,self.NBins))
         self.spec2d_temp = np.zeros(shape=(self.NBins,self.NBins))   ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
 
+        self.makeFakeData()
+        
         self.xzoom = [1,self.NBins]
         self.yzoom = [1,self.NBins]
         self.zmax = 0
 
         self.gate = None
         self.hasGate = False
+
+    def makeFakeData(self):
+        n = 1000000
+        cov = [[500**2,300**2],[300**2,500**2]]
+        mean = [2400, 1700]
+        x, y = np.random.multivariate_normal(mean,cov,n).T
+        df = pd.DataFrame(np.array([x,y]).T, columns=['Pos1','DE'])
+
+        self.spec2d, self.xedges, self.yedges = np.histogram2d(
+            x=df.loc[:,list(df)[0]]/8,
+            y=df.loc[:,list(df)[1]]/8,
+            bins=self.NBins, range=[[0,self.NBins],[0,self.NBins]])
                       
     def __str__(self):
         return '2D Spectrum Name: {}'.format(self.Name)

@@ -118,6 +118,10 @@ class SpectrumCanvas(FigureCanvas):
     def SaveASCIIData(self):
         self.Spec.SaveASCIIData()
 
+    def LoadAdditionalASCIIData(self):
+        self.Spec.LoadASCIIData()
+        self.PlotData()
+
     def LoadHDFData(self):
         self.SpecColl.LoadHDFData()
         self.sindex1d = 0

@@ -96,6 +96,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         treeFrame.setLayout(treeFramevbox)
 
+        self.PopulateTree()
+
         ##----------------------------------------------------------------------
         ## The scaler window
         scalertitle = QtWidgets.QLabel()
@@ -212,6 +214,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Save ascii spectrum
         self.file_menu.addAction('&Save Spectrum File (ascii)',
                                  self.SaveASCIIData)
+        ## Load ADDITIONAL ascii spectrum
+        self.file_menu.addAction('&Load Additional Spectrum File (ascii)',
+                                 self.LoadAdditionalASCIIData)
         ## Load HDF data
         self.file_menu.addAction('&Load HDF File',
                                  self.LoadHDFData)
@@ -261,9 +266,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
     def LoadASCIIData(self):
         self.SpecCanvas.LoadASCIIData()
+        self.PopulateTree()
 
     def SaveASCIIData(self):
         self.SpecCanvas.SaveASCIIData()
+
+    def LoadAdditionalASCIIData(self):
+        self.SpecColl.addSpectrum("New Spectrum")
+        self.SpecCanvas.setSpecIndex(len(self.SpecColl.spec1d)-1, is2D=False)
+        self.SpecCanvas.LoadASCIIData()
+        self.PopulateTree()
 
     def LoadHDFData(self):
         print("Loading HDF Data")
