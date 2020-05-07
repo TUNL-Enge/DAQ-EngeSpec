@@ -265,6 +265,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         
     def LoadASCIIData(self):
+        ## Clear the old spectrum collection
+        self.SpecColl.ClearCollection()
         self.SpecCanvas.LoadASCIIData()
         self.PopulateTree()
 
@@ -272,8 +274,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecCanvas.SaveASCIIData()
 
     def LoadAdditionalASCIIData(self):
-        self.SpecColl.addSpectrum("New Spectrum")
-        self.SpecCanvas.setSpecIndex(len(self.SpecColl.spec1d)-1, is2D=False)
+        ##self.SpecColl.addSpectrum("New Spectrum")
+        ##self.SpecCanvas.setSpecIndex(len(self.SpecColl.spec1d)-1, is2D=False)
         self.SpecCanvas.LoadASCIIData()
         self.PopulateTree()
 

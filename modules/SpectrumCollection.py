@@ -61,6 +61,11 @@ class SpectrumCollection:
         sObj.Name = name
         self.spec1d.append(sObj)
 
+    def ClearCollection(self):
+        self.spec1d.clear()
+        self.spec2d.clear()
+        print("Cleared spectrum collection")
+
         
     ## Load spectra from a "pickle" file
     def LoadHDFData(self):

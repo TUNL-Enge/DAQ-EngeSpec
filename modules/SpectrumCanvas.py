@@ -112,6 +112,10 @@ class SpectrumCanvas(FigureCanvas):
             self.PlotData2D(drawGate)
             
     def LoadASCIIData(self):
+        self.SpecColl.addSpectrum("Test Spectrum")
+        idx = len(self.SpecColl.spec1d)-1
+        self.setSpecIndex(idx, is2D=False)
+        self.Spec = self.SpecColl.spec1d[idx]
         self.Spec.LoadASCIIData()
         self.PlotData()
 
