@@ -15,6 +15,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecCanvas = SpecCanvas
         ## Grab the spectrum collection
         self.SpecColl = self.SpecCanvas.SpecColl
+
+        self.scalersRunning = False
         
         ##  -----------------------------------------------------------------
         ##  Menu ..  ..                                                Help
@@ -310,13 +312,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.scaler_thread = ScalerCollectionThread(self)
 
     def startmidas(self):
-        print("Running midas")
+        ##print("Running midas")
         self.SpecColl.startmidas()
-        self.scaler_thread.start()
+        if not self.scalersRunning:
+            self.scaler_thread.start()
         
     def stopmidas(self):
-        print("Stopping midas")
-        os.system("odbedit -c stop")
+        ##print("Stopping midas")
+        if self.SpecColl.isOnline:
+            os.system("odbedit -c stop")
         
     def setgate(self):
         self.SpecCanvas.getGate()
@@ -416,8 +420,8 @@ class ScalerCollectionThread(QtCore.QThread):
         ##    print(" - ",name)
 
     def run(self):
-        print("Collecting Scalers")
-        while self.specColl.MIDASisRunning:
+        ##print("Collecting Scalers")
+        while True: ##self.specColl.MIDASisRunning:
             self.view.UpdateScalers()
             time.sleep(1)
 

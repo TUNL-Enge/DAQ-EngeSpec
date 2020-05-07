@@ -55,6 +55,9 @@ class EngeSort {
   StringVector getScalerNames();
   IntVector getScalers();
 
+  void setIsRunning(bool isr){isRunning = isr;}
+  bool getIsRunning(){return isRunning;}
+
   
   // Gate passing
   void putGate(std::string name, p::list x, p::list y);

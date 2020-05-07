@@ -14,6 +14,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import copy
+import time
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -271,6 +272,11 @@ class SpectrumCanvas(FigureCanvas):
         ##ymin    = self.a.get_ylim()[0]
         ##ymax    = self.a.get_ylim()[1]
 
+        ## Is MIDAS running? If so, run the collection thread
+        if self.SpecColl.MIDASisRunning:
+            self.SpecColl.midas_collection_thread.start()
+            time.sleep(0.5)
+            
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
             sp.spec[:] = sp.spec_temp

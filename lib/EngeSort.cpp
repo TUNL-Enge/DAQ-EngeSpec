@@ -466,12 +466,14 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
   fTotalEventCounter = 0;
 }
 void MidasAnalyzerModule::Finish(){
-  printf("Finish!");
+  printf("Finish!\n");
   printf("Counted %d events\n",fTotalEventCounter);
   std::cout << "number of spectra: " << eA->getSpectrumNames().size() << std::endl;
+  eA->setIsRunning(false);
 }
 TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
   printf("NewRunObject, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
+  eA->setIsRunning(true);
   return new MidasAnalyzerRun(runinfo, this);
 }
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
@@ -559,6 +561,7 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector
     .def("gethasGates", &EngeSort::gethasGates)          // bool vector
     .def("getSpectrumNames", &EngeSort::getSpectrumNames) // string vector
+    .def("getIsRunning", &EngeSort::getIsRunning)        // bool value
     .def("getScalerNames", &EngeSort::getScalerNames)     // string vector
     .def("getScalers", &EngeSort::getScalers)             // IntVector of scaler values
     .def("ClearData", &EngeSort::ClearData)        // void

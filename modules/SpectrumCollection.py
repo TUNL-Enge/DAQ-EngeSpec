@@ -30,6 +30,7 @@ class SpectrumCollection:
             self.dm = EngeSort.EngeSort()
 
         self.isRunning = False
+        self.isOnline = False
         self.MIDASisRunning = False
 
         self.offlinefiles = ""
@@ -196,6 +197,7 @@ class SpectrumCollection:
     ## Connect midas for data collection
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
+        self.isOnline = True
 
     ## Replay midas
     def offlinemidas(self):
@@ -204,15 +206,18 @@ class SpectrumCollection:
                                                "MIDAS Files (*.mid *.mid.*)")
         self.offlinefiles = filename[0]#"run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
+        self.isOnline = False
         
 
     ## Actually run the analyzer
     def startmidas(self):
+        if not self.MIDASisRunning:
+            self.midas_collection_thread = MidasCollectionThread(self)
         self.midas_thread.start()
-        self.MIDASisRunning = True
-        self.midas_collection_thread = MidasCollectionThread(self)
-        self.midas_collection_thread.start()
-        os.system("odbedit -c start")
+        
+        ##self.midas_collection_thread.start()
+        if self.isOnline:
+            os.system("odbedit -c start")
         
 ## Run MIDAS in a separate thread so it doesn't lock up the GUI
 class MidasThread(QThread):
@@ -283,9 +288,15 @@ class MidasThread(QThread):
                 
                 
     def run(self):
-        print("Connecting MIDAS")
+        print("Running MIDAS")
+        self.specColl.MIDASisRunning = True
         self.specColl.dm.connectMidasAnalyzer(self.specColl.offlinefiles)
-#        self.specColl.MIDASisRunning = False
+        while self.specColl.dm.getIsRunning():
+            time.sleep(1)
+        print("MIDAS finished running")
+        ## Collect the last bunch of data 
+        self.specColl.midas_collection_thread.start()
+        self.specColl.MIDASisRunning = False
 #        self.specColl.dm.connectMidasAnalyzer()
 
 class MidasCollectionThread(QThread):
@@ -304,7 +315,7 @@ class MidasCollectionThread(QThread):
 
     def run(self):
         print("Collecting MIDAS data")
-        while self.specColl.MIDASisRunning:
+        while True: ##self.specColl.MIDASisRunning:
 ##            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())
             dat2d = self.specColl.dm.getData2D()
@@ -327,7 +338,8 @@ class MidasCollectionThread(QThread):
                     sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
                     counter2d = counter2d+1
                 
-            time.sleep(1)
+            #time.sleep(1)
+            break  ## run only once for data collection when the update button is pressed
         
             
 ## Run this if this file is run alone for debugging purposes            
