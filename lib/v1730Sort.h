@@ -22,6 +22,7 @@ typedef std::vector<vec> mat;
 typedef std::vector<mat> mat2d;
 typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
+typedef std::vector<int> IntVector;
 
 
 //class EngeAnalyzer: public TRootanaEventLoop {
@@ -37,6 +38,7 @@ class EngeSort {
   
   // Connect the midas analyzer
   int connectMidasAnalyzer();
+  int runMidasAnalyzer(boost::python::list file_list);
   
   // New 2d matrix method
   np::ndarray getData();
@@ -47,7 +49,12 @@ class EngeSort {
   BoolVector getis2Ds();
   BoolVector gethasGates();
   StringVector getSpectrumNames();
+  StringVector getScalerNames();
+  IntVector getScalers();
 
+  void setIsRunning(bool isr){isRunning = isr;}
+  bool getIsRunning(){return isRunning;}
+  
   // Gate passing
   void putGate(std::string name, p::list x, p::list y);
   
@@ -93,6 +100,8 @@ class MidasAnalyzerModule: public TAFactory{
   EngeSort *eA;
 };
   
+MidasAnalyzerModule mAMod;
+
 class MidasAnalyzerRun: public TARunObject{
  public:
 

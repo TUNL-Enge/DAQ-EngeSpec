@@ -1,6 +1,3 @@
-
-
-
 #include <iostream>
 #include <vector>
 #include <random>
@@ -70,16 +67,46 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 }
 
 
+// Connect the analyzer to midas
 int EngeSort::connectMidasAnalyzer(){
 
-  MidasAnalyzerModule mAMod;
-  //TARegisterModule tarm(&mAMod);
   TARegister tar(&mAMod);
 
   mAMod.ConnectEngeAnalyzer(this);
+  return 0;
+}
+
+// Run the midas analyzer
+int EngeSort::runMidasAnalyzer(boost::python::list file_list){
+  
+  std::cout << "runMidasAnalyzer " << len(file_list) << std::endl;;
+  // We need to send a dummy argument to manalyzer, which gets ignored
+  std::string filename = "dummy ";
+  for(int i=0; i<len(file_list); i++){
+    std::string file = boost::python::extract<std::string>(file_list[i]);
+    std::cout << " " << file;
+    filename += file + " ";
+  }
+  std::cout << std::endl;
+  
+  std::cout << filename << std::endl;
+  
+  enum { kMaxArgs = 64 };
+  int ac=0;
+  char *av[kMaxArgs];
+
+  char *dup = strdup(filename.c_str());
+  char *p2 = strtok(dup, " ");
+  while (p2 && ac < kMaxArgs-1)
+    {
+      av[ac++] = p2;
+      p2=strtok(0, " ");
+    }
+  av[ac]=0;
   
   Py_BEGIN_ALLOW_THREADS
-    manalyzer_main(0,0);
+    manalyzer_main(ac,av);
+    //    manalyzer_main(0,0);
   Py_END_ALLOW_THREADS
     
   return 0;
@@ -95,6 +122,18 @@ StringVector EngeSort::getSpectrumNames(){
 
   return s;
 }
+
+// Return a vector of spectrum names
+StringVector EngeSort::getScalerNames(){
+
+  StringVector s;
+  for(auto Sclr: Scalers){
+    s.push_back(Sclr -> getName());
+  }
+
+  return s;
+}
+
 // Return a bool vector of whether the spectra are 2D
 BoolVector EngeSort::getis2Ds(){
 
@@ -116,6 +155,18 @@ BoolVector EngeSort::gethasGates(){
 
   return hasgate;
 }
+
+// Return a vector of scalers
+IntVector EngeSort::getScalers(){
+
+  IntVector sclr;
+  for(auto sc: Scalers){
+    sclr.push_back(sc -> getValue());
+  }
+
+  return sclr;
+}
+
 
 np::ndarray EngeSort::getData(){
 
@@ -233,9 +284,11 @@ void MidasAnalyzerModule::Finish(){
   printf("Finish!");
   printf("Counted %d events\n",fTotalEventCounter);
   std::cout << "number of spectra: " << eA->getSpectrumNames().size() << std::endl;
+  eA->setIsRunning(false);
 }
 TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
   printf("NewRunObject, run %d, file %s\n",runinfo->fRunNo, runinfo->fFileName.c_str());
+  eA->setIsRunning(true);
   return new MidasAnalyzerRun(runinfo, this);
 }
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
@@ -305,17 +358,23 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def(vector_indexing_suite<StringVector>());
   class_<BoolVector>("BoolVector")
     .def(vector_indexing_suite<BoolVector>());
+  class_<IntVector>("IntVector")
+    .def(vector_indexing_suite<IntVector>());
     
   class_<EngeSort>("EngeSort")
     .def("sayhello", &EngeSort::sayhello)          // string
     .def("saygoodbye", &EngeSort::saygoodbye)          // string
     .def("Initialize", &EngeSort::Initialize)          // void
     .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
+    .def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
     .def("getData", &EngeSort::getData)                // 1D histograms
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector
     .def("gethasGates", &EngeSort::gethasGates)          // bool vector
     .def("getSpectrumNames", &EngeSort::getSpectrumNames)
+    .def("getIsRunning", &EngeSort::getIsRunning)        // bool value
+    .def("getScalerNames", &EngeSort::getScalerNames)     // string vector
+    .def("getScalers", &EngeSort::getScalers)             // IntVector of scaler values
     .def("ClearData", &EngeSort::ClearData)        // void
     .def("putGate", &EngeSort::putGate)            // void
     .def("data", range(&EngeSort::begin, &EngeSort::end))
