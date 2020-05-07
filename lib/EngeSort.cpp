@@ -255,18 +255,19 @@ void EngeSort::incScalers(uint32_t *dSCAL){
   BCI -> inc(dSCAL);
 }
 
-//#include <cstring>
-//int EngeSort::connectMidasAnalyzer(std::vector<std::string> filenames){
-int EngeSort::connectMidasAnalyzer(boost::python::list file_list){
-//int EngeSort::connectMidasAnalyzer(){
+// Connect the analyzer to midas
+int EngeSort::connectMidasAnalyzer(){
 
-  MidasAnalyzerModule mAMod;
-  //TARegisterModule tarm(&mAMod);
   TARegister tar(&mAMod);
 
   mAMod.ConnectEngeAnalyzer(this);
+  return 0;
+}
 
-  std::cout << "connectMidasAnalyzer " << len(file_list);
+// Run the midas analyzer
+int EngeSort::runMidasAnalyzer(boost::python::list file_list){
+  
+  std::cout << "runMidasAnalyzer " << len(file_list) << std::endl;;
   // We need to send a dummy argument to manalyzer, which gets ignored
   std::string filename = "dummy ";
   for(int i=0; i<len(file_list); i++){
@@ -445,7 +446,10 @@ void EngeSort::ClearData(){
   for(auto h:Histograms){
     h->Clear();
   }
-  
+
+  for(auto Sclr: Scalers){
+    Sclr -> Clear();
+  }
   totalCounter=0;
   gateCounter=0;
   
@@ -556,6 +560,7 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("saygoodbye", &EngeSort::saygoodbye)          // string
     .def("Initialize", &EngeSort::Initialize)          // void
     .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
+    .def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
     .def("getData", &EngeSort::getData)                // 1D histograms
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector

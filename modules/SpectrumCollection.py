@@ -174,6 +174,8 @@ class SpectrumCollection:
         for i in self.spec2d:
             i.spec2d.fill(0)
             i.spec2d_temp.fill(0)
+        for i in self.sclr:
+            i.N = 0
 
         self.dm.ClearData();
             
@@ -285,12 +287,16 @@ class MidasThread(QThread):
             scObj = ScalerObject(i)
             scObj.Name = self.sclrnames[i]
             self.specColl.sclr.append(scObj)
-                
-                
+
+        ## Connect the analyzer to MIDAS
+        self.specColl.dm.connectMidasAnalyzer()
+        
+            
     def run(self):
         print("Running MIDAS")
         self.specColl.MIDASisRunning = True
-        self.specColl.dm.connectMidasAnalyzer(self.specColl.offlinefiles)
+        self.specColl.dm.runMidasAnalyzer(self.specColl.offlinefiles)
+        
         while self.specColl.dm.getIsRunning():
             time.sleep(1)
         print("MIDAS finished running")

@@ -39,7 +39,8 @@ class EngeSort {
 
   // Connect the midas analyzer
   //  int connectMidasAnalyzer(std::vector<std::string> filenames);
-  int connectMidasAnalyzer(boost::python::list file_list);
+  int connectMidasAnalyzer();
+  int runMidasAnalyzer(boost::python::list file_list);
   //  int connectMidasAnalyzer();
   
   // New 2d matrix method
@@ -72,6 +73,11 @@ class EngeSort {
   
   
  private:
+
+  // The analyzer module
+  //MidasAnalyzerModule mAMod;
+
+  
   bool isRunning = false;
 
   std::vector<int> Dat[2];
@@ -106,7 +112,9 @@ class MidasAnalyzerModule: public TAFactory{
   int fTotalEventCounter;
   EngeSort *eA;
 };
-  
+
+MidasAnalyzerModule mAMod;
+
 class MidasAnalyzerRun: public TARunObject{
  public:
 
