@@ -33,7 +33,7 @@ class SpectrumCollection:
         self.isOnline = False
         self.MIDASisRunning = False
 
-        self.offlinefiles = ""
+        self.offlinefiles = [""]
         
     def __str__(self):
         return 'Spectrum Collection Name: {}'.format(self.Name)
