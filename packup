@@ -1,6 +1,6 @@
 #!/bin/bash
 
 mkdir EngeSpec
-cp -r EngeSpec.py images modules spectra EngeSpec/
+cp -r EngeSpec.py images modules spectra lib EngeSpec.so EngeSpec/
 tar -czvf EngeSpec.tar.gz EngeSpec
 rm -rf EngeSpec
