@@ -35,7 +35,7 @@ void EngeSort::Initialize(){
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
-void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
+void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 
   totalCounter++;
 
@@ -53,7 +53,7 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
   */
 
-  for(int i = 0; i<1023; i++){
+  for(int i = 0; i<nADC; i++){
     // Define the channels
     uint32_t dat = dADC[i] & 0xFFFF;
     int cDet1 = (int)std::floor(dat/8.0);
@@ -78,12 +78,15 @@ int EngeSort::connectMidasAnalyzer(){
 
 // Run the midas analyzer
 int EngeSort::runMidasAnalyzer(boost::python::list file_list){
-  
+  std::cout << "Test 1" << std::endl;
+ 
   std::cout << "runMidasAnalyzer " << len(file_list) << std::endl;;
   // We need to send a dummy argument to manalyzer, which gets ignored
   std::string filename = "dummy ";
+  std::cout << "Test 2" << std::endl;
   for(int i=0; i<len(file_list); i++){
     std::string file = boost::python::extract<std::string>(file_list[i]);
+    std::cout << "Test 3" << std::endl;
     std::cout << " " << file;
     filename += file + " ";
   }
@@ -294,32 +297,49 @@ TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 				    TAFlags* flags, TAFlowEvent* flow){
 
-  if(event->event_id != 1)
-    return flow;
+  if(event->event_id == 1){
 
-  //printf("Analyze, run %d, event serno %d, id 0x%04x, data size %d\n", runinfo->fRunNo, event->serial_number, (int)event->event_id, event->data_size);
+    event->FindAllBanks();
+    std::cout << event->BankListToString() << std::endl;
 
+    // Get the ADC Bank
+    TMBank* bADC = event->FindBank("V730");
+    uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
+    TMBank* bTDC = event->FindBank("TDC1");
+    uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
+
+    printf("V1730 Bank: Name = %s, Type = %d, Size = %d\n",&bADC->name[0],
+	   bADC->type,bADC->data_size); 
+
+    uint64_t dat;
+    dat = dADC[0] & 0xFFFF;
+    //  printf("dADC[0] = 0x%x\n",dat);
+    //  printf("dADC[0] = %d\n",dat);
+
+    int singleADCSize = 0;
+    int singleTDCSize = 0;
+    if(bADC->type == 4)singleADCSize = 2;
+    if(bADC->type == 6)singleADCSize = 4;
+    
+    // Find the size of the data
+    int nADC = 0;
+    int nTDC = 0;
+    if(bADC)nADC=(bADC->data_size - 2)/singleADCSize;
+    if(bTDC)nTDC=(bTDC->data_size - 2)/singleTDCSize;
+
+    std::cout << "nADC = " << nADC << " nTDC = " << nTDC << std::endl;
+    
   
-  // Get the ADC Bank
-  TMBank* bADC = event->FindBank("V730");
-  uint32_t* dADC = (uint32_t*)event->GetBankData(bADC);
-  TMBank* bTDC = event->FindBank("TDC1");
-  uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
+    fRunEventCounter++;
+    fModule->fTotalEventCounter++;
+    fModule->eA->sort(dADC, nADC, dTDC, nTDC);
 
-  //printf("V1730 Bank: Name = %s, Type = %d, Size = %d\n",&bADC->name[0],
-  //	 bADC->type,bADC->data_size); 
+  } else if(event->event_id == 2){
 
-  //printf("Size of data = %lu\n",sizeof(dADC)/sizeof(dADC[0]));
+    std::cout << "This is a scaler event. It should never happen!" << std::endl;
 
-  uint64_t dat;
-  dat = dADC[0] & 0xFFFF;
-  //  printf("dADC[0] = 0x%x\n",dat);
-  //  printf("dADC[0] = %d\n",dat);
-  
-  fRunEventCounter++;
-  fModule->fTotalEventCounter++;
-  fModule->eA->sort(dADC, dTDC);
-
+  }
+    
   return flow;
 
 }
