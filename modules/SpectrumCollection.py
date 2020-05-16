@@ -32,6 +32,7 @@ class SpectrumCollection:
         self.isRunning = False
         self.isOnline = False
         self.MIDASisRunning = False
+        self.MIDASinit = True
 
         self.offlinefiles = [""]
         
@@ -196,6 +197,9 @@ class SpectrumCollection:
 ##        self.isRunning = False
 ##        print(self.dm.saygoodbye())
 
+    def initmidas(self):
+        self.MIDASinit = False
+
     ## Connect midas for data collection
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
@@ -215,6 +219,7 @@ class SpectrumCollection:
     def startmidas(self):
         if not self.MIDASisRunning:
             self.midas_collection_thread = MidasCollectionThread(self)
+        #if self.MIDASinit:
         self.midas_thread.start()
         
         ##self.midas_collection_thread.start()
@@ -290,15 +295,17 @@ class MidasThread(QThread):
 
         ## Connect the analyzer to MIDAS
         self.specColl.dm.connectMidasAnalyzer()
-        
             
     def run(self):
         print("Running MIDAS")
         self.specColl.MIDASisRunning = True
         self.specColl.dm.runMidasAnalyzer(self.specColl.offlinefiles)
-        
+        print("Test")
+
         while self.specColl.dm.getIsRunning():
+            print("running")
             time.sleep(1)
+            
         print("MIDAS finished running")
         ## Collect the last bunch of data 
         self.specColl.midas_collection_thread.start()

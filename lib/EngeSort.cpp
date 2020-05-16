@@ -266,17 +266,20 @@ int EngeSort::connectMidasAnalyzer(){
 
 // Run the midas analyzer
 int EngeSort::runMidasAnalyzer(boost::python::list file_list){
-  
-  std::cout << "runMidasAnalyzer " << len(file_list) << std::endl;;
+  std::cout << "Test 1" << std::endl;
+  std::cout << "runMidasAnalyzer " << len(file_list) << std::endl;
   // We need to send a dummy argument to manalyzer, which gets ignored
   std::string filename = "dummy ";
+  std::cout << "Test 2" << std::endl;
   for(int i=0; i<len(file_list); i++){
     std::string file = boost::python::extract<std::string>(file_list[i]);
+    std::cout << "Test 3" << std::endl;
     std::cout << " " << file;
+    //std::cout << " " << file << std::endl;
     filename += file + " ";
   }
+
   std::cout << std::endl;
-  
   std::cout << filename << std::endl;
   
   enum { kMaxArgs = 64 };
@@ -285,6 +288,7 @@ int EngeSort::runMidasAnalyzer(boost::python::list file_list){
 
   char *dup = strdup(filename.c_str());
   char *p2 = strtok(dup, " ");
+
   while (p2 && ac < kMaxArgs-1)
     {
       av[ac++] = p2;

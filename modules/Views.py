@@ -69,7 +69,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dataFrame.setMinimumSize(900,600)
         ##
         scalerFrame = QtWidgets.QFrame()
-        scalerFrame.setMinimumSize(200,720)
+        scalerFrame.setMinimumSize(100,720) # (200, 720) crashed X11 - Will
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -194,7 +194,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self, "About",
                           """This is EngeSpec!"""
         )
-
+        
     ## Function to write to the command editor
     def append_text(self, text, col=None):
         if col:
@@ -314,6 +314,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def startmidas(self):
         ##print("Running midas")
         self.SpecColl.startmidas()
+        #if self.SpecColl.MIDASinit:
+            #self.SpecColl.initmidas()
         if not self.scalersRunning:
             self.scaler_thread.start()
         
@@ -321,6 +323,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##print("Stopping midas")
         if self.SpecColl.isOnline:
             os.system("odbedit -c stop")
+        self.MIDASisRunning = False
         
     def setgate(self):
         self.SpecCanvas.getGate()
@@ -371,7 +374,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.SpecCanvas.setOverlayIndex(allitems[1].spec.num)
         else:
             self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,allitems[0].parent().spec.is2D,True)
-        
 
  
     ## Build the list of scalers
@@ -396,7 +398,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             hbox.addWidget(self.sclrval[isclr])
             self.scalerFramevbox.addLayout(hbox)
             isclr = isclr+1
-
         
     ## Update scaler values
     def UpdateScalers(self):
@@ -525,7 +526,7 @@ class MyCustomToolbar(NavigationToolbar):
 ##    app = QtWidgets.QApplication(sys.argv)
 ##    ex = Ui_MainWindow()
 ##    sys.exit(app.exec_())
-##
+
 ##if __name__ == '__main__':
 ##    main()
 

@@ -28,10 +28,9 @@ SpecCanvas = SpectrumCanvas(SpecColl=SpecColl)
 ui = Ui_MainWindow(SpecCanvas)  ## Pass the spectrum to the GUI
 ui.show()
 
-
 ## make a queue and direct sys.stdout to it
 commandqueue = Queue()
-sys.stdout = WriteStream(commandqueue)
+sys.stdout = WriteStream(commandqueue) # X11 crashes here - Will
 sys.stderr = WriteStream(commandqueue)
 
 ## Now create a receiver to listen to the queue
@@ -42,13 +41,16 @@ commandreceiver.moveToThread(commandthread)
 commandthread.started.connect(commandreceiver.run)
 commandthread.start()
 
-##app.exit(app.exec_())
+#app.exit(app.exec_())
 
 app.exec_()
+#print("Test 10")
 
 ## A little trick to make the text printer exit nicely
 print("Exiting")
 commandthread.quit()
 commandthread.wait()
 
-app.exit(0)
+#app.exit(0)
+
+
