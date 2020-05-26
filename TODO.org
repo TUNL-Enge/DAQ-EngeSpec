@@ -7,8 +7,11 @@
   - [X] Jam-like zooming
   - [X] Reloading data
   - [X] Jiggling icons
-  - [ ] Scalers
+  - [X] Scalers
   - [X] segfault on exit
+  - [ ] More than one gate per histogram
+  - [ ] replace curve_fit with lmfit for fitting spectra
+  - [ ] 1D Gates
 * Current
   - [X] Separate out sort routines
   - [X] Fix updating on 2D histograms
@@ -21,12 +24,9 @@
   - [X] HiDPI scaling
   - [X] Expand tree by default
   - [X] Spectra list width
-  - [ ] replace curve_fit with lmfit for fitting spectra
-  - [ ] 1D Gates
-  - [ ] Scaler display
-  - [ ] More than one gate per histogram
-  - [ ] Arbitrary 2D histogram size
-  - [ ] OutLog fixes with threads?
+  - [X] Scaler display
+  - [X] Arbitrary 2D histogram size
+  - [X] OutLog fixes with threads?
 * GUI
   - [ ] Some feedback numbers
   - [ ] Grab stuff from MIDAS to display?
