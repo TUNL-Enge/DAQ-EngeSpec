@@ -140,4 +140,3 @@ if __name__ == '__main__':
     #print(Spec.spec)
     Spec2D = SpectrumObject2D(0)
     print(Spec2D)
-    Spec2D.LoadHDFData()

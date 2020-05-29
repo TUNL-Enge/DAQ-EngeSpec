@@ -67,16 +67,6 @@ class SpectrumCollection:
         print("Cleared spectrum collection")
 
 
-    ## Load spectra from a "pickle" file
-    def LoadHDFData(self):
-        filename = QFileDialog.getOpenFileName(None,
-                                               "Open Data Collection", "./",
-                                               "Data Files (*.hdf)")
-        print("Loading: ",filename[0])
-        if filename != '':
-            self.df = pd.read_hdf(filename[0])
-        
-            self.Sort()
 
     def LoadPickleData(self):
         filename = QFileDialog.getOpenFileName(None,
@@ -108,15 +98,6 @@ class SpectrumCollection:
         self.printSummary()
 
         #### Make simplified 1D and 2D spectra
-        ##df = pd.DataFrame()
-        ##for i in range(len(self.spec1d)):
-        ##    df[self.spec1d[i].Name] = self.spec1d[i].spec
-        ##    
-        ##df.to_hdf(filename[0], key='df', mode='w')
-        ##
-        ##for i in range(len(self.spec2d)):
-        ##    df2d = pd.DataFrame(self.spec2d[i].spec2d)
-        ##    df2d.to_hdf(filename[0], key='df', mode='a')
         my_list = list([self.spec1d,self.spec2d])
         print(my_list)
 
@@ -126,45 +107,6 @@ class SpectrumCollection:
 
 
         save_object(my_list, filename[0])
-        ##spec_pd = pd.DataFrame([p for p in my_list])
-        ##print(spec_pd.dtypes)
-        ##print(spec_pd)
-        ##spec_pd.to_hdf(filename[0], key='df', mode='w')
-        
-
-        
-    def Sort(self):
-        ## First delete the old spectra
-        self.spec1d = []
-        self.spec2d = []
-        ## For each column in df, make a 1D spectrum
-        for i in range(len(list(self.df))):
-            sObj = SpectrumObject(i)
-            sObj.Name = list(self.df)[i]
-            h, edges = np.histogram(self.df.loc[:,sObj.Name],bins=range(0,sObj.NBins+1))
-            sObj.spec = h
-            sObj.spec_temp[:] = h
-            self.spec1d.append(sObj)
-
-        ## Make a 2D spectrum
-        sObj = SpectrumObject2D(0)
-        sObj.Name = list(self.df)[0] + "vs" + list(self.df)[1]
-        sObj.spec2d, sObj.xedges, sObj.yedges = np.histogram2d(
-            x=self.df.loc[:,list(self.df)[0]]/8,
-            y=self.df.loc[:,list(self.df)[1]]/8,
-            bins=sObj.NBins, range=[[0,sObj.NBins],[0,sObj.NBins]])
-        sObj.spec2d_temp[:] = sObj.spec2d
-        self.spec2d.append(sObj)
-
-        sObj = self.spec2d[0]
-        print("is there a gate? ",sObj.gate)
-        if sObj.gate:
-            ## Make the cut spectra
-            self.addSpectrum("Cut Spectrum")
-            ## test
-            x = 0
-            y = 0
-            print("Position x:",x,"y:",y,"In gate?",inGate(x,y,sObj.gate))
         
     def ZeroAll(self):
         for i in self.spec1d:
@@ -178,23 +120,6 @@ class SpectrumCollection:
 
         self.dm.ClearData();
             
-    ## Is a count at x,y in the Gate G?
-    def inGate(x,y,G):
-        rough = x>min(G[:,1]) & x<max(G[:,1]) 
-        return rough
-    
-##    ## Start a simulation of data
-##    def connectsim(self):
-##        self.simulator_thread = SimulatorThread(self)
-##
-##    def startsim(self):
-##        self.isRunning = True
-##        self.simulator_thread.start()
-##        
-##    def stopsim(self):
-##        self.isRunning = False
-##        print(self.dm.saygoodbye())
-
     ## Connect midas for data collection
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
@@ -353,5 +278,4 @@ if __name__ == '__main__':
     SpecColl = SpectrumCollection(0)
 
     app = QApplication([])
-    SpecColl.LoadHDFData()
     SpecColl.printSummary()

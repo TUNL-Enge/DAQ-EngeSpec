@@ -127,17 +127,6 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec.LoadASCIIData()
         self.PlotData()
 
-    def LoadHDFData(self):
-        self.SpecColl.LoadHDFData()
-        self.sindex1d = 0
-        for i in range(len(self.SpecColl.spec1d)):
-            self.SpecColl.spec1d[i].isLog=False
-        for i in range(len(self.SpecColl.spec2d)):
-            self.SpecColl.spec2d[i].isLog=False
-        self.Spec = self.SpecColl.spec1d[self.sindex1d]
-        self.PlotData()
-        ##self.PlotData2D()
-
     def LoadPickleData(self):
         self.SpecColl.LoadPickleData()
         self.sindex1d = 0

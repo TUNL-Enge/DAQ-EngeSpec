@@ -219,13 +219,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Load ADDITIONAL ascii spectrum
         self.file_menu.addAction('&Load Additional Spectrum File (ascii)',
                                  self.LoadAdditionalASCIIData)
-        ## Load HDF data
-        self.file_menu.addAction('&Load HDF File',
-                                 self.LoadHDFData)
         ## Load pickle data
         self.file_menu.addAction('&Load Pickle File',
                                  self.LoadPickleData)
-        ## Save HDF data
+        ## Save pickle data
         self.file_menu.addAction('&Save Pickle File',
                                  self.SavePickleData)
         ## Connect to MIDAS
@@ -279,11 +276,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##self.SpecColl.addSpectrum("New Spectrum")
         ##self.SpecCanvas.setSpecIndex(len(self.SpecColl.spec1d)-1, is2D=False)
         self.SpecCanvas.LoadASCIIData()
-        self.PopulateTree()
-
-    def LoadHDFData(self):
-        print("Loading HDF Data")
-        self.SpecCanvas.LoadHDFData()
         self.PopulateTree()
 
     def LoadPickleData(self):
