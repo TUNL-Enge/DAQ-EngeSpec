@@ -50,7 +50,7 @@ class EngeSort {
   void sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC);
   
   BoolVector getis2Ds();
-  BoolVector gethasGates();
+  IntVector getNGates();
   StringVector getSpectrumNames();
   StringVector getScalerNames();
   IntVector getScalers();

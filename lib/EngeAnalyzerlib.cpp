@@ -27,7 +27,7 @@ std::string Messages::saygoodbye( ) {
 Histogram::Histogram(std::string name, int nchannels, int dims){
   Name = name;
   nDims = dims;
-  hasGate = false;
+  nGates = 0;
   nChannels = nchannels;
   
   // Fill an empty spectrum
@@ -84,7 +84,7 @@ void Histogram::addGate(std::string name){
   //  std::cout << "Adding gate: " << name << " to histogram " << Name << std::endl;
   Gate G1(name);
   GateCollection.push_back(G1);
-  hasGate = true;
+  nGates++;
 }
 
 // Clear the histogram

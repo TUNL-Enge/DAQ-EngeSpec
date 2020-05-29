@@ -330,11 +330,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(l1d):
             spec = SpecColl.spec1d[i]
             name = spec.Name
-            hasGate = spec.hasGate
+            NGates = spec.NGates
             item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
-            if hasGate:
-                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
+            for i in range(NGates):
+                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate {}".format(i)])
                 subitem.spec = spec
             self.treeWidget.addTopLevelItem(item)
             
@@ -342,12 +342,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(l2d):
             spec = SpecColl.spec2d[i]
             name = spec.Name
-            hasGate = spec.hasGate
+            NGates = spec.NGates
+            gates = spec.gates
             item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
-            if hasGate:
-                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate"])
-                subitem.spec = spec.gate
+            #for i in range(NGates):
+            #    subitem = QtWidgets.QTreeWidgetItem(item, ["Gate {}".format(i)])
+            #    subitem.spec = spec.gate
+            for gObj in gates:
+                subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
+                subitem.spec = spec.gates
+#                print(gObj.name)
             self.treeWidget.addTopLevelItem(item)
 
         self.treeWidget.expandAll()

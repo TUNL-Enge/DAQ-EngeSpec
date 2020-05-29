@@ -170,7 +170,7 @@ class MidasThread(QThread):
         ##     print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
-        self.hasGates = self.specColl.dm.gethasGates()
+        self.NGates = self.specColl.dm.getNGates()
         
         ## First delete the old spectra
         self.specColl.spec1d = []
@@ -186,7 +186,16 @@ class MidasThread(QThread):
             if not self.is2Ds[i]:
                 sObj = SpectrumObject(counter1d)
                 sObj.Name = self.names[i]
-                sObj.hasGate = self.hasGates[i]
+                sObj.NGates = self.NGates[i]
+                ## Fill the gate names
+                if(self.NGates[i]>0):
+                    gnames = self.specColl.dm.getGateNames(sObj.Name)
+                    for j in range(len(gnames)):
+                        gObj = GateObject()
+                        gObj.name = gnames[j]
+                        sObj.gate.append(gObj)
+                        print(gObj.name)
+                    
                 sObj.spec = np.zeros(sObj.NBins)
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec[0] = 1
@@ -196,7 +205,14 @@ class MidasThread(QThread):
             else:
                 sObj = SpectrumObject2D(counter2d)
                 sObj.Name = self.names[i]
-                sObj.hasGate = self.hasGates[i]
+                sObj.NGates = self.NGates[i]
+                ## Fill the gate names
+                if(self.NGates[i]>0):
+                    gnames = self.specColl.dm.getGateNames(sObj.Name)
+                    for j in range(len(gnames)):
+                        gObj = GateObject()
+                        gObj.name = gnames[j]
+                        sObj.gates.append(gObj)
                 sObj.xedges = np.array([x for x in range(0,sObj.NBins)])
                 sObj.yedges = np.array([y for y in range(0,sObj.NBins)])
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
@@ -241,7 +257,7 @@ class MidasCollectionThread(QThread):
         ##    print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
-        self.hasGates = self.specColl.dm.gethasGates()
+        self.NGates = self.specColl.dm.getNGates()
 
     def run(self):
         print("Collecting MIDAS data")

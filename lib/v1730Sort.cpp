@@ -146,14 +146,14 @@ BoolVector EngeSort::getis2Ds(){
   return is2D;
 }
 // Return a bool vector of whether the spectra have gates
-BoolVector EngeSort::gethasGates(){
+IntVector EngeSort::getNGates(){
 
-  BoolVector hasgate;
+  IntVector ngates;
   for(auto h: Histograms){
-    hasgate.push_back(h -> gethasGate());
+    ngates.push_back(h -> getNGates());
   }
 
-  return hasgate;
+  return ngates;
 }
 
 // Return a vector of scalers
@@ -236,7 +236,7 @@ void EngeSort::putGate(std::string name, p::list x, p::list y){
       //std::cout << "Found the histogram! With name: " << h->getName() << " " << name << std::endl;
 
       // Make sure this histogram has gates defined
-      if(h -> gethasGate()){
+      if(h -> getNGates() > 0){
 	//std::cout << "Yes, this histogram has gates!" << std::endl;
 	
 	p::ssize_t len = p::len(x);
@@ -392,7 +392,7 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("getData", &EngeSort::getData)                // 1D histograms
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector
-    .def("gethasGates", &EngeSort::gethasGates)          // bool vector
+    .def("getNGates", &EngeSort::getNGates)          // bool vector
     .def("getSpectrumNames", &EngeSort::getSpectrumNames)
     .def("getIsRunning", &EngeSort::getIsRunning)        // bool value
     .def("getScalerNames", &EngeSort::getScalerNames)     // string vector

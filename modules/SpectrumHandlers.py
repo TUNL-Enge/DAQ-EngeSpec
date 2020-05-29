@@ -31,8 +31,8 @@ class SpectrumObject:
         ##if os.path.exists('EngeSort.so'):
         ##    self.dm = EngeSort.EngeSort()
 
-        self.gate = None
-        self.hasGate = False
+        self.gates = []
+        self.NGates = 0
 
         
     ## Load ascii file
@@ -105,8 +105,8 @@ class SpectrumObject2D:
         self.yzoom = [1,self.NBins]
         self.zmax = 0
 
-        self.gate = None
-        self.hasGate = False
+        self.gates = []
+        self.NGates = 0
 
     def makeFakeData(self):
         n = 1000000
@@ -132,7 +132,16 @@ class ScalerObject:
     def __str__(self):
         return 'Scaler Name: {}'.format(self.Name)
 
-    
+class GateObject:
+    def __init__(self):
+        self.name = "Test Gate"
+        self.x = []
+        self.y = []
+
+    def setGate(self,x,y):
+        self.x = x
+        self.y = y
+        
 if __name__ == '__main__':
     #Spec = SpectrumObject()
     #print(Spec)

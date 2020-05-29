@@ -245,8 +245,11 @@ class SpectrumCanvas(FigureCanvas):
         #self.lincb = False
         #self.a.set_axes_locator(self.original_loc)
         
-        if drawGate and self.Spec2D.hasGate and self.Spec2D.gate is not None:
-            self.drawGate()
+        if drawGate:
+            for i in range(self.Spec2D.NGates-1):
+                #print(i)
+                if len(self.Spec2D.gates[i].x)>0:
+                    self.drawGates(i)
 
         self.updateSlider()
         self.fig.canvas.draw()
@@ -611,16 +614,16 @@ class SpectrumCanvas(FigureCanvas):
             y.append(y[0])
             self.a.plot(x,y, 'r-')
             self.fig.canvas.draw()
-            self.Spec2D.hasGate = True
-            self.Spec2D.gate = (x,y)
+            self.Spec2D.NGates = self.Spec2D.NGates+1
+            self.Spec2D.gates[0].setGate(x,y)
             ##        print(self.Spec2D.gate)
         
             ## Send the gate over to c++
-            self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gate[0],self.Spec2D.gate[1])
+            self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gates[0].x,self.Spec2D.gates[0].y)
 
-    def drawGate(self):
-        x = self.Spec2D.gate[0]
-        y = self.Spec2D.gate[1]
+    def drawGates(self, i):
+        x = self.Spec2D.gates[i].x
+        y = self.Spec2D.gates[i].y
         self.a.plot(x,y,'r-')
         
     def getSingle(self,color="red"):

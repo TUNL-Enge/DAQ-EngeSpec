@@ -48,8 +48,8 @@ app.exec_()
 ## A little trick to make the text printer exit nicely
 print("Exiting")
 commandthread.quit()
-commandthread.wait()
+#commandthread.wait()
 
-#app.exit(0)
+app.exit(0)
 
 

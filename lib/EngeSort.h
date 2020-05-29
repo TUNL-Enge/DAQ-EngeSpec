@@ -49,7 +49,8 @@ class EngeSort {
   void incScalers(uint32_t *dSCAL);
   
   BoolVector getis2Ds();
-  BoolVector gethasGates();
+  IntVector getNGates();
+  StringVector getGateNames(std::string hname);
   StringVector getSpectrumNames();
   StringVector getScalerNames();
   IntVector getScalers();
