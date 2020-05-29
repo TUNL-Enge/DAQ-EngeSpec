@@ -69,7 +69,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dataFrame.setMinimumSize(900,600)
         ##
         scalerFrame = QtWidgets.QFrame()
-        scalerFrame.setMinimumSize(100,720) # (200, 720) crashed X11 - Will
+        scalerFrame.setMinimumSize(100,720) ## (200, 720) crashes X11 on Windows- Will
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -314,8 +314,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def startmidas(self):
         ##print("Running midas")
         self.SpecColl.startmidas()
-        #if self.SpecColl.MIDASinit:
-            #self.SpecColl.initmidas()
         if not self.scalersRunning:
             self.scaler_thread.start()
         

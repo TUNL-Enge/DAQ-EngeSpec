@@ -6,6 +6,8 @@
 #include <random>
 #include <string>
 #include <thread>
+#include <iostream>
+#include <fstream>
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -24,6 +26,7 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 typedef std::vector<int> IntVector;
 
+std::ofstream f_qlong;
 
 //class EngeAnalyzer: public TRootanaEventLoop {
 class EngeSort {

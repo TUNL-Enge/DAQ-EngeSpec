@@ -57,7 +57,8 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
     // Define the channels
     uint32_t dat = dADC[i] & 0xFFFF;
     int cDet1 = (int)std::floor(dat/8.0);
-
+    
+    f_qlong << dat << std::endl;
     //std::cout << i << " " << cDet1 << std::endl;
   
     // Increment 1D histograms
@@ -78,15 +79,11 @@ int EngeSort::connectMidasAnalyzer(){
 
 // Run the midas analyzer
 int EngeSort::runMidasAnalyzer(boost::python::list file_list){
-  std::cout << "Test 1" << std::endl;
- 
   std::cout << "runMidasAnalyzer " << len(file_list) << std::endl;;
   // We need to send a dummy argument to manalyzer, which gets ignored
   std::string filename = "dummy ";
-  std::cout << "Test 2" << std::endl;
   for(int i=0; i<len(file_list); i++){
     std::string file = boost::python::extract<std::string>(file_list[i]);
-    std::cout << "Test 3" << std::endl;
     std::cout << " " << file;
     filename += file + " ";
   }
@@ -347,17 +344,22 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 /* 
    manalyzer run
 */
+
 void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Begin run %d\n",runinfo->fRunNo);
   time_t run_start_time = runinfo->fOdb->odbReadUint32("/Runinfo/Start time binary", 0, 0);
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
   fRunEventCounter = 0;
+  
+  f_qlong.open("qlong_engespec.txt");
 }
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
   std::cout << "Total counts: " << totalCounter << "   Gated counts: " << gateCounter << std::endl;
+  
+  f_qlong.close();
 }
 
 BOOST_PYTHON_MODULE(EngeSort)

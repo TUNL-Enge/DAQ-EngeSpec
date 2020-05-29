@@ -30,7 +30,7 @@ ui.show()
 
 ## make a queue and direct sys.stdout to it
 commandqueue = Queue()
-sys.stdout = WriteStream(commandqueue) # X11 crashes here - Will
+sys.stdout = WriteStream(commandqueue)
 sys.stderr = WriteStream(commandqueue)
 
 ## Now create a receiver to listen to the queue
@@ -44,7 +44,6 @@ commandthread.start()
 #app.exit(app.exec_())
 
 app.exec_()
-#print("Test 10")
 
 ## A little trick to make the text printer exit nicely
 print("Exiting")
