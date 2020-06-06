@@ -27,6 +27,7 @@ class Gate{
   int pnpoly(double testx, double testy);
   int inGate(double x, double y);
   void Print();
+  void Clear();
   std::string getName(){return Name;}
   
  private:
@@ -49,14 +50,15 @@ class Histogram{
   void Print(int, int);
   void Print(int, int, int, int);
   int getnDims(){return nDims;}
-  bool getNGates(){return nGates;}
-  void setNGates(int ng){nGates = ng;}
+  //void setNGates(int ng){nGates = ng;}
   std::string getName(){return Name;}
   int getnChannels(){return nChannels;}
   std::vector<int> getData1D(){return Bins1D;}
   std::vector<std::vector<int>> getData2D(){return Bins2D;}
-  void addGate(std::string name);
-  Gate* getGates(int i){return &GateCollection[i];}
+  int getNGates(){return GateCollection.size();}
+  void addGate(std::string gname);
+  Gate& getGate(int i){return GateCollection[i];}
+
   void Clear();
   
  private:
@@ -64,7 +66,7 @@ class Histogram{
   std::string Name;
   int nDims;
   int nChannels;
-  int nGates;
+  //int nGates;
   std::vector<int> Bins1D;
   std::vector<std::vector<int>> Bins2D;
   std::vector<Gate> GateCollection;

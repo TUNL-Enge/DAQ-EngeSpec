@@ -107,6 +107,7 @@ class SpectrumObject2D:
 
         self.gates = []
         self.NGates = 0
+        self.GateIndex = -1  ## -1 for no gates selected
 
     def makeFakeData(self):
         n = 1000000

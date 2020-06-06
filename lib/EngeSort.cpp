@@ -42,10 +42,13 @@ Histogram *hThetavsPos1;
 Histogram *hSiDEvsSiE;
 
 // Gated Spectra
-Histogram *hPos1_gDEvPos1;
+Histogram *hPos1_gDEvPos1_G1;
+Histogram *hPos1_gDEvPos1_G2;
 
-// 2D Gate on the DE vs Pos1 spectrum
-Gate *g2d_DEvsPos1;
+// 2D Gates on the DE vs Pos1 spectrum
+//Gate *g2d_DEvsPos1_1;
+//Gate *g2d_DEvsPos1_2;
+//Gate *g2d_DEvsPos1_3;
 
 // Counters
 int totalCounter=0;
@@ -97,13 +100,20 @@ void EngeSort::Initialize(){
   
   //--------------------
   // Gated Histograms
-  hPos1_gDEvPos1 = new Histogram("Pos 1; GDEvPos1", Channels1D, 1);
+  hPos1_gDEvPos1_G1 = new Histogram("Pos 1; GDEvPos1-G1", Channels1D, 1);
+  hPos1_gDEvPos1_G2 = new Histogram("Pos 1; GDEvPos1-G2", Channels1D, 1);
 
 
   //--------------------
   // Gates
+  //g2d_DEvsPos1_1 = new Gate("Gate 1");
+  //g2d_DEvsPos1_2 = new Gate("Gate 2");
+  //g2d_DEvsPos1_3 = new Gate("Gate 3");
+    
   hDEvsPos1 -> addGate("Gate 1");
   hDEvsPos1 -> addGate("Gate 2");
+  //hDEvsPos1 -> addGate(g2d_DEvsPos1_2);
+  //hDEvsPos1 -> addGate(g2d_DEvsPos1_3);
   
   /*
   // Loop through and print all histograms
@@ -226,15 +236,23 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   //std::cout << "2D spect" << std::endl;
   
   // The gated spectrum
-  Gate *G1 = hDEvsPos1->getGates(0);
-  //G1->Print();
-  if(G1->inGate(cPos1comp,cDEcomp)){
-    gateCounter++;;
-    hPos1_gDEvPos1->inc(cPos1);
-  }
-
   //std::cout << "gated spec" << std::endl; 
 
+  Gate &G1 = hDEvsPos1->getGate(0);
+  //G1.Print();
+  if(G1.inGate(cPos1comp,cDEcomp)){
+    gateCounter++;;
+    hPos1_gDEvPos1_G1->inc(cPos1);
+  }
+
+  Gate &G2 = hDEvsPos1->getGate(1);
+  //G2.Print();
+  if(G2.inGate(cPos1comp,cDEcomp)){
+    gateCounter++;;
+    hPos1_gDEvPos1_G2->inc(cPos1);
+  }
+
+  
 }
 
 // Increment the scalers
@@ -421,11 +439,11 @@ StringVector EngeSort::getGateNames(std::string hname){
   // First find the spectrum that corresponds to the hname
   for(auto h:Histograms){
     if(h -> getName() == hname){
-      
+      //std::cout << "Hist: " << hname << " has " << h -> getNGates() << " gates" << std::endl;
       // Make sure this histogram has gates defined
       for(int i=0; i< (h -> getNGates()); i++){
-	Gate *G1 = h->getGates(i);
-	gname.push_back(G1->getName());
+	Gate G1 = h->getGate(i);
+	gname.push_back(G1.getName());
       }
     }
   }
@@ -433,26 +451,34 @@ StringVector EngeSort::getGateNames(std::string hname){
   return gname;
 }
 
-void EngeSort::putGate(std::string name, p::list x, p::list y){
+void EngeSort::putGate(std::string name, std::string gname, p::list x, p::list y){
 
+  //std::cout << "Putting gate: " << gname << " into histogram " << name << std::endl;
+  
   // First find the spectrum that corresponds to the name
   for(auto h:Histograms){
     if(h -> getName() == name){
-      //std::cout << "Found the histogram! With name: " << h->getName() << " " << name << std::endl;
+      //std::cout << "Found the histogram! With name: " << h->getName() << std::endl;
 
       // Make sure this histogram has gates defined
-      if(h -> getNGates() > 0){
-	//std::cout << "Yes, this histogram has gates!" << std::endl;
-	
-	p::ssize_t len = p::len(x);
-	Gate *G1 = h->getGates(0);
-	
-	// Make a vector for the gate
-	for(int i=0; i<len; i++){
-	  std::vector<double> tmp;
-	  tmp.push_back(p::extract<double>(x[i]));
-	  tmp.push_back(p::extract<double>(y[i]));
-	  G1->addVertex(tmp);
+      //if(h -> getNGates() > 0){
+      //std::cout << "Yes, this histogram has gates!" << std::endl;
+      for(int ig = 0; ig < (h -> getNGates()); ig++){
+	Gate &G1 = h->getGate(ig);
+	if(G1.getName() == gname){
+
+	  G1.Clear();
+	  //G1.Print();
+
+	  p::ssize_t len = p::len(x);
+	  // Make a vector for the gate
+	  for(int i=0; i<len; i++){
+	    std::vector<double> tmp;
+	    tmp.push_back(p::extract<double>(x[i]));
+	    tmp.push_back(p::extract<double>(y[i]));
+	    G1.addVertex(tmp);
+	  }
+	  //G1.Print();
 	}
       }
     }

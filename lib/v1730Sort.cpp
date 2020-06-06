@@ -227,27 +227,34 @@ np::ndarray EngeSort::getData2D(){
   
 }
 
+void EngeSort::putGate(std::string name, std::string gname, p::list x, p::list y){
 
-void EngeSort::putGate(std::string name, p::list x, p::list y){
-
+  //std::cout << "Putting gate: " << gname << " into histogram " << name << std::endl;
+  
   // First find the spectrum that corresponds to the name
   for(auto h:Histograms){
     if(h -> getName() == name){
-      //std::cout << "Found the histogram! With name: " << h->getName() << " " << name << std::endl;
+      //std::cout << "Found the histogram! With name: " << h->getName() << std::endl;
 
       // Make sure this histogram has gates defined
-      if(h -> getNGates() > 0){
-	//std::cout << "Yes, this histogram has gates!" << std::endl;
-	
-	p::ssize_t len = p::len(x);
-	Gate *G1 = h->getGates(0);
-	
-	// Make a vector for the gate
-	for(int i=0; i<len; i++){
-	  std::vector<double> tmp;
-	  tmp.push_back(p::extract<double>(x[i]));
-	  tmp.push_back(p::extract<double>(y[i]));
-	  G1->addVertex(tmp);
+      //if(h -> getNGates() > 0){
+      //std::cout << "Yes, this histogram has gates!" << std::endl;
+      for(int ig = 0; ig < (h -> getNGates()); ig++){
+	Gate &G1 = h->getGate(ig);
+	if(G1.getName() == gname){
+
+	  G1.Clear();
+	  //G1.Print();
+
+	  p::ssize_t len = p::len(x);
+	  // Make a vector for the gate
+	  for(int i=0; i<len; i++){
+	    std::vector<double> tmp;
+	    tmp.push_back(p::extract<double>(x[i]));
+	    tmp.push_back(p::extract<double>(y[i]));
+	    G1.addVertex(tmp);
+	  }
+	  //G1.Print();
 	}
       }
     }

@@ -27,7 +27,6 @@ std::string Messages::saygoodbye( ) {
 Histogram::Histogram(std::string name, int nchannels, int dims){
   Name = name;
   nDims = dims;
-  nGates = 0;
   nChannels = nchannels;
   
   // Fill an empty spectrum
@@ -79,12 +78,12 @@ void Histogram::Print(int minBinx=0, int maxBinx=10, int minBiny=0, int maxBiny=
 
 }
 
-void Histogram::addGate(std::string name){
+void Histogram::addGate(std::string gname){
 
-  //  std::cout << "Adding gate: " << name << " to histogram " << Name << std::endl;
-  Gate G1(name);
-  GateCollection.push_back(G1);
-  nGates++;
+  //std::cout << "Adding gate: " << gname << " to histogram " << Name << std::endl;
+  Gate G(gname);
+  GateCollection.push_back(G);
+  //std::cout << GateCollection.size() << "   " << nGates << std::endl;
 }
 
 // Clear the histogram
@@ -104,7 +103,7 @@ void Histogram::Clear(){
 Gate::Gate(std::string name){
 
   Name = name;
-  //  std::cout << "Made a gate called " << name << std::endl;
+  //std::cout << "Made a gate called " << name << std::endl;
 
 }
 
@@ -112,6 +111,12 @@ void Gate::Print(){
 
   std::cout << "This is the gate called " << Name << std::endl;
   std::cout << "Number of vertices: " << Points.size() << std::endl;
+  
+}
+
+void Gate::Clear(){
+
+  Points.clear();
   
 }
 

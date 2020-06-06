@@ -87,11 +87,12 @@ class SpectrumCanvas(FigureCanvas):
         #print("entering a blocking loop")
         self.fc.start_event_loop(self)#,timeout=-1)
         
-    def setSpecIndex(self,i,is2D,drawGate=False):
+    def setSpecIndex(self,i,is2D,drawGate=-1):
         if is2D:
             ##self.sindex1d = 0
             self.sindex2d = i
             self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
+            self.Spec2D.GateIndex = drawGate
         else:            
             self.sindex1d = i
             ##self.sindex2d = 0
@@ -106,7 +107,7 @@ class SpectrumCanvas(FigureCanvas):
         self.SpecOverlay = self.SpecColl.spec1d[self.sindex1dOverlay]
         self.PlotData()
         
-    def PlotGeneral(self,is2D,drawGate=False):
+    def PlotGeneral(self,is2D,drawGate=-1):
         if not is2D:
             self.PlotData(drawGate)
         else:
@@ -141,7 +142,7 @@ class SpectrumCanvas(FigureCanvas):
     def SavePickleData(self):
         self.SpecColl.SavePickleData()
 
-    def PlotData(self,drawGate=False):
+    def PlotData(self,drawGate=-1):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
    
@@ -177,7 +178,7 @@ class SpectrumCanvas(FigureCanvas):
             self.a.step(x,y,'red',alpha=0.6,where='mid')
         self.fig.canvas.draw()
 
-    def PlotData2D(self,drawGate=False):
+    def PlotData2D(self,drawGate=-1):
         xmin = self.Spec2D.xzoom[0]
         xmax = self.Spec2D.xzoom[1]
         ymin = self.Spec2D.yzoom[0]
@@ -244,12 +245,11 @@ class SpectrumCanvas(FigureCanvas):
         #self.lincb.remove()
         #self.lincb = False
         #self.a.set_axes_locator(self.original_loc)
-        
-        if drawGate:
-            for i in range(self.Spec2D.NGates-1):
-                #print(i)
-                if len(self.Spec2D.gates[i].x)>0:
-                    self.drawGates(i)
+        if drawGate > -1:
+            ##for i in range(self.Spec2D.NGates-1):
+            #print(i)
+            if len(self.Spec2D.gates[drawGate].x)>0:
+                self.drawGates(drawGate)
 
         self.updateSlider()
         self.fig.canvas.draw()
@@ -615,16 +615,17 @@ class SpectrumCanvas(FigureCanvas):
             self.a.plot(x,y, 'r-')
             self.fig.canvas.draw()
             self.Spec2D.NGates = self.Spec2D.NGates+1
-            self.Spec2D.gates[0].setGate(x,y)
-            ##        print(self.Spec2D.gate)
-        
+            ig = self.Spec2D.GateIndex
+            self.Spec2D.gates[ig].setGate(x,y)
+                    
             ## Send the gate over to c++
-            self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gates[0].x,self.Spec2D.gates[0].y)
+            self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gates[ig].name,
+                                     self.Spec2D.gates[ig].x,self.Spec2D.gates[ig].y)
 
     def drawGates(self, i):
         x = self.Spec2D.gates[i].x
         y = self.Spec2D.gates[i].y
-        self.a.plot(x,y,'r-')
+        self.a.plot(x,y,color="C{}".format(i))
         
     def getSingle(self,color="red"):
         clicks = self.fig.ginput(2)

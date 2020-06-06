@@ -349,11 +349,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #for i in range(NGates):
             #    subitem = QtWidgets.QTreeWidgetItem(item, ["Gate {}".format(i)])
             #    subitem.spec = spec.gate
+            count = 0
             for gObj in gates:
                 subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
-                subitem.spec = spec.gates
-#                print(gObj.name)
-            self.treeWidget.addTopLevelItem(item)
+                subitem.index = count
+                count = count+1
+                self.treeWidget.addTopLevelItem(item)
 
         self.treeWidget.expandAll()
            
@@ -363,12 +364,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         allitems = self.treeWidget.selectedItems()
         ##print("Old item: ",allitems[0])
         ##print("Selected: ",allitems)
+        ##print("Parent: ",allitems[0].parent())
         if it.parent() is None:
-            self.SpecCanvas.setSpecIndex(allitems[0].spec.num,allitems[0].spec.is2D,False)
+            self.SpecCanvas.setSpecIndex(allitems[0].spec.num,allitems[0].spec.is2D,-1)
             if(len(allitems)>1):
                 self.SpecCanvas.setOverlayIndex(allitems[1].spec.num)
         else:
-            self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,allitems[0].parent().spec.is2D,True)
+            self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,
+                                         allitems[0].parent().spec.is2D,allitems[0].index)
 
  
     ## Build the list of scalers

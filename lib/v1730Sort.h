@@ -59,7 +59,7 @@ class EngeSort {
   bool getIsRunning(){return isRunning;}
   
   // Gate passing
-  void putGate(std::string name, p::list x, p::list y);
+  void putGate(std::string name, std::string gname, p::list x, p::list y);
   
   // For returning the old data arrays (clean this up later)
   std::vector<int>::iterator begin(){
