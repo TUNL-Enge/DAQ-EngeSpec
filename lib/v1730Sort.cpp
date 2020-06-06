@@ -18,8 +18,31 @@ std::string EngeSort::saygoodbye( ) {
 int Channels1D = 4096;
 int Channels2D = 256;
 
+// List v1730 channels used (0-15)
+IntVector channelsUsed = {0,1};
+
 // 1D Spectra
 Histogram *hDet1;
+//Histogram *hDet2;
+
+// Generalized for 16 channels. Is there a less verose way?
+/*
+std::vector<Histogram*> hists;
+for (int c : channelsUsed){
+  if (c == 0){
+    Histogram *hDet1;
+    hists.pushback{hDet1};
+  }
+  else if (c == 1){
+    Histogram *hDet2;
+    hists.pushback{hDet2};
+  }
+  else if (c == 2){
+    Histogram *hDet3;
+    hists.pushback{hDet3};
+  }
+}
+*/
 
 // Counters
 int totalCounter=0;
@@ -29,7 +52,9 @@ void EngeSort::Initialize(){
 
   //--------------------
   // 1D Histograms
+    
   hDet1 = new Histogram("Detector 1", Channels1D, 1);
+  //hDet2 = new Histogram("Detector 2", Channels1D, 1);
   
 }
 
@@ -55,15 +80,23 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 
   for(int i = 0; i<nADC; i++){
     // Define the channels
-    uint32_t dat = dADC[i] & 0xFFFF;
-    int cDet1 = (int)std::floor(dat/8.0);
+    uint32_t dat = dADC[i] & 0xFFFF; // dADC[i] now includes channel # and qlong
+    uint32_t ch = (dADC[i] & 0xFFFF0000) >> 16;
     
+    int cDet = (int)std::floor(dat/8.0);
     f_qlong << dat << std::endl;
+    
     //std::cout << i << " " << cDet1 << std::endl;
   
     // Increment 1D histograms
-    if(cDet1 > 20 && cDet1 < 4096)
-      hDet1 -> inc(cDet1);
+    if(cDet > 20 && cDet < 4096){
+      //if (ch == 0){
+      hDet1 -> inc(cDet);
+        //f_qlong << dat << std::endl;
+      //}
+      //else if (ch == 1)
+        //hDet2 -> inc(cDet);
+    }
   }
 }
 
