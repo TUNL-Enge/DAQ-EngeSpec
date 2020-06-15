@@ -188,12 +188,12 @@ class MidasThread(QThread):
                 sObj.Name = self.names[i]
                 sObj.NGates = self.NGates[i]
                 ## Fill the gate names
-                if(self.NGates[i]>0):
+                if(sObj.NGates>0):
                     gnames = self.specColl.dm.getGateNames(sObj.Name)
                     for j in range(len(gnames)):
                         gObj = GateObject()
                         gObj.name = gnames[j]
-                        sObj.gate.append(gObj)
+                        sObj.gates.append(gObj)
                                             
                 sObj.spec = np.zeros(sObj.NBins)
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum

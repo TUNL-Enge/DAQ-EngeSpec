@@ -331,11 +331,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             spec = SpecColl.spec1d[i]
             name = spec.Name
             NGates = spec.NGates
+            gates = spec.gates
             item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
-            for i in range(NGates):
-                subitem = QtWidgets.QTreeWidgetItem(item, ["Gate {}".format(i)])
-                subitem.spec = spec
+            ##
+            count = 0
+            for gObj in gates:
+                subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
+                subitem.index = count
+                count = count+1
             self.treeWidget.addTopLevelItem(item)
             
         l2d = len(SpecColl.spec2d)
@@ -354,7 +358,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
                 subitem.index = count
                 count = count+1
-                self.treeWidget.addTopLevelItem(item)
+            self.treeWidget.addTopLevelItem(item)
 
         self.treeWidget.expandAll()
            

@@ -621,7 +621,20 @@ class SpectrumCanvas(FigureCanvas):
             ## Send the gate over to c++
             self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gates[ig].name,
                                      self.Spec2D.gates[ig].x,self.Spec2D.gates[ig].y)
+        else:
+            tup = self.fig.ginput(n=2)
+            x = [i[0] for i in tup]
+            y = [i[1] for i in tup]   ## we don't need this but it helps reuse the algorithms
+            self.a.vlines(x=x, ymin=0.1, ymax=self.a.get_ylim()[1], color="red")
+            self.fig.canvas.draw()
 
+            self.Spec.NGates = self.Spec.NGates+1
+            ig = self.Spec.GateIndex
+            self.Spec.gates[ig].setGate(x, y)
+            ## Send the gate over to c++
+            self.SpecColl.dm.putGate(self.Spec.Name, self.Spec.gates[ig].name,
+                                     self.Spec.gates[ig].x, self.Spec.gates[ig].y)
+            
     def drawGates(self, i):
         x = self.Spec2D.gates[i].x
         y = self.Spec2D.gates[i].y

@@ -23,9 +23,14 @@ class Gate{
   
   void addVertex(std::vector<double> v);
   std::vector<std::vector<double>> getPoints(){return Points;}
+
+  // For 2D gates
   bool inBound(double x, double y);
   int pnpoly(double testx, double testy);
   int inGate(double x, double y);
+  // For 1D gates
+  int inGate(double x);
+
   void Print();
   void Clear();
   std::string getName(){return Name;}

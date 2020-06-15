@@ -109,7 +109,10 @@ void EngeSort::Initialize(){
   //g2d_DEvsPos1_1 = new Gate("Gate 1");
   //g2d_DEvsPos1_2 = new Gate("Gate 2");
   //g2d_DEvsPos1_3 = new Gate("Gate 3");
-    
+
+  hE -> addGate("Gate 1");
+
+  
   hDEvsPos1 -> addGate("Gate 1");
   hDEvsPos1 -> addGate("Gate 2");
   //hDEvsPos1 -> addGate(g2d_DEvsPos1_2);

@@ -181,6 +181,18 @@ int Gate::inGate(double testx, double testy){
   return c;
 }
 
+// Main gate testing function for 1D gates
+int Gate::inGate(double testx){
+
+  int c = 0;
+  // Is the gate defined?
+  if(Points.size()>0){
+    if(testx > minx && testx < maxx)
+      c=1;
+  }
+  return c;
+}
+
 //----------------------------------------------------------------------
 // SCALERS
 
