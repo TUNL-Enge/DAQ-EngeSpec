@@ -45,6 +45,8 @@ Histogram *hSiDEvsSiE;
 Histogram *hPos1_gDEvPos1_G1;
 Histogram *hPos1_gDEvPos1_G2;
 
+Histogram *hE_gE_G1;
+
 // 2D Gates on the DE vs Pos1 spectrum
 //Gate *g2d_DEvsPos1_1;
 //Gate *g2d_DEvsPos1_2;
@@ -103,18 +105,17 @@ void EngeSort::Initialize(){
   hPos1_gDEvPos1_G1 = new Histogram("Pos 1; GDEvPos1-G1", Channels1D, 1);
   hPos1_gDEvPos1_G2 = new Histogram("Pos 1; GDEvPos1-G2", Channels1D, 1);
 
-
+  hE_gE_G1 = new Histogram("E; GE-G1", Channels1D, 1);
   //--------------------
   // Gates
   //g2d_DEvsPos1_1 = new Gate("Gate 1");
   //g2d_DEvsPos1_2 = new Gate("Gate 2");
   //g2d_DEvsPos1_3 = new Gate("Gate 3");
 
-  hE -> addGate("Gate 1");
-
+  hE -> addGate("Energy Gate");
   
-  hDEvsPos1 -> addGate("Gate 1");
-  hDEvsPos1 -> addGate("Gate 2");
+  hDEvsPos1 -> addGate("Protons");
+  hDEvsPos1 -> addGate("Deuterons");
   //hDEvsPos1 -> addGate(g2d_DEvsPos1_2);
   //hDEvsPos1 -> addGate(g2d_DEvsPos1_3);
   
@@ -241,6 +242,11 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
   // The gated spectrum
   //std::cout << "gated spec" << std::endl; 
 
+  Gate &G = hE->getGate(0);
+  if(G.inGate(cE)){
+    hE_gE_G1->inc(cE);
+  }
+  
   Gate &G1 = hDEvsPos1->getGate(0);
   //G1.Print();
   if(G1.inGate(cPos1comp,cDEcomp)){

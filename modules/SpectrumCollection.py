@@ -134,7 +134,6 @@ class SpectrumCollection:
         self.midas_thread = MidasThread(self)
         self.isOnline = False
         
-
     ## Actually run the analyzer
     def startmidas(self):
         if not self.MIDASisRunning:
@@ -226,7 +225,7 @@ class MidasThread(QThread):
             scObj = ScalerObject(i)
             scObj.Name = self.sclrnames[i]
             self.specColl.sclr.append(scObj)
-
+            
         ## Connect the analyzer to MIDAS
         self.specColl.dm.connectMidasAnalyzer()
             

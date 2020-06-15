@@ -9,9 +9,9 @@
   - [X] Jiggling icons
   - [X] Scalers
   - [X] segfault on exit
-  - [ ] More than one gate per histogram
+  - [X] More than one gate per histogram
   - [ ] replace curve_fit with lmfit for fitting spectra
-  - [ ] 1D Gates
+  - [X] 1D Gates
 * Current
   - [X] Separate out sort routines
   - [X] Fix updating on 2D histograms

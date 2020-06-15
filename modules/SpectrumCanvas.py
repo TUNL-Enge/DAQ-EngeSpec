@@ -145,7 +145,7 @@ class SpectrumCanvas(FigureCanvas):
     def PlotData(self,drawGate=-1):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
-   
+        
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
@@ -176,6 +176,14 @@ class SpectrumCanvas(FigureCanvas):
         if self.SpecOverlay:
             y = self.SpecOverlay.spec
             self.a.step(x,y,'red',alpha=0.6,where='mid')
+
+
+        if drawGate > -1:
+            ##for i in range(self.Spec2D.NGates-1):
+            #print(i)
+            if len(self.Spec.gates[drawGate].x)>0:
+                self.drawGates(drawGate)
+                
         self.fig.canvas.draw()
 
     def PlotData2D(self,drawGate=-1):
@@ -249,7 +257,7 @@ class SpectrumCanvas(FigureCanvas):
             ##for i in range(self.Spec2D.NGates-1):
             #print(i)
             if len(self.Spec2D.gates[drawGate].x)>0:
-                self.drawGates(drawGate)
+                self.drawGates2D(drawGate)
 
         self.updateSlider()
         self.fig.canvas.draw()
@@ -427,7 +435,7 @@ class SpectrumCanvas(FigureCanvas):
         #x = self.fig.ginput(2)
         #print(x)
         self.getNClicks(2)
-        print(self.cydata)
+        ##print(self.cydata)
         ylow,yhigh = self.a.get_ylim()
         if self.cydata[0] == -1:
             self.cydata[0] = ylow
@@ -635,11 +643,15 @@ class SpectrumCanvas(FigureCanvas):
             self.SpecColl.dm.putGate(self.Spec.Name, self.Spec.gates[ig].name,
                                      self.Spec.gates[ig].x, self.Spec.gates[ig].y)
             
-    def drawGates(self, i):
+    def drawGates2D(self, i):
         x = self.Spec2D.gates[i].x
         y = self.Spec2D.gates[i].y
         self.a.plot(x,y,color="C{}".format(i))
-        
+
+    def drawGates(self, i):
+        x = self.Spec.gates[i].x
+        self.a.vlines(x=x,ymin=self.a.get_ylim()[0],ymax=self.a.get_ylim()[1],color="C{}".format(i))
+
     def getSingle(self,color="red"):
         clicks = self.fig.ginput(2)
         xcut = list(range(int(np.floor(clicks[0][0])),int(1+np.ceil(clicks[1][0]))))
