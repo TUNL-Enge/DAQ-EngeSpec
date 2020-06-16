@@ -178,12 +178,15 @@ class SpectrumCanvas(FigureCanvas):
             self.a.step(x,y,'red',alpha=0.6,where='mid')
 
 
-        if drawGate > -1:
-            ##for i in range(self.Spec2D.NGates-1):
-            #print(i)
+        if drawGate == -1:
+            for i in range(self.Spec.NGates):
+                #print(i)
+                if len(self.Spec.gates[i].x)>0:
+                    self.drawGates(i)
+        else:
             if len(self.Spec.gates[drawGate].x)>0:
-                self.drawGates(drawGate)
-                
+                    self.drawGates(drawGate)
+                    
         self.fig.canvas.draw()
 
     def PlotData2D(self,drawGate=-1):
@@ -253,11 +256,16 @@ class SpectrumCanvas(FigureCanvas):
         #self.lincb.remove()
         #self.lincb = False
         #self.a.set_axes_locator(self.original_loc)
-        if drawGate > -1:
-            ##for i in range(self.Spec2D.NGates-1):
-            #print(i)
+        if drawGate == -1:
+            ##for g in self.Spec2D.gates:
+            ##print("NGates = ",self.Spec2D.NGates)
+            for i in range(self.Spec2D.NGates):
+                ##print(i)
+                if len(self.Spec2D.gates[i].x)>0:
+                    self.drawGates2D(i)
+        else:
             if len(self.Spec2D.gates[drawGate].x)>0:
-                self.drawGates2D(drawGate)
+                    self.drawGates2D(drawGate)
 
         self.updateSlider()
         self.fig.canvas.draw()
@@ -622,7 +630,7 @@ class SpectrumCanvas(FigureCanvas):
             y.append(y[0])
             self.a.plot(x,y, 'r-')
             self.fig.canvas.draw()
-            self.Spec2D.NGates = self.Spec2D.NGates+1
+            ##self.Spec2D.NGates = self.Spec2D.NGates+1
             ig = self.Spec2D.GateIndex
             self.Spec2D.gates[ig].setGate(x,y)
                     
