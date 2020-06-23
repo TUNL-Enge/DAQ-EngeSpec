@@ -15,6 +15,11 @@ from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import copy
 import time
+# Victor's additional libraries:
+#import IPython.display as display
+from scipy.optimize import curve_fit as cf
+# Will's additional libraries:
+from lmfit import Model
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -145,7 +150,7 @@ class SpectrumCanvas(FigureCanvas):
     def PlotData(self,drawGate=-1):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
-        
+   
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
@@ -443,7 +448,7 @@ class SpectrumCanvas(FigureCanvas):
         #x = self.fig.ginput(2)
         #print(x)
         self.getNClicks(2)
-        ##print(self.cydata)
+        print(self.cydata)
         ylow,yhigh = self.a.get_ylim()
         if self.cydata[0] == -1:
             self.cydata[0] = ylow
@@ -698,6 +703,21 @@ class SpectrumCanvas(FigureCanvas):
         else:
             clicks = self.fig.ginput(4)
 
+    # Will's Modifications (See SpectrumCanvas_old for original):
+    #---------------------------------------------------------------------------------------------
+
+    def line(self, x, m, b):
+        return (m*x) + b
+
+    def gaussian(self, x, a, c, sig):
+        return a * np.exp(-(x-c)**2/(2.0*(sig)**2))
+
+    #def gauss_plus_line(self,x,a1,x1,sig1,m,b):
+    #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b
+
+    #def double_gauss_plus_line(self,x,a1,x1,sig1,a2,x2,sig2,m,b):
+    #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b+a2*np.exp(-(x-x2)**2/(2.0*(sig2)**2))
+    
     def netArea(self):
         if self.is2D:
             print("Not available in 2D spectra")
@@ -714,6 +734,7 @@ class SpectrumCanvas(FigureCanvas):
             bgx = bg1points[0] + bg2points[0]
             bgy = bg1points[1] + bg2points[1]
             bgfit = np.polyfit(bgx,bgy,deg=1)
+            m,b = bgfit
             bgCounts = np.polyval(bgfit,bgx)
             res = bgy-bgCounts
 
@@ -722,17 +743,24 @@ class SpectrumCanvas(FigureCanvas):
             ## Draw background line
             xplot = list(range(min(bgx),max(bgx)))
             yplot = np.poly1d(bgfit)
-            self.a.plot(xplot,yplot(xplot),"firebrick")
+            self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
             self.fig.canvas.draw()
 
             ## Find the peak position
             Chn = peakpoints[0]
+            #print(len(Chn))
+            
             Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)# - peakpoints[1]
+            #print(len(Counts))
             centroid = sum(Chn*Counts)/sum(Counts)
-            ##ucentroid = sum(Counts/((Chn-centroid)**2 *sum(Counts)))
-            ##ucentroid = np.sqrt(ucentroid/(max(Chn)-min(Chn)))
-            ucentroid = sum(Counts*(Chn-centroid)**2)/(sum(Counts)-1)
-            ucentroid = np.sqrt(ucentroid)
+            #print(centroid)
+            a1 = Counts[Chn.index(int(centroid))]
+            #print(a1)
+            sig1 = (peakpoints[0][-1] - peakpoints[0][0])/2.0
+            #ucentroid = sum(Counts/((Chn-centroid)**2 *sum(Counts)))
+            #ucentroid = np.sqrt(ucentroid/(max(Chn)-min(Chn)))
+            ucentroid = sum(Counts * (Chn - centroid)**2)/(sum(Counts) - 1)
+            ucentroid = np.sqrt(ucentroid)/np.sqrt(sum(Counts))
             
             ## Calculate the number of counts
             bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
@@ -740,25 +768,54 @@ class SpectrumCanvas(FigureCanvas):
             totalsum = sum(peakpoints[1])
             net = totalsum - bgsum
             unet = np.sqrt(net + ubgsum**2)
+            
+            self.guess = [a1,centroid,sig1,m,b]
+            
+            #Gauss Fitting
+            #Change Chn and PckPnts[1] to arrays
+            gChn = np.array(Chn)
+            gCnt = np.array(peakpoints[1])
+            self.fig.canvas.draw()
 
-
+            # Will's lmfit Modifications
+            #----------------------------------------------------
+            
+            glmod = Model(self.gaussian) + Model(self.line)
+            pars = glmod.make_params(a=self.guess[0], c=self.guess[1], sig=self.guess[2],
+                                     m=self.guess[3], b=self.guess[4])
+            result = glmod.fit(gCnt, pars, x=gChn)
+            
+            print(result.fit_report())
+            
+            #self.a.plot(gChn, result.init_fit, 'c--')
+            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
+            self.fig.canvas.draw()
+            
+            comps = result.eval_components()
+            #self.a.plot(gChn, comps['gaussian'], 'b--')
+            self.a.plot(gChn, comps['line'], 'C3--')
+            self.fig.canvas.draw()
+            
+            
+            #----------------------------------------------------
 
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
             ## rounding
             dprecis = self.getprecis(ucentroid)
             nprecis = self.getprecis(centroid)
-            print(centroid, ucentroid)
+            #print(centroid, ucentroid)
             #print(dprecis,nprecis)
             print("Peak at ",self.round_to_n(centroid,1+nprecis), "+/-",
                   self.round_to_n(ucentroid,dprecis))
             ## rounding
             dprecis = self.getprecis(unet)
             nprecis = self.getprecis(net)
-            print(net,unet)
+            #            print(net,unet)
             print("Net Area =",self.round_to_n(net,1+nprecis),"+/-",
                   self.round_to_n(unet,dprecis))
 
-            
+    #---------------------------------------------------------------------------------------------
+    
     def getprecis(self,x):
         l = np.log10(x)
         return(int(np.ceil(l)))
