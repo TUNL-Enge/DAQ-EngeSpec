@@ -23,6 +23,8 @@ conversioncommand
 *.tar.gz
 tmp
 test.dat
+Will.dat
+qlong_engespec.txt
 
 ## CMake stuff
 CMakeFiles

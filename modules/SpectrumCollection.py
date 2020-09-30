@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QThread, QTimer
 from PySide2.QtWidgets import QApplication, QFileDialog
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+##import matplotlib.pyplot as plt
 import time
 import os.path
 import pickle
@@ -288,7 +288,7 @@ class MidasCollectionThread(QThread):
             
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
+    ##import matplotlib.pyplot as plt
     SpecColl = SpectrumCollection(0)
 
     app = QApplication([])

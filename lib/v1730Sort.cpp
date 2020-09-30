@@ -23,7 +23,7 @@ IntVector channelsUsed = {0,1};
 
 // 1D Spectra
 Histogram *hDet1;
-//Histogram *hDet2;
+Histogram *hDet2;
 
 // Generalized for 16 channels. Is there a less verose way?
 /*
@@ -53,8 +53,8 @@ void EngeSort::Initialize(){
   //--------------------
   // 1D Histograms
     
-  hDet1 = new Histogram("Detector 1", Channels1D, 1);
-  //hDet2 = new Histogram("Detector 2", Channels1D, 1);
+  hDet1 = new Histogram("Detector 1", 4096, 1);
+  hDet2 = new Histogram("Detector 2", 8192, 1);
   
 }
 
