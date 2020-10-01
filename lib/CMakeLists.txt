@@ -9,7 +9,7 @@ find_package( PythonLibs 3 REQUIRED )
 include_directories( ${PYTHON_INCLUDE_DIRS} )
 MESSAGE(STATUS "Pythonlibs: " ${PYTHON_INCLUDE_DIRS})
 
-find_package( Boost COMPONENTS numpy3 REQUIRED )
+find_package( Boost COMPONENTS numpy REQUIRED)
 include_directories( ${Boost_INCLUDE_DIR} )
 MESSAGE(STATUS "Boost: " ${Boost_INCLUDE_DIR})
 
