@@ -290,6 +290,11 @@ class SpectrumCanvas(FigureCanvas):
             self.SpecColl.midas_collection_thread.start()
             time.sleep(0.5)
             
+        if self.SpecColl.MIDASLastAgg:
+            self.SpecColl.midas_collection_thread.start()
+            self.SpecColl.MIDASLastAgg = False
+            time.sleep(0.5)
+            
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
             sp.spec[:] = sp.spec_temp
@@ -655,7 +660,7 @@ class SpectrumCanvas(FigureCanvas):
             ## Send the gate over to c++
             self.SpecColl.dm.putGate(self.Spec.Name, self.Spec.gates[ig].name,
                                      self.Spec.gates[ig].x, self.Spec.gates[ig].y)
-            
+
     def drawGates2D(self, i):
         x = self.Spec2D.gates[i].x
         y = self.Spec2D.gates[i].y
@@ -664,7 +669,7 @@ class SpectrumCanvas(FigureCanvas):
     def drawGates(self, i):
         x = self.Spec.gates[i].x
         self.a.vlines(x=x,ymin=self.a.get_ylim()[0],ymax=self.a.get_ylim()[1],color="C{}".format(i))
-
+        
     def getSingle(self,color="red"):
         clicks = self.fig.ginput(2)
         xcut = list(range(int(np.floor(clicks[0][0])),int(1+np.ceil(clicks[1][0]))))
@@ -709,8 +714,9 @@ class SpectrumCanvas(FigureCanvas):
     def line(self, x, m, b):
         return (m*x) + b
 
-    def gaussian(self, x, a, c, sig):
-        return a * np.exp(-(x-c)**2/(2.0*(sig)**2))
+    def gaussian(self, x, A, c, sig):
+        #return a * np.exp(-(x-c)**2/(2.0*(sig)**2))
+        return (A / (np.sqrt(2 * np.pi) * sig)) * np.exp(-(x-c)**2/(2.0*(sig)**2))
 
     #def gauss_plus_line(self,x,a1,x1,sig1,m,b):
     #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b
@@ -743,8 +749,8 @@ class SpectrumCanvas(FigureCanvas):
             ## Draw background line
             xplot = list(range(min(bgx),max(bgx)))
             yplot = np.poly1d(bgfit)
-            self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
-            self.fig.canvas.draw()
+            #self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
+            #self.fig.canvas.draw()
 
             ## Find the peak position
             Chn = peakpoints[0]
@@ -752,13 +758,11 @@ class SpectrumCanvas(FigureCanvas):
             
             Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)# - peakpoints[1]
             #print(len(Counts))
-            centroid = sum(Chn*Counts)/sum(Counts)
+            centroid = sum(Chn*Counts/sum(Counts))
             #print(centroid)
             a1 = Counts[Chn.index(int(centroid))]
             #print(a1)
             sig1 = (peakpoints[0][-1] - peakpoints[0][0])/2.0
-            #ucentroid = sum(Counts/((Chn-centroid)**2 *sum(Counts)))
-            #ucentroid = np.sqrt(ucentroid/(max(Chn)-min(Chn)))
             ucentroid = sum(Counts * (Chn - centroid)**2)/(sum(Counts) - 1)
             ucentroid = np.sqrt(ucentroid)/np.sqrt(sum(Counts))
             
@@ -769,50 +773,79 @@ class SpectrumCanvas(FigureCanvas):
             net = totalsum - bgsum
             unet = np.sqrt(net + ubgsum**2)
             
-            self.guess = [a1,centroid,sig1,m,b]
+            #self.guess = [a1,centroid,sig1,m,b] ## Peak height as param
+            self.guess = [net,centroid,sig1,m,b] ## Net area as param
             
             #Gauss Fitting
             #Change Chn and PckPnts[1] to arrays
             gChn = np.array(Chn)
             gCnt = np.array(peakpoints[1])
-            self.fig.canvas.draw()
 
-            # Will's lmfit Modifications
-            #----------------------------------------------------
-            
+            ## lmfit
             glmod = Model(self.gaussian) + Model(self.line)
-            pars = glmod.make_params(a=self.guess[0], c=self.guess[1], sig=self.guess[2],
-                                     m=self.guess[3], b=self.guess[4])
+            #pars = glmod.make_params(a=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
+            pars = glmod.make_params(A=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
             result = glmod.fit(gCnt, pars, x=gChn)
             
-            print(result.fit_report())
+            ## Best-fit values
+            #print(result.fit_report())
+            cent = result.best_values.get('c')
+            #cent = result.params.get('c').value
+            ucent = result.params.get('c').stderr
+            sd = np.abs(result.best_values.get('sig'))
+            usd = result.params.get('sig').stderr
+            fwhm = 2 * np.sqrt(2 * np.log(2)) * sd
+            #ufwhm = fwhm / np.sqrt(2 * net)
+            ufwhm = 2 * np.sqrt(2 * np.log(2)) * usd ## Might be wrong
+            netarea = result.best_values.get('A')
+            unetarea = result.params.get('A').stderr
+            print("Cent: ", cent) # Centroid
+            print("uCent: ", ucent) # Uncertainty in centroid
+            print("SD: ", sd) # standard deviation
+            print("uSD: ", usd) # Uncertainty in standard deviation
+            #print("FWHM: ", fwhm) # FWHM
+            #print("UFWHM: ", ufwhm) # Uncertainty in FWHM
+            print("NetArea (fit): ", netarea) # Net area of peak
+            print("uNetArea (fit)", unetarea) # Uncertainty in net area
             
+            ## Plotting fits
             #self.a.plot(gChn, result.init_fit, 'c--')
-            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
+            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 5.0)
             self.fig.canvas.draw()
             
+            ## Plotting fit components
             comps = result.eval_components()
             #self.a.plot(gChn, comps['gaussian'], 'b--')
             self.a.plot(gChn, comps['line'], 'C3--')
             self.fig.canvas.draw()
-            
-            
-            #----------------------------------------------------
 
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
             ## rounding
-            dprecis = self.getprecis(ucentroid)
-            nprecis = self.getprecis(centroid)
+            dprecis = self.getprecis(ucent)
+            nprecis = self.getprecis(cent)
             #print(centroid, ucentroid)
             #print(dprecis,nprecis)
-            print("Peak at ",self.round_to_n(centroid,1+nprecis), "+/-",
-                  self.round_to_n(ucentroid,dprecis))
+            print("Peak at ",self.round_to_n(cent,1+nprecis), "+/-",
+                  self.round_to_n(ucent,dprecis))
             ## rounding
             dprecis = self.getprecis(unet)
             nprecis = self.getprecis(net)
             #            print(net,unet)
-            print("Net Area =",self.round_to_n(net,1+nprecis),"+/-",
+            print("Net Area (tot - bkg) =",self.round_to_n(net,1+nprecis),"+/-",
                   self.round_to_n(unet,dprecis))
+            
+            ## Writing (appending) centroids and FWHM to .txt file
+            '''
+            cent_fwhm_data = open(r"/home/daq/midas/online/src/v1730/CentFWHMRuns/Co60Emulator/cent_fwhm_data_Co60Emulator.txt", "a+")
+            cent_fwhm_data.write("\n")
+            fit_data = [self.round_to_n(cent,1+self.getprecis(cent)), self.round_to_n(ucent,self.getprecis(ucent)), 
+                        self.round_to_n(sd,1+self.getprecis(sd)), self.round_to_n(usd,self.getprecis(usd)), 
+                        self.round_to_n(fwhm,1+self.getprecis(fwhm)), self.round_to_n(ufwhm,self.getprecis(ufwhm)),
+                        self.round_to_n(net,1+self.getprecis(net)), self.round_to_n(unet,self.getprecis(unet))]
+            for i in range(len(fit_data)):
+                cent_fwhm_data.write("%5.2f\n" % fit_data[i])
+            cent_fwhm_data.close()
+            '''
 
     #---------------------------------------------------------------------------------------------
     

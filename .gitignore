@@ -25,6 +25,7 @@ tmp
 test.dat
 Will.dat
 qlong_engespec.txt
+*_backup*
 
 ## CMake stuff
 CMakeFiles

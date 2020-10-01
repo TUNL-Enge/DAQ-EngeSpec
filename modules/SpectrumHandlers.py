@@ -18,7 +18,7 @@ class SpectrumObject:
         self.is2D = False
         self.isLog = False
 
-        self.NBins = 2**12
+        self.NBins = 2**13
         
         self.spec = np.zeros(self.NBins)
         self.spec_temp = np.zeros(self.NBins)   ## The temporary spectrum in memory
@@ -34,8 +34,6 @@ class SpectrumObject:
         self.gates = []
         self.NGates = 0
         self.GateIndex = -1  ## -1 for no gates selected
-
-
         
     ## Load ascii file
     def LoadASCIIData(self):
@@ -92,7 +90,8 @@ class SpectrumObject2D:
         self.is2D = True
         self.isLog = False
 
-        self.NBins = 2**9
+        self.NBins = 2**10
+        
         #self.xedges = None
         #self.yedges = None
         self.xedges = np.array([x for x in range(0,self.NBins)])

@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QThread, QTimer
 from PySide2.QtWidgets import QApplication, QFileDialog
 import numpy as np
 import pandas as pd
-##import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import time
 import os.path
 import pickle
@@ -32,6 +32,7 @@ class SpectrumCollection:
         self.isRunning = False
         self.isOnline = False
         self.MIDASisRunning = False
+        self.MIDASLastAgg = False
 
         self.offlinefiles = [""]
         
@@ -133,16 +134,29 @@ class SpectrumCollection:
         self.offlinefiles = filename[0]#"run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
         self.isOnline = False
-        
+
     ## Actually run the analyzer
     def startmidas(self):
         if not self.MIDASisRunning:
             self.midas_collection_thread = MidasCollectionThread(self)
-        self.midas_thread.start()
+        if not self.midas_thread.isRunning():
+            self.midas_thread.start()
+        self.MIDASisRunning = True
         
         ##self.midas_collection_thread.start()
         if self.isOnline:
             os.system("odbedit -c start")
+            
+    def stopmidas(self):
+        print("MIDAS finished running")
+        ## Collect the last bunch of data (not working currently)
+        if self.MIDASisRunning:
+            #time.sleep(0.5)
+            if self.isOnline:
+                os.system("odbedit -c stop")
+                self.midas_collection_thread.start()
+                self.MIDASLastAgg = True
+                self.MIDASisRunning = False
         
 ## Run MIDAS in a separate thread so it doesn't lock up the GUI
 class MidasThread(QThread):
@@ -225,23 +239,23 @@ class MidasThread(QThread):
             scObj = ScalerObject(i)
             scObj.Name = self.sclrnames[i]
             self.specColl.sclr.append(scObj)
-            
+
         ## Connect the analyzer to MIDAS
         self.specColl.dm.connectMidasAnalyzer()
             
     def run(self):
         print("Running MIDAS")
-        self.specColl.MIDASisRunning = True
+        #self.specColl.MIDASisRunning = True
         self.specColl.dm.runMidasAnalyzer(self.specColl.offlinefiles)
-
+        ## Nothing executes past runMidasAnalyzer
         while self.specColl.dm.getIsRunning():
             time.sleep(1)
             
-        print("MIDAS finished running")
+        #print("MIDAS finished running")
         ## Collect the last bunch of data 
-        self.specColl.midas_collection_thread.start()
-        self.specColl.MIDASisRunning = False
-#        self.specColl.dm.connectMidasAnalyzer()
+        #self.specColl.midas_collection_thread.start()
+        #self.specColl.MIDASisRunning = False
+        #self.specColl.dm.connectMidasAnalyzer()
 
 class MidasCollectionThread(QThread):
     def __init__(self,specColl):
@@ -288,7 +302,7 @@ class MidasCollectionThread(QThread):
             
 ## Run this if this file is run alone for debugging purposes            
 if __name__ == '__main__':
-    ##import matplotlib.pyplot as plt
+    #import matplotlib.pyplot as plt
     SpecColl = SpectrumCollection(0)
 
     app = QApplication([])

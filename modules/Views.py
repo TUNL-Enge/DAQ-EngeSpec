@@ -311,9 +311,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
     def stopmidas(self):
         ##print("Stopping midas")
-        if self.SpecColl.isOnline:
-            os.system("odbedit -c stop")
-        self.MIDASisRunning = False
+        self.SpecColl.stopmidas()
+        #if self.SpecColl.isOnline:
+            #os.system("odbedit -c stop")
+        #self.MIDASisRunning = False
         
     def setgate(self):
         self.SpecCanvas.getGate()
@@ -358,7 +359,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
                 subitem.index = count
                 count = count+1
-            self.treeWidget.addTopLevelItem(item)
+                self.treeWidget.addTopLevelItem(item)
 
         self.treeWidget.expandAll()
            

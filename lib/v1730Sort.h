@@ -26,7 +26,10 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 typedef std::vector<int> IntVector;
 
-std::ofstream f_qlong;
+std::ofstream f_qlong0;
+std::ofstream f_qlong1;
+std::ofstream f_timetag0;
+std::ofstream f_timetag1;
 
 //class EngeAnalyzer: public TRootanaEventLoop {
 class EngeSort {
@@ -48,9 +51,11 @@ class EngeSort {
   np::ndarray getData2D();
 
   void sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC);
+  void sortChannels(int ch, int cDet, uint32_t dat);
   
   BoolVector getis2Ds();
   IntVector getNGates();
+  StringVector getGateNames(std::string hname);
   StringVector getSpectrumNames();
   StringVector getScalerNames();
   IntVector getScalers();
