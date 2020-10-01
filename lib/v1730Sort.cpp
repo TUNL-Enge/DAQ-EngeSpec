@@ -553,8 +553,8 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     TMBank* bTDC = event->FindBank("TDC1");
     uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
 
-    printf("V1730 Bank: Name = %s, Type = %d, Size = %d\n",&bADC->name[0],
-	   bADC->type,bADC->data_size); 
+    //    printf("V1730 Bank: Name = %s, Type = %d, Size = %d\n",&bADC->name[0],
+    //	   bADC->type,bADC->data_size); 
 
     uint64_t dat;
     dat = dADC[0] & 0xFFFF;

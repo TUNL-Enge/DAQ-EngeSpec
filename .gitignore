@@ -14,6 +14,7 @@
 *.out
 *.root
 *.mid*
+runs
 
 ## Folders we don't need
 modules/backup
