@@ -652,9 +652,12 @@ class SpectrumCanvas(FigureCanvas):
             self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gates[ig].name,
                                      self.Spec2D.gates[ig].x,self.Spec2D.gates[ig].y)
         else:
-            tup = self.fig.ginput(n=2)
-            x = [i[0] for i in tup]
-            y = [i[1] for i in tup]   ## we don't need this but it helps reuse the algorithms
+            ##tup = self.fig.ginput(n=2)
+            self.getNClicks(2)
+            x = self.cxdata
+            ##x = [i[0] for i in tup]
+            y = self.cydata
+            ##y = [i[1] for i in tup]   ## we don't need this but it helps reuse the algorithms
             self.a.vlines(x=x, ymin=0.1, ymax=self.a.get_ylim()[1], color="red")
             self.fig.canvas.draw()
 
