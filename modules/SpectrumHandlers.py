@@ -90,7 +90,7 @@ class SpectrumObject2D:
         self.is2D = True
         self.isLog = False
 
-        self.NBins = 2**10
+        self.NBins = 2**9
         
         #self.xedges = None
         #self.yedges = None

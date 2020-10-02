@@ -17,7 +17,7 @@ std::string EngeSort::saygoodbye( ) {
 
 int Channels1D = 8192;
 
-int Channels2D = 1024;
+int Channels2D = 512;
 
 //------ Settings ------
 double long_gate = 700; // in ns
@@ -145,7 +145,7 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
         }
         */
         
-        cDet = (int)std::floor(dat/8.0);
+        cDet = (int)std::floor(dat/4.0);
         
         sortChannels(ch, cDet, dat);
       
@@ -184,9 +184,9 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
             //std::cout << "Coincidence!" << std::endl;
 
             if (energy0 > 20 && energy0 < Channels1D && energy1 > 20 && energy1 < Channels1D){
-              int energy0_scaled = (int) std::floor(energy0/8.0);
-              int energy1_scaled = (int) std::floor(energy1/8.0);
-              int time_scaled = (int) std::floor(diff_scaled / 8.0);
+              int energy0_scaled = (int) std::floor(energy0/4.0);
+              int energy1_scaled = (int) std::floor(energy1/4.0);
+              int time_scaled = (int) std::floor(diff_scaled / 16.0);
               hDetEvsE -> inc(energy1_scaled, energy0_scaled); // Energy of Detector 0 vs Detector 1 (y vs x)
               hDetEvsT0 -> inc(time_scaled, energy0_scaled); // Energy of Detector 0 vs Coincidence Time
               hDetEvsT1 -> inc(time_scaled, energy1_scaled); // Energy of Detector 1 vs Coincidence Time
@@ -239,7 +239,7 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
       uint32_t dat = dADC[i] & 0xFFFF; // dADC[i] includes channel # and qlong
       uint32_t ch = (dADC[i] & 0xFFFF0000) >> 16;
       
-      int cDet = (int)std::floor(dat/8.0);
+      int cDet = (int)std::floor(dat/4.0);
         
       sortChannels(ch, cDet, dat);
     }
