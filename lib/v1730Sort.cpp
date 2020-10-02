@@ -34,9 +34,10 @@ Histogram *hDet1, *hDet2, *hDet3, *hDet4, *hDet5, *hDet6, *hDet7, *hDet8, *hDet9
 // 2D Spectra
 Histogram *hDetEvsE, *hDetEvsT0, *hDetEvsT1;
 // 1D Gated Spectra
-Histogram *hDet_gEvsT0_G1, *hDet_gEvsT0_G2, *hDet_gEvsT0_G3, *hDet_gEvsT1_G1, *hDet_gEvsT1_G2, *hDet_gEvsT1_G3;
+Histogram *hDet_gE0_G1, *hDet_gE0_G2, *hDet_gE0_G3, *hDet_gE0_G4;
+Histogram *hDet_gE1_G1, *hDet_gE1_G2, *hDet_gE1_G3, *hDet_gE1_G4;
 // 2D Gated Spectra
-Histogram *hDet_gEvsE_G1, *hDet_gEvsE_G2, *hDet_gEvsE_G3;
+Histogram *hDet_gEvsE_G1, *hDet_gEvsE_G2, *hDet_gEvsE_G3, *hDet_gEvsE_G4;
 
 // Counters
 int totalCounter=0;
@@ -90,19 +91,22 @@ void EngeSort::Initialize(){
     hDet_gEvsE_G1 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #1", Channels2D, 2);
     hDet_gEvsE_G2 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #2", Channels2D, 2);
     hDet_gEvsE_G3 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #3", Channels2D, 2);
+    hDet_gEvsE_G4 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #4", Channels2D, 2);
     
-    hDet_gEvsT0_G1 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs Coin. Time Gated on Coin. #1", Channels2D, 2);
-    hDet_gEvsT0_G2 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs Coin. Time Gated on Coin. #2", Channels2D, 2);
-    hDet_gEvsT0_G3 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") vs Coin. Time Gated on Coin. #3", Channels2D, 2);
-    
-    hDet_gEvsT1_G1 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") vs Coin. Time Gated on Coin. #1", Channels2D, 2);
-    hDet_gEvsT1_G2 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") vs Coin. Time Gated on Coin. #2", Channels2D, 2);
-    hDet_gEvsT1_G3 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") vs Coin. Time Gated on Coin. #3", Channels2D, 2);
+    hDet_gE0_G1 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") Gated on Coin. #1", Channels1D, 1);
+    hDet_gE0_G2 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") Gated on Coin. #2", Channels1D, 1);
+    hDet_gE0_G3 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") Gated on Coin. #3", Channels1D, 1);
+    hDet_gE0_G4 = new Histogram("E (Ch " + std::to_string(channelsCoin[0]) + ") Gated on Coin. #4", Channels1D, 1);
+    hDet_gE1_G1 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #1", Channels1D, 1);
+    hDet_gE1_G2 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #2", Channels1D, 1);
+    hDet_gE1_G3 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #3", Channels1D, 1);
+    hDet_gE1_G4 = new Histogram("E (Ch " + std::to_string(channelsCoin[1]) + ") Gated on Coin. #4", Channels1D, 1);
     
     // Gates    
-    hDetCoin -> addGate("Coincidence #1");
-    hDetCoin -> addGate("Coincidence #2");
-    hDetCoin -> addGate("Coincidence #3");
+    hDetCoin -> addGate("Coincidence Peak #1");
+    hDetCoin -> addGate("Coincidence Peak #2");
+    hDetCoin -> addGate("Coincidence Peak #3");
+    hDetCoin -> addGate("Coincidence Peak #4")
   }
 }
 
@@ -177,9 +181,9 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
             energy0 = prev_energy;
             energy1 = cDet;
           }
-          int diff = 2 * (timetag0 - timetag1); // in timetag units [1 unit = 2 ns]
+          int diff = 2 * (timetag0 - timetag1); // in ns [1 timetag unit = 2 ns]
           if (std::abs(diff) < long_gate){
-            int diff_scaled = ((int) std::floor(diff * 4096 / long_gate)) + 4096; // offset by 4096, scaled by long gate in timetag units
+            int diff_scaled = ((int) std::floor(diff * 4096 / long_gate)) + 4096; // offset by 4096, scaled by long gate
             hDetCoin -> inc(diff_scaled);
             //std::cout << "Coincidence!" << std::endl;
 
@@ -197,8 +201,8 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
                 std::cout << "In Gate 1" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G1 -> inc(energy1_scaled, energy0_scaled);
-                hDet_gEvsT0_G1 -> inc(time_scaled, energy0_scaled);
-                hDet_gEvsT1_G1 -> inc(time_scaled, energy1_scaled);
+                hDet_gE0_G1 -> inc(energy0_scaled);
+                hDet_gE1_G1 -> inc(energy1_scaled);
                 std::cout << "Passed Gate 1 Code" << std::endl;
               }
               Gate &G2 = hDetCoin -> getGate(1);
@@ -206,22 +210,28 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
                 std::cout << "In Gate 2" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G2 -> inc(energy1_scaled, energy0_scaled);
-                hDet_gEvsT0_G2 -> inc(time_scaled, energy0_scaled);
-                hDet_gEvsT1_G2 -> inc(time_scaled, energy1_scaled);
+                hDet_gE0_G2 -> inc(energy0_scaled);
+                hDet_gE1_G2 -> inc(energy1_scaled);
                 std::cout << "Passed Gate 2 Code" << std::endl;
               }
               Gate &G3 = hDetCoin -> getGate(2);
               if(G3.inGate(diff_scaled)){
                 std::cout << "In Gate 3" << std::endl;
                 gateCounter++;
-                // Segmentation fault occurs when incrementing the gated histograms
                 hDet_gEvsE_G3 -> inc(energy1_scaled, energy0_scaled);
-                std::cout << "Test 1" << std::endl;
-                hDet_gEvsT0_G3 -> inc(time_scaled, energy0_scaled);
-                std::cout << "Test 2" << std::endl;
-                hDet_gEvsT1_G3 -> inc(time_scaled, energy1_scaled);
+                hDet_gE0_G3 -> inc(energy0_scaled);
+                hDet_gE1_G3 -> inc(energy1_scaled);
                 std::cout << "Passed Gate 3 Code" << std::endl;
               }
+              Gate &G4 = hDetCoin -> getGate(3);
+              if(G4.inGate(diff_scaled)){
+                std::cout << "In Gate 4" << std::endl;
+                gateCounter++;
+                hDet_gEvsE_G4 -> inc(energy1_scaled, energy0_scaled);
+                hDet_gE0_G4 -> inc(energy0_scaled);
+                hDet_gE1_G4 -> inc(energy1_scaled);
+                std::cout << "Passed Gate 4 Code" << std::endl;
+              }              
             }
           }
         }
