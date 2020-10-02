@@ -106,7 +106,7 @@ void EngeSort::Initialize(){
     hDetCoin -> addGate("Coincidence Peak #1");
     hDetCoin -> addGate("Coincidence Peak #2");
     hDetCoin -> addGate("Coincidence Peak #3");
-    hDetCoin -> addGate("Coincidence Peak #4")
+    hDetCoin -> addGate("Coincidence Peak #4");
   }
 }
 
