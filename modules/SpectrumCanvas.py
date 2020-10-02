@@ -400,6 +400,7 @@ class SpectrumCanvas(FigureCanvas):
         global ix, iy
         ix = event.xdata
         iy = event.ydata
+        
         if ix is not None:
             #print('x = %f' %(ix))
             self.cxdata.append(ix) 
@@ -412,8 +413,8 @@ class SpectrumCanvas(FigureCanvas):
         else:
             #print('in margin')
             self.cydata.append(-1)       
-            
-        if self.NClicks == 0:
+
+        if self.NClicks == 0 or event.button == 3:
             #print("disconnecting clicker")
             self.fc.mpl_disconnect(self,cid)
             self.fc.stop_event_loop(self)
@@ -551,10 +552,10 @@ class SpectrumCanvas(FigureCanvas):
 
         self.fig.canvas.draw()
 
-    def getClicks(self,n=1):
-        print("Click ",n," times\n")
-        x = self.fig.ginput(n)
-        print(x)
+#    def getClicks(self,n=1):
+#        print("Click ",n," times\n")
+#        x = self.fig.ginput(n)
+#        print(x)
 
     def setupSlider(self,scroll):
         self.scroll = scroll
@@ -633,10 +634,13 @@ class SpectrumCanvas(FigureCanvas):
         
     def getGate(self):
         if self.is2D:
-            tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
-            x = [i[0] for i in tup]
+            ##tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
+            self.getNClicks(-1)
+            #x = [i[0] for i in tup]
+            x = self.cxdata
             x.append(x[0])
-            y = [i[1] for i in tup]
+            #y = [i[1] for i in tup]
+            y = self.cydata
             y.append(y[0])
             self.a.plot(x,y, 'r-')
             self.fig.canvas.draw()
@@ -671,8 +675,10 @@ class SpectrumCanvas(FigureCanvas):
         self.a.vlines(x=x,ymin=self.a.get_ylim()[0],ymax=self.a.get_ylim()[1],color="C{}".format(i))
         
     def getSingle(self,color="red"):
-        clicks = self.fig.ginput(2)
-        xcut = list(range(int(np.floor(clicks[0][0])),int(1+np.ceil(clicks[1][0]))))
+        ##clicks = self.fig.ginput(2)
+        self.getNClicks(2)
+        clicks = self.cxdata
+        xcut = list(range(int(np.floor(clicks[0])),int(1+np.ceil(clicks[1]))))
         ##print(xcut)
         ##print(self.Spec.spec)
         ##        ycut = list(self.Spec.spec[xcut])
@@ -706,7 +712,10 @@ class SpectrumCanvas(FigureCanvas):
             print("Area = ", self.round_to_n(area,nprecis), " +/- ",
                   self.round_to_n(darea,dprecis))
         else:
-            clicks = self.fig.ginput(4)
+            ##clicks = self.fig.ginput(4)
+            self.getNClicks(4)
+            clicks = self.cxdata
+            
 
     # Will's Modifications (See SpectrumCanvas_old for original):
     #---------------------------------------------------------------------------------------------
