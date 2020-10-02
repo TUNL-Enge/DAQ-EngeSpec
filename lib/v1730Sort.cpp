@@ -201,8 +201,8 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
                 std::cout << "In Gate 1" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G1 -> inc(energy1_scaled, energy0_scaled);
-                hDet_gE0_G1 -> inc(energy0_scaled);
-                hDet_gE1_G1 -> inc(energy1_scaled);
+                hDet_gE0_G1 -> inc(energy0);
+                hDet_gE1_G1 -> inc(energy1);
                 std::cout << "Passed Gate 1 Code" << std::endl;
               }
               Gate &G2 = hDetCoin -> getGate(1);
@@ -210,8 +210,8 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
                 std::cout << "In Gate 2" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G2 -> inc(energy1_scaled, energy0_scaled);
-                hDet_gE0_G2 -> inc(energy0_scaled);
-                hDet_gE1_G2 -> inc(energy1_scaled);
+                hDet_gE0_G2 -> inc(energy0);
+                hDet_gE1_G2 -> inc(energy1);
                 std::cout << "Passed Gate 2 Code" << std::endl;
               }
               Gate &G3 = hDetCoin -> getGate(2);
