@@ -203,7 +203,10 @@ class SpectrumCanvas(FigureCanvas):
         H = self.Spec2D.spec2d.T
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
+        #print(ye)
         X, Y = np.meshgrid(xe,ye)
+        #print(X)
+        #print(Y)
         
         x = xe[xe>xmin]# & xe<xmax]
         x = x[x<xmax].astype(int)
@@ -217,18 +220,18 @@ class SpectrumCanvas(FigureCanvas):
         else:
             Hmax = self.Spec2D.zmax
         #Hmax = self.Spec2D.zmax
-        Nc = 256
-        cbreak = np.zeros(Nc)
+        Nc = 255
+        cbreak = np.zeros(Nc+1)
         if not self.Spec2D.isLog:
             cbreak[1] = 1.0
-            for i in range(1,Nc-1):
-                cbreak[i+1] = i* Hmax/(Nc-2)
+            for i in range(1,Nc):
+                cbreak[i+1] = 1+i* Hmax/(Nc-1)
         else:
             cbreak[1] = 0
-            for i in range(1,Nc-1):
-                cbreak[i+1] = i* np.log10(Hmax)/(Nc-2)
+            for i in range(1,Nc):
+                cbreak[i+1] = i* np.log10(Hmax)/(Nc-1)
             cbreak = 10**(cbreak)
-            cbreak[0]=0
+            cbreak[0]=0.1
 
         norm = BoundaryNorm(cbreak,Nc)
         
@@ -241,7 +244,10 @@ class SpectrumCanvas(FigureCanvas):
 
         self.a.format_coord = format_coord
         self.a.clear()
-        self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
+        ##self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
+        
+        ##self.image = self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols)
+        self.image = self.a.pcolormesh(H, norm = norm, cmap=self.cols)
         if self.lincb:
             self.lincb.update_normal(self.image)
         else:
