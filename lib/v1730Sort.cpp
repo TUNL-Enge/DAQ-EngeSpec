@@ -16,17 +16,19 @@ std::string EngeSort::saygoodbye( ) {
 }
 
 int Channels1D = 8192;
-
 int Channels2D = 512;
 
 //------ Settings ------
-double long_gate = 700; // in ns
-
 // List v1730 channels used (0-15)
-// Eventually enable histogams based directly on which channels are enabled from fev1730-DPP.cxx
-IntVector channelsUsed = {0,1}; //,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-IntVector channelsCoin = {0,1}; // channels used for coincidence
+// [Eventually enable histogams based directly on which channels are enabled from fev1730-DPP.cxx]
+IntVector channelsUsed = {0,1}; //{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+// Enabling coincidence spectra?
 bool coincidences = true;
+// Channels used for coincidence
+IntVector channelsCoin = {0,1};
+// Scaling down coin. time scale (for E vs t histograms) by this factor
+// Scale --> timeScale * 2 ns per bin [timeScale min = 1 (best resolution), max = 16]
+int timeScale = 1;
 //----------------------
 
 // 1D Spectra
@@ -139,33 +141,14 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
         // Define the channels
         dat = dADC[i] & 0xFFFF; // dADC[i] includes channel # and qlong
         ch = (dADC[i] & 0xFFFF0000) >> 16;
-      
-        /*
-        if (ch == channelsCoin[0]){
-          f_qlong0 << dat << std::endl;
-        }
-        else if (ch == channelsCoin[1]){
-          f_qlong1 << dat << std::endl;    
-        }
-        */
-        
         cDet = (int)std::floor(dat/4.0);
         
-        sortChannels(ch, cDet, dat);
+        sortChannels(ch, cDet);
       
       }
       // Timetags are odd midas counts
       else{
         timetag = dADC[i];
-        
-        /*
-        if (ch == channelsCoin[0]){
-          f_timetag0 << timetag << std::endl;
-        }
-        else if (ch == channelsCoin[1]){
-          f_timetag1 << timetag << std::endl;
-        }
-        */
         
         // Coincidence must be between two consecutive, different channels
         if (prev_ch != ch){
@@ -181,56 +164,56 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
             energy0 = prev_energy;
             energy1 = cDet;
           }
-          int diff = 2 * (timetag0 - timetag1); // in ns [1 timetag unit = 2 ns]
-          if (std::abs(diff) < long_gate){
-            int diff_scaled = ((int) std::floor(diff * 4096 / long_gate)) + 4096; // offset by 4096, scaled by long gate
-            hDetCoin -> inc(diff_scaled);
+          int diff = timetag0 - timetag1; // in timetag units [1 unit = 2 ns]
+          if (std::abs(diff) < Channels1D / 2){
+            int diff_offset = diff + (Channels1D / 2);
+            hDetCoin -> inc(diff_offset);
             //std::cout << "Coincidence!" << std::endl;
 
             if (energy0 > 20 && energy0 < Channels1D && energy1 > 20 && energy1 < Channels1D){
               int energy0_scaled = (int) std::floor(energy0/4.0);
               int energy1_scaled = (int) std::floor(energy1/4.0);
-              int time_scaled = (int) std::floor(diff_scaled / 16.0);
-              hDetEvsE -> inc(energy1_scaled, energy0_scaled); // Energy of Detector 0 vs Detector 1 (y vs x)
-              hDetEvsT0 -> inc(time_scaled, energy0_scaled); // Energy of Detector 0 vs Coincidence Time
-              hDetEvsT1 -> inc(time_scaled, energy1_scaled); // Energy of Detector 1 vs Coincidence Time
+              // Cut off the outer-edges of the coin. time range with center at 256. Adjust scaling by timeScale setting
+              int diff_scaled = ((diff_offset - (Channels1D / 2)) / timeScale) + (Channels2D / 2);
+              // Energy of Detector 0 vs Detector 1 (y vs x)
+              hDetEvsE -> inc(energy1_scaled, energy0_scaled);
+              // Energy of Detector 0 vs Coincidence Time
+              hDetEvsT0 -> inc(time_scaled, energy0_scaled);
+              // Energy of Detector 1 vs Coincidence Time
+              hDetEvsT1 -> inc(time_scaled, energy1_scaled);
               
               // Gates
               Gate &G1 = hDetCoin -> getGate(0);
-              if(G1.inGate(diff_scaled)){
-                std::cout << "In Gate 1" << std::endl;
+              if(G1.inGate(diff_offset)){
+                //std::cout << "In Gate 1" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G1 -> inc(energy1_scaled, energy0_scaled);
                 hDet_gE0_G1 -> inc(energy0);
                 hDet_gE1_G1 -> inc(energy1);
-                std::cout << "Passed Gate 1 Code" << std::endl;
               }
               Gate &G2 = hDetCoin -> getGate(1);
-              if(G2.inGate(diff_scaled)){
-                std::cout << "In Gate 2" << std::endl;
+              if(G2.inGate(diff_offset)){
+                //std::cout << "In Gate 2" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G2 -> inc(energy1_scaled, energy0_scaled);
                 hDet_gE0_G2 -> inc(energy0);
                 hDet_gE1_G2 -> inc(energy1);
-                std::cout << "Passed Gate 2 Code" << std::endl;
               }
               Gate &G3 = hDetCoin -> getGate(2);
-              if(G3.inGate(diff_scaled)){
-                std::cout << "In Gate 3" << std::endl;
+              if(G3.inGate(diff_offset)){
+                //std::cout << "In Gate 3" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G3 -> inc(energy1_scaled, energy0_scaled);
                 hDet_gE0_G3 -> inc(energy0);
                 hDet_gE1_G3 -> inc(energy1);
-                std::cout << "Passed Gate 3 Code" << std::endl;
               }
               Gate &G4 = hDetCoin -> getGate(3);
-              if(G4.inGate(diff_scaled)){
-                std::cout << "In Gate 4" << std::endl;
+              if(G4.inGate(diff_offset)){
+                //std::cout << "In Gate 4" << std::endl;
                 gateCounter++;
                 hDet_gEvsE_G4 -> inc(energy1_scaled, energy0_scaled);
                 hDet_gE0_G4 -> inc(energy0);
                 hDet_gE1_G4 -> inc(energy1);
-                std::cout << "Passed Gate 4 Code" << std::endl;
               }              
             }
           }
@@ -248,26 +231,21 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
       // Define the channels
       uint32_t dat = dADC[i] & 0xFFFF; // dADC[i] includes channel # and qlong
       uint32_t ch = (dADC[i] & 0xFFFF0000) >> 16;
-      
       int cDet = (int)std::floor(dat/4.0);
         
-      sortChannels(ch, cDet, dat);
+      sortChannels(ch, cDet);
     }
   }
 }
 //======================================================================
-void EngeSort::sortChannels(int ch, int cDet, uint32_t dat){
+void EngeSort::sortChannels(int ch, int cDet){
     
   // Increment 1D histograms
   if (cDet > 20 && cDet < Channels1D){
-    if (ch == 0){
+    if (ch == 0)
       hDet1 -> inc(cDet);
-      //f_qlong0 << dat << std::endl;
-    }
-    else if (ch == 1){
+    else if (ch == 1)
       hDet2 -> inc(cDet);
-      //f_qlong1 << dat << std::endl;
-    }
     else if (ch == 2)
       hDet3 -> inc(cDet);
     else if (ch == 3)
@@ -609,22 +587,11 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
   fRunEventCounter = 0;
-  
-  //f_qlong0.open("/home/daq/midas/online/src/v1730/Coincidences/2NaIDetectors/qlong0_Eu152_10min.txt");
-  //f_qlong1.open("/home/daq/midas/online/src/v1730/Coincidences/2NaIDetectors/qlong1_Eu152_10min.txt");
-  //f_timetag0.open("/home/daq/midas/online/src/v1730/Coincidences/2NaIDetectors/timetag0_Eu152_10min.txt");
-  //f_timetag1.open("/home/daq/midas/online/src/v1730/Coincidences/2NaIDetectors/timetag1_Eu152_10min.txt");
-  
 }
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
   std::cout << "Total counts: " << totalCounter << "   Gated counts: " << gateCounter << std::endl;
-  
-  //f_qlong0.close();
-  //f_qlong1.close();
-  //f_timetag0.close();
-  //f_timetag1.close();
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
