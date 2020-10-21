@@ -178,9 +178,9 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
               // Energy of Detector 0 vs Detector 1 (y vs x)
               hDetEvsE -> inc(energy1_scaled, energy0_scaled);
               // Energy of Detector 0 vs Coincidence Time
-              hDetEvsT0 -> inc(time_scaled, energy0_scaled);
+              hDetEvsT0 -> inc(diff_scaled, energy0_scaled);
               // Energy of Detector 1 vs Coincidence Time
-              hDetEvsT1 -> inc(time_scaled, energy1_scaled);
+              hDetEvsT1 -> inc(diff_scaled, energy1_scaled);
               
               // Gates
               Gate &G1 = hDetCoin -> getGate(0);
