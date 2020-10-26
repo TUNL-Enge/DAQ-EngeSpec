@@ -18,6 +18,8 @@ from queue import Queue
 ##spec =
 app = QApplication([])
 
+## Here is a new comment
+
 ## Load and initialize a collection of spectra 
 SpecColl = SpectrumCollection(0)
 
