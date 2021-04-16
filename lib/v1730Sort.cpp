@@ -112,7 +112,7 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 
   totalCounter++;
 
-  //  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
+ //  double ADCsize = sizeof(dADC)/sizeof(dADC[0]);
   //  double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
   // std::cout << ADCsize << "  " << TDCsize << std::endl;
   
