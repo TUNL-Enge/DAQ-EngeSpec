@@ -5,13 +5,13 @@ set (CMAKE_CXX_STANDARD 11)
 project( BoostPythonMakeData )
  
 # Find necessary packages
-find_package( PythonInterp 3 REQUIRED )
+#find_package( PythonInterp 3 REQUIRED )
 find_package( PythonLibs 3 REQUIRED )
 #set(PYTHON_LIBRARIES /opt/anaconda3/lib/libpython3.7m.so)
 include_directories( ${PYTHON_INCLUDE_DIRS} )
 MESSAGE(STATUS "Pythonlibs: " ${PYTHON_INCLUDE_DIRS})
 
-find_package( Boost COMPONENTS numpy REQUIRED )
+find_package( Boost COMPONENTS numpy3 REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 MESSAGE(STATUS "Boost: " ${Boost_INCLUDE_DIR})
 
@@ -31,9 +31,11 @@ link_directories( ${ROOTANASYS}/lib )
 MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 
 ##find_package(Boost REQUIRED COMPONENTS numpy)
-<<<<<<< Updated upstream
+
+LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
 
 #include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/lib )
+
 # Define the general Enge analyzer library
 add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 
@@ -45,21 +47,9 @@ add_library( v1730Sort SHARED v1730Sort.cpp)
 
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a ) 
+#-lrt )
 
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  )
  
-# Build our library
-add_library( MakeData SHARED MakeData.cpp )
-add_library( EngeAnalyzer SHARED EngeAnalyzer.cpp)
-
- 
-# Define the wrapper library that wraps our library
-add_library( libMakeData SHARED MakeDatalib.cpp )
-add_library( libEngeAnalyzer SHARED EngeAnalyzerlib.cpp )
-target_link_libraries( libMakeData ${Boost_LIBRARIES} MakeData )
-target_link_libraries( libEngeAnalyzer ${Boost_LIBRARIES} EngeAnalyzer
-  librootana.a ${ROOT_LIBRARIES}  libmidas.a )
-
-

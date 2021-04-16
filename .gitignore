@@ -1,5 +1,6 @@
 ## Libraries, backup, images
 *.so
+*.dylib
 *.pyc
 *.png
 *.bak
