@@ -1,4 +1,6 @@
 cmake_minimum_required( VERSION 2.8 )
+
+set (CMAKE_CXX_STANDARD 11)
  
 project( BoostPythonMakeData )
  
@@ -29,6 +31,7 @@ link_directories( ${ROOTANASYS}/lib )
 MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 
 ##find_package(Boost REQUIRED COMPONENTS numpy)
+<<<<<<< Updated upstream
 
 #include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 # Define the general Enge analyzer library
@@ -46,7 +49,17 @@ target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer
 
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+ 
+# Build our library
+add_library( MakeData SHARED MakeData.cpp )
+add_library( EngeAnalyzer SHARED EngeAnalyzer.cpp)
 
-# don't prepend wrapper library name with lib
-# set_target_properties( EngeSort PROPERTIES PREFIX "../" )
+ 
+# Define the wrapper library that wraps our library
+add_library( libMakeData SHARED MakeDatalib.cpp )
+add_library( libEngeAnalyzer SHARED EngeAnalyzerlib.cpp )
+target_link_libraries( libMakeData ${Boost_LIBRARIES} MakeData )
+target_link_libraries( libEngeAnalyzer ${Boost_LIBRARIES} EngeAnalyzer
+  librootana.a ${ROOT_LIBRARIES}  libmidas.a )
+
 
