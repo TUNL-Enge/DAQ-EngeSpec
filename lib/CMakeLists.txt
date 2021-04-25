@@ -50,12 +50,12 @@ add_library( MDPPSort SHARED MDPPSort.cpp)
 
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a ) 
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt ) 
 #-lrt )
 
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  )
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
 
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a  )
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
  
