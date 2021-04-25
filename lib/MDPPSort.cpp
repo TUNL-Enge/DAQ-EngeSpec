@@ -111,12 +111,12 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     // ERROR: Channels 1-16 are energy readings
     //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
    
-    if chn <= 15{
-    dADC[chn] = signal;
-      }
-    else if chn > 15{
-	dTDC[chn-16] = signal
-      }
+    if(chn <= 15){
+      dADC[chn] = signal;
+    }
+    else if(chn > 15){
+      dTDC[chn-16] = signal;
+    }
   }
 
 
