@@ -104,23 +104,58 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   */
   int dADC[16] = {0};   // stores energies
   int dTDC[16] = {0};   // stores times
+  
   for(int i = 0; i < nMDPP; i++){
     int signal = dMDPP[i] & 0xFFFF;    // either time or energy
     int chn = (dMDPP[i] >> 16) & 0x1F;
     // ERROR: Channels 1-16 are energy readings
     //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
+   
+    if chn <= 15{
     dADC[chn] = signal;
-    // if chn > 16
-    // dTDC[chn-16] = signal
+      }
+    else if chn > 15{
+	dTDC[chn-16] = signal
+      }
   }
+
 
 
   // Define the channels
   int cDet1 = dADC[0];
   int cDet2 = dADC[1];
+  int cDet3 = dADC[2];
+  int cDet4 = dADC[3];
+  int cDet5 = dADC[4];
+  int cDet6 = dADC[5];
+  int cDet7 = dADC[6];
+  int cDet8 = dADC[7]; 
+  int cDet9 = dADC[8];
+  int cDet10 = dADC[9];
+  int cDet11 = dADC[10];
+  int cDet12 = dADC[11];
+  int cDet13 = dADC[12];
+  int cDet14 = dADC[13];
+  int cDet15 = dADC[14];
+  int cDet16 = dADC[15]; 
 
-  int cTDC_Det1 = dTDC[2];
-  int cTDC_Det2 = dTDC[3];
+
+  int cTDC_Det1 = dTDC[0];
+  int cTDC_Det2 = dTDC[1];
+  int cTDC_Det3 = dTDC[2];
+  int cTDC_Det4 = dTDC[3];
+  int cTDC_Det5 = dTDC[4];
+  int cTDC_Det6 = dTDC[5];
+  int cTDC_Det7 = dTDC[6];
+  int cTDC_Det8 = dTDC[7]; 
+  int cTDC_Det9 = dTDC[8];
+  int cTDC_Det10 = dTDC[9];
+  int cTDC_Det11 = dTDC[10];
+  int cTDC_Det12 = dTDC[11];
+  int cTDC_Det13 = dTDC[12];
+  int cTDC_Det14 = dTDC[13];
+  int cTDC_Det15 = dTDC[14];
+  int cTDC_Det16 = dTDC[15]; 
 
 
 
