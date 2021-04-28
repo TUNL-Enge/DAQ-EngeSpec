@@ -18,6 +18,9 @@ std::string EngeSort::saygoodbye( ) {
 int Channels1D = 8192;
 int Channels2D = 512;
 
+int comp1d = 8;   // The amount of compression to apply to
+		  // measurements so they fit in the spectra
+
 // 1D Spectra
 Histogram *hDet1;
 Histogram *hDet2;
@@ -99,6 +102,9 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
   */
 
+  // Cade: here's an example
+  std::cout << "nMDPP = " << nMDPP << "\n";
+  
   /* 
      Here is where the raw data gets split into voltage and timing information
   */
@@ -110,6 +116,8 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     int chn = (dMDPP[i] >> 16) & 0x1F;
     // ERROR: Channels 1-16 are energy readings
     //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
+    std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
+	      << "\n";
    
     if(chn <= 15){
       dADC[chn] = signal;
@@ -119,13 +127,13 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     }
   }
 
-
+  std::cout << "Assigned data to channels\n";
 
   // Define the channels
-  int cDet1 = dADC[0];
-  int cDet2 = dADC[1];
-  int cDet3 = dADC[2];
-  int cDet4 = dADC[3];
+  int cDet1 = (int)std::round(dADC[0]/comp1d);
+  int cDet2 = (int)std::round(dADC[1]/comp1d);
+  /* int cDet3 = dADC[2];
+   int cDet4 = dADC[3];
   int cDet5 = dADC[4];
   int cDet6 = dADC[5];
   int cDet7 = dADC[6];
@@ -137,12 +145,13 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int cDet13 = dADC[12];
   int cDet14 = dADC[13];
   int cDet15 = dADC[14];
-  int cDet16 = dADC[15]; 
+  int cDet16 = dADC[15];
+  */
 
 
-  int cTDC_Det1 = dTDC[0];
-  int cTDC_Det2 = dTDC[1];
-  int cTDC_Det3 = dTDC[2];
+  int cTDC_Det1 = (int)std::round(dTDC[0]/comp1d);
+  int cTDC_Det2 = (int)std::round(dTDC[1]/comp1d);
+  /* int cTDC_Det3 = dTDC[2];
   int cTDC_Det4 = dTDC[3];
   int cTDC_Det5 = dTDC[4];
   int cTDC_Det6 = dTDC[5];
@@ -155,9 +164,10 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int cTDC_Det13 = dTDC[12];
   int cTDC_Det14 = dTDC[13];
   int cTDC_Det15 = dTDC[14];
-  int cTDC_Det16 = dTDC[15]; 
+  int cTDC_Det16 = dTDC[15]; */
 
-
+  // Below this point only deal in 'c' values, which are the
+  // compressed values
 
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
@@ -480,7 +490,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     // Get the size
     int nMDPP = (bMDPP->data_size - 2)/4;
     
-    //  std::cout << "ADC Size: " << bADC->data_size << std::endl;
+    std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
   
     fRunEventCounter++;
     fModule->fTotalEventCounter++;

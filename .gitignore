@@ -16,6 +16,7 @@
 *.root
 *.mid*
 runs
+*.log
 
 ## Folders we don't need
 modules/backup
