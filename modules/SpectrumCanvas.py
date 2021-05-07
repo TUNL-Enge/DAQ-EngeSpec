@@ -341,7 +341,8 @@ class SpectrumCanvas(FigureCanvas):
             x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
             y_rebin = np.zeros(len(x_rebin))
             for i in range(len(x_rebin)):
-                y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+                #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+                y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
 
             
             self.a.clear()
