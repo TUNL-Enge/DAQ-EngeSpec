@@ -35,6 +35,10 @@ class SpectrumCanvas(FigureCanvas):
         self.SpecOverlay = 0
         self.Spec2D = SpecColl.spec2d[self.sindex2d]
         self.is2D = False
+
+        ## Settings
+        self.autobin = True
+        self.dots = False
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
@@ -168,23 +172,31 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec.yzoom[0]
         ymax = self.Spec.yzoom[1]
 
-        ## Auto rebin.
-        ## The principle, here, is to plot a maximum of
-        ## nBinMax bins, so rebin the data to fit
-        nBinMax = 1000
-        byBin = round((xmax-xmin)/1000)
-        print("auto binning by: ",byBin)
-        x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-        y_rebin = np.zeros(len(x_rebin))
-        for i in range(len(x_rebin)):
-            #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-            y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
+        if self.autobin:
+            ## Auto rebin.
+            ## The principle, here, is to plot a maximum of
+            ## nBinMax bins, so rebin the data to fit
+            nBinMax = 1000
+            byBin = round((xmax-xmin)/1000)
+            print("auto binning by: ",byBin)
+            x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
+            y_rebin = np.zeros(len(x_rebin))
+            for i in range(len(x_rebin)):
+                #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+                y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
+        else:
+            x_rebin = x
+            y_rebin = y
 
         
         self.a.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
         self.a.clear()
-        self.a.step(x_rebin,y_rebin,'k',where='mid')
-        #self.a.step(x,y,'k',where='mid')
+        if not self.dots:
+            self.a.step(x_rebin,y_rebin,'k',where='mid')
+            #self.a.step(x,y,'k',where='mid')
+        else:
+            self.a.plot(x_rebin, y_rebin, 'k+')
+            
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
         if self.Spec.isLog:
@@ -332,21 +344,29 @@ class SpectrumCanvas(FigureCanvas):
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
 
-            ## Auto rebin.
-            ## The principle, here, is to plot a maximum of
-            ## nBinMax bins, so rebin the data to fit
-            nBinMax = 1000
-            byBin = round((xmax-xmin)/1000)
-            print(byBin)
-            x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-            y_rebin = np.zeros(len(x_rebin))
-            for i in range(len(x_rebin)):
-                #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-                y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-
+            if self.autobin:
+                ## Auto rebin.
+                ## The principle, here, is to plot a maximum of
+                ## nBinMax bins, so rebin the data to fit
+                nBinMax = 1000
+                byBin = round((xmax-xmin)/1000)
+                print("auto binning by: ",byBin)
+                x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
+                y_rebin = np.zeros(len(x_rebin))
+                for i in range(len(x_rebin)):
+                    #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+                    y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
+            else:
+                x_rebin = x
+                y_rebin = y
             
             self.a.clear()
-            self.a.step(x_rebin,y_rebin,'k',where='mid')
+            if not self.dots:
+                self.a.step(x_rebin,y_rebin,'k',where='mid')
+                #self.a.step(x,y,'k',where='mid')
+            else:
+                self.a.plot(x_rebin, y_rebin, 'k+')
+                #            self.a.step(x_rebin,y_rebin,'k',where='mid')
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
             

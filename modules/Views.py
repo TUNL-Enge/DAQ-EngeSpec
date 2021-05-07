@@ -194,7 +194,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self, "About",
                           """This is EngeSpec!"""
         )
-        
+
+    ##--------------------------------------------------
+    ## Settings
+    def setting_autobin(self):
+        if self.SpecCanvas.autobin:
+            self.SpecCanvas.autobin=False
+        else:
+            self.SpecCanvas.autobin=True
+
+    def setting_dots(self):
+        if self.SpecCanvas.dots:
+            self.SpecCanvas.dots=False
+        else:
+            self.SpecCanvas.dots=True
+
+    ## --------------------------------------------------
     ## Function to write to the command editor
     def append_text(self, text, col=None):
         if col:
@@ -236,6 +251,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
            QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
+        ## -----
+        ## Settings Menu
+        self.settings_menu = QtWidgets.QMenu('&Settings', self)
+        self.menuBar().addSeparator()
+        self.menuBar().addMenu(self.settings_menu)
+        autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
+        autobinAction.setCheckable(True)
+        autobinAction.setChecked(True)
+        autobinAction.triggered.connect(self.setting_autobin)
+        self.settings_menu.addAction(autobinAction)
+        
+        dotsAction = QtWidgets.QAction('&dots',self.settings_menu)
+        dotsAction.setCheckable(True)
+        dotsAction.setChecked(False)
+        dotsAction.triggered.connect(self.setting_dots)
+        self.settings_menu.addAction(dotsAction)
+        
         ## -----
         ## Help Menu
         self.help_menu = QtWidgets.QMenu('&Help', self)
