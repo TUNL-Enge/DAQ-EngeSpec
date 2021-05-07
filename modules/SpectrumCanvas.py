@@ -173,11 +173,12 @@ class SpectrumCanvas(FigureCanvas):
         ## nBinMax bins, so rebin the data to fit
         nBinMax = 1000
         byBin = round((xmax-xmin)/1000)
-        print(byBin)
+        print("auto binning by: ",byBin)
         x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
         y_rebin = np.zeros(len(x_rebin))
         for i in range(len(x_rebin)):
-            y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+            #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+            y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
 
         
         self.a.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
