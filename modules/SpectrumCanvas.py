@@ -150,7 +150,8 @@ class SpectrumCanvas(FigureCanvas):
     def PlotData(self,drawGate=-1):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
-   
+
+       
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
@@ -167,9 +168,22 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec.yzoom[0]
         ymax = self.Spec.yzoom[1]
 
+        ## Auto rebin.
+        ## The principle, here, is to plot a maximum of
+        ## nBinMax bins, so rebin the data to fit
+        nBinMax = 1000
+        byBin = round((xmax-xmin)/1000)
+        print(byBin)
+        x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
+        y_rebin = np.zeros(len(x_rebin))
+        for i in range(len(x_rebin)):
+            y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+
+        
         self.a.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
         self.a.clear()
-        self.a.step(x,y,'k',where='mid')
+        self.a.step(x_rebin,y_rebin,'k',where='mid')
+        #self.a.step(x,y,'k',where='mid')
         self.a.set_xlim([xmin,xmax])
         self.a.set_ylim([ymin,ymax])
         if self.Spec.isLog:
@@ -317,8 +331,20 @@ class SpectrumCanvas(FigureCanvas):
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
 
+            ## Auto rebin.
+            ## The principle, here, is to plot a maximum of
+            ## nBinMax bins, so rebin the data to fit
+            nBinMax = 1000
+            byBin = round((xmax-xmin)/1000)
+            print(byBin)
+            x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
+            y_rebin = np.zeros(len(x_rebin))
+            for i in range(len(x_rebin)):
+                y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
+
+            
             self.a.clear()
-            self.a.step(x,y,'k',where='mid')
+            self.a.step(x_rebin,y_rebin,'k',where='mid')
             self.a.set_xlim([xmin,xmax])
             self.a.set_ylim([ymin,ymax])
             
