@@ -18,7 +18,7 @@ std::string EngeSort::saygoodbye( ) {
 int Channels1D = 8192;
 int Channels2D = 512;
 
-int comp1d = 8;   // The amount of compression to apply to
+int comp1d = 4;   // The amount of compression to apply to
 		  // measurements so they fit in the spectra
 
 // 1D Spectra
@@ -103,7 +103,7 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   */
 
   // Cade: here's an example
-  std::cout << "nMDPP = " << nMDPP << "\n";
+  //  std::cout << "nMDPP = " << nMDPP << "\n";
   
   /* 
      Here is where the raw data gets split into voltage and timing information
@@ -112,12 +112,17 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int dTDC[16] = {0};   // stores times
   
   for(int i = 0; i < nMDPP; i++){
+    if ((dMDPP[i] & 0xF0000000) != 0x10000000){
+      continue;
+    }
+
     int signal = dMDPP[i] & 0xFFFF;    // either time or energy
     int chn = (dMDPP[i] >> 16) & 0x1F;
+
     // ERROR: Channels 1-16 are energy readings
     //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
-    std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
-	      << "\n";
+    // std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
+    // << "\n";
    
     if(chn <= 15){
       dADC[chn] = signal;
@@ -127,11 +132,13 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     }
   }
 
-  std::cout << "Assigned data to channels\n";
+  //  std::cout << "Assigned data to channels\n";
 
   // Define the channels
   int cDet1 = (int)std::round(dADC[0]/comp1d);
   int cDet2 = (int)std::round(dADC[1]/comp1d);
+  //  int cDet1 = dADC[0];
+  //  int cDet2 = dADC[1];
   /* int cDet3 = dADC[2];
    int cDet4 = dADC[3];
   int cDet5 = dADC[4];
@@ -149,8 +156,8 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   */
 
 
-  int cTDC_Det1 = (int)std::round(dTDC[0]/comp1d);
-  int cTDC_Det2 = (int)std::round(dTDC[1]/comp1d);
+  int cTDC_Det1 = dTDC[0]; //(int)std::round(dTDC[0]/comp1d);
+  int cTDC_Det2 = dTDC[1]; //(int)std::round(dTDC[1]/comp1d);
   /* int cTDC_Det3 = dTDC[2];
   int cTDC_Det4 = dTDC[3];
   int cTDC_Det5 = dTDC[4];
@@ -488,9 +495,10 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     uint32_t* dMDPP = (uint32_t*)event->GetBankData(bMDPP);
 
     // Get the size
-    int nMDPP = (bMDPP->data_size - 2)/4;
     
-    std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
+    //  int nMDPP = (bMDPP->data_size - 2)/4;
+    int nMDPP = (bMDPP->data_size)/4;
+    //  std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
   
     fRunEventCounter++;
     fModule->fTotalEventCounter++;
