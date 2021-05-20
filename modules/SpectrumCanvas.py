@@ -147,7 +147,7 @@ class SpectrumCanvas(FigureCanvas):
         self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.PlotData()
         ##self.PlotData2D()
-
+    
     def SavePickleData(self):
         self.SpecColl.SavePickleData()
 
@@ -155,7 +155,10 @@ class SpectrumCanvas(FigureCanvas):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
 
-       
+        self.x = x
+        self.y = y
+
+        
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
@@ -221,6 +224,44 @@ class SpectrumCanvas(FigureCanvas):
                     
         self.fig.canvas.draw()
 
+    def ReBin(self, binNum):
+        try:
+            n = binNum
+            new_y = []
+            new_x = list(range(0,len(self.x),binNum))
+            
+            if new_x.count(self.x[-1])==0:
+                new_x.append(self.x[-1])
+
+            for i in range(len(new_x)):
+                if i==len(new_x)-1:
+                    y_vals = self.y[i*n+1:len(self.y)]
+                    if len(y_vals)==0:
+                        new_y.append(self.y[-1])
+                    else:
+                        new_y.append(sum(y_vals)/len(y_vals))
+
+                else:
+                    y_vals = self.y[i*n+1:(i+1)*n]
+                    new_y.append(sum(y_vals)/len(y_vals))
+                        
+            self.a.clear()
+            self.a.step(new_x,new_y,'k',where='mid')
+
+            xmin = self.Spec.xzoom[0]
+            xmax = self.Spec.xzoom[1]
+            ymin = self.Spec.yzoom[0]
+            ymax = self.Spec.yzoom[1]
+
+            
+            self.a.set_xlim([xmin,xmax])
+            self.a.set_ylim([ymin,ymax])
+            print("Re-binned")
+            self.fig.canvas.draw()
+            
+        except:
+            print("No bins currently displayed")
+        
     def PlotData2D(self,drawGate=-1):
         xmin = self.Spec2D.xzoom[0]
         xmax = self.Spec2D.xzoom[1]

@@ -187,6 +187,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle('EngeSpec')    
         self.show()
 
+
+
+        ##Creates slider for re-binning
+
+        v = QtWidgets.QHBoxLayout()
+        
+        self.rebinSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.rebinSlider.setMinimum(1)
+        self.rebinSlider.setMaximum(100)
+        self.rebinSlider.setValue(1)
+        self.rebinSlider.setTickInterval(1)
+        self.rebinSlider.setTickPosition(QtWidgets.QSlider.TicksAbove)
+        self.rebinSlider.valueChanged.connect(self.rebin_action)
+        
+        self.rebinLabel = QtWidgets.QLabel()
+        self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
+        
+        
+        v.addWidget(self.rebinLabel)
+        v.addWidget(self.rebinSlider)
+        gridDataFrame.addLayout(v,0,0)
+
     def fileQuit(self):
         self.close()
 
@@ -208,6 +230,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.SpecCanvas.dots=False
         else:
             self.SpecCanvas.dots=True
+
+
+    def rebin_action(self):
+         self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
+
+         self.SpecCanvas.ReBin(self.rebinSlider.value())
 
     ## --------------------------------------------------
     ## Function to write to the command editor
@@ -532,6 +560,7 @@ class MyCustomToolbar(NavigationToolbar):
                                 "Zero all", plotCanvas.ZeroAll)
         self.a.setToolTip("Zero all spectra")
         self._actions['zeroall'] = self.a
+
 
         
         ## Add a Splitter
