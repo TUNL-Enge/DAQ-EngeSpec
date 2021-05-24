@@ -37,7 +37,7 @@ class SpectrumCanvas(FigureCanvas):
         self.is2D = False
 
         ## Settings
-        self.autobin = True
+        self.autobin = False
         self.dots = False
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)

@@ -286,7 +286,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.menuBar().addMenu(self.settings_menu)
         autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
         autobinAction.setCheckable(True)
-        autobinAction.setChecked(True)
+        autobinAction.setChecked(False)
         autobinAction.triggered.connect(self.setting_autobin)
         self.settings_menu.addAction(autobinAction)
         
