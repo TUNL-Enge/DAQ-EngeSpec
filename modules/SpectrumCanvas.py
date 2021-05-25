@@ -37,8 +37,10 @@ class SpectrumCanvas(FigureCanvas):
         self.is2D = False
 
         ## Settings
-        self.autobin = True
+        self.autobin = False
         self.dots = False
+        self.n1 = 1
+        self.n2 = 1
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
@@ -259,7 +261,7 @@ class SpectrumCanvas(FigureCanvas):
             SpectrumCanvas.PlotData(self, reBin = [[new_x],[new_y]])
 
             print("Re-binned by "+str(binNum))
-
+            self.n1 = n
             
             
         except:
@@ -370,7 +372,7 @@ class SpectrumCanvas(FigureCanvas):
 
         
     def ReBin2D(self,binNum):
-        try:
+        if True==True:
             n = binNum
             
             
@@ -388,7 +390,7 @@ class SpectrumCanvas(FigureCanvas):
             if new_y[-1]!=self.Y[-2][0]:
                 new_y.append(self.Y[-2][0])
 
-            nonZero = []
+            
             for i in range(len(new_y)):
             
                 new_h = []
@@ -424,8 +426,7 @@ class SpectrumCanvas(FigureCanvas):
                         H_val += np.sum(h_val)
                     
             
-                    if H_val!=0:
-                        nonZero.append(H_val)
+                   
                         
                     H_val/=(np.size(h_val)*len(y_indices))
                     
@@ -438,8 +439,9 @@ class SpectrumCanvas(FigureCanvas):
             new_H = np.array(new_H)
            
             print("Re-binned by "+str(n))
+            self.n2 = n
             SpectrumCanvas.PlotData2D(self, reBin = [new_H,new_x,new_y])
-        except:
+        else:
             print("No bins currently displayed")
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
@@ -473,7 +475,9 @@ class SpectrumCanvas(FigureCanvas):
             x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
-
+            self.x = x
+            self.y = y
+            SpectrumCanvas.ReBin(self,self.n1)
           #  if self.autobin:
                 ## Auto rebin.
                 ## The principle, here, is to plot a maximum of
@@ -487,21 +491,31 @@ class SpectrumCanvas(FigureCanvas):
                     #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
                  #   y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
            # else:
-            x_rebin = x
-            y_rebin = y
+           
+           # x_rebin = x
+           # y_rebin = y
             
-            self.a.clear()
-            if not self.dots:
-                self.a.step(x_rebin,y_rebin,'k',where='mid')
+           # self.a.clear()
+           # if not self.dots:
+           #     self.a.step(x_rebin,y_rebin,'k',where='mid')
                 #self.a.step(x,y,'k',where='mid')
-            else:
-                self.a.plot(x_rebin, y_rebin, 'k+')
+          #  else:
+            #    self.a.plot(x_rebin, y_rebin, 'k+')
                 #            self.a.step(x_rebin,y_rebin,'k',where='mid')
-            self.a.set_xlim([xmin,xmax])
-            self.a.set_ylim([ymin,ymax])
-            
+           #self.a.set_xlim([xmin,xmax])
+           # self.a.set_ylim([ymin,ymax])
+           
         else:
-            self.PlotData2D()
+            H = self.Spec2D.spec2d.T
+            xe = self.Spec2D.xedges
+            ye = self.Spec2D.yedges
+        #print(ye)
+            X, Y = np.meshgrid(xe,ye)
+            self.H = H
+            self.X = X.astype(int)
+            self.Y = Y.astype(int)
+
+            SpectrumCanvas.ReBin2D(self,self.n2)
            #self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
 
         self.updateSlider()

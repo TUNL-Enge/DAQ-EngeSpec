@@ -43,6 +43,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## The main widget that holds everything else
         self.main_widget = QtWidgets.QWidget(self)
 
+
+        self.rebinSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.rebinSlider.setMinimum(1)
+        self.rebinSlider.setMaximum(20)
+        self.rebinSlider.setValue(1)
+        self.rebinSlider.setTickInterval(1)
+        self.rebinSlider.setTickPosition(QtWidgets.QSlider.TicksAbove)
+        self.rebinSlider.valueChanged.connect(self.rebin_action)
+        
+        self.rebinLabel = QtWidgets.QLabel()
+        self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
+
+        
         ## Start with two vertical groups
         ## - toolbar holds all of the run start, stop, gates, etc.
         ## - mainFrame holds the tree, spectrum, etc
@@ -192,21 +205,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         v = QtWidgets.QHBoxLayout()
         
-        self.rebinSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.rebinSlider.setMinimum(1)
-        self.rebinSlider.setMaximum(100)
-        self.rebinSlider.setValue(1)
-        self.rebinSlider.setTickInterval(1)
-        self.rebinSlider.setTickPosition(QtWidgets.QSlider.TicksAbove)
-        self.rebinSlider.valueChanged.connect(self.rebin_action)
         
-        self.rebinLabel = QtWidgets.QLabel()
-        self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
         
         
         v.addWidget(self.rebinLabel)
         v.addWidget(self.rebinSlider)
-        gridDataFrame.addLayout(v,0,0)
+       # gridDataFrame.addLayout(v,0,0)
 
     def fileQuit(self):
         self.close()
@@ -321,6 +325,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.runControlsToolbar.addAction(startAction)
         self.runControlsToolbar.addAction(stopAction)
         self.runControlsToolbar.addAction(gateAction)
+
+        #self.rebinSlider.setFixedWidth(20)
+        right_spacer = QtWidgets.QWidget()
+        right_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        
+        self.runControlsToolbar.addWidget(right_spacer)
+        self.runControlsToolbar.addWidget(self.rebinLabel)
+        self.runControlsToolbar.addWidget(self.rebinSlider)
 
         
     def LoadASCIIData(self):
