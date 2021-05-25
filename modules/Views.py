@@ -89,7 +89,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         label = QtWidgets.QLabel()
         label.resize(240, 100)
         label.setPixmap(pixmap)
-
         ## Within the tree frame, make a vertical box layout
         treeFramevbox = QtWidgets.QVBoxLayout()
         treeFramevbox.addWidget(self.treeWidget)
@@ -234,9 +233,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def rebin_action(self):
          self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
-
-         self.SpecCanvas.ReBin(self.rebinSlider.value())
-
+         if self.SpecCanvas.twoD == False:
+             self.SpecCanvas.ReBin(self.rebinSlider.value())
+         else:
+             self.SpecCanvas.ReBin2D(self.rebinSlider.value())
     ## --------------------------------------------------
     ## Function to write to the command editor
     def append_text(self, text, col=None):
@@ -284,11 +284,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.settings_menu = QtWidgets.QMenu('&Settings', self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.settings_menu)
-        autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
-        autobinAction.setCheckable(True)
-        autobinAction.setChecked(True)
-        autobinAction.triggered.connect(self.setting_autobin)
-        self.settings_menu.addAction(autobinAction)
+       # autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
+       # autobinAction.setCheckable(True)
+       # autobinAction.setChecked(False)
+       # autobinAction.triggered.connect(self.setting_autobin)
+       # self.settings_menu.addAction(autobinAction)
         
         dotsAction = QtWidgets.QAction('&dots',self.settings_menu)
         dotsAction.setCheckable(True)

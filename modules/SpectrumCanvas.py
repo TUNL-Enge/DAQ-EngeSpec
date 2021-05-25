@@ -151,14 +151,18 @@ class SpectrumCanvas(FigureCanvas):
     def SavePickleData(self):
         self.SpecColl.SavePickleData()
 
-    def PlotData(self,drawGate=-1):
+    def PlotData(self,drawGate=-1, reBin = []):
         x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
         y = self.Spec.spec
 
         self.x = x
         self.y = y
 
-        
+        if len(reBin)!=0:
+            x = np.array(reBin[0][0])
+            y = np.array(reBin[1][0])
+
+                 
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
@@ -175,26 +179,27 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec.yzoom[0]
         ymax = self.Spec.yzoom[1]
 
-        if self.autobin:
+     #   if self.autobin:
             ## Auto rebin.
             ## The principle, here, is to plot a maximum of
             ## nBinMax bins, so rebin the data to fit
-            nBinMax = 1000
-            byBin = round((xmax-xmin)/1000)
-            print("auto binning by: ",byBin)
-            x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-            y_rebin = np.zeros(len(x_rebin))
-            for i in range(len(x_rebin)):
+      #     byBin = round((xmax-xmin)/1000)
+       #     print("auto binning by: ",byBin)
+        #    x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
+         #   y_rebin = np.zeros(len(x_rebin))
+          #  for i in range(len(x_rebin)):
                 #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-                y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-        else:
-            x_rebin = x
-            y_rebin = y
-
+           #     y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
+       # else:
+        #    x_rebin = x
+         #   y_rebin = y
+        x_rebin = x
+        y_rebin = y
         
         self.a.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
         self.a.clear()
         if not self.dots:
+            
             self.a.step(x_rebin,y_rebin,'k',where='mid')
             #self.a.step(x,y,'k',where='mid')
         else:
@@ -223,46 +228,44 @@ class SpectrumCanvas(FigureCanvas):
                     self.drawGates(drawGate)
                     
         self.fig.canvas.draw()
-
+        self.twoD = False
+        
     def ReBin(self, binNum):
         try:
             n = binNum
             new_y = []
-            new_x = list(range(0,len(self.x),binNum))
+            new_x = list(range(self.x[0],len(self.x),n))
             
             if new_x.count(self.x[-1])==0:
                 new_x.append(self.x[-1])
 
             for i in range(len(new_x)):
                 if i==len(new_x)-1:
-                    y_vals = self.y[i*n+1:len(self.y)]
+                    y_vals = self.y[i*n:len(self.y)]
                     if len(y_vals)==0:
                         new_y.append(self.y[-1])
                     else:
                         new_y.append(sum(y_vals)/len(y_vals))
 
-                else:
-                    y_vals = self.y[i*n+1:(i+1)*n]
-                    new_y.append(sum(y_vals)/len(y_vals))
                         
-            self.a.clear()
-            self.a.step(new_x,new_y,'k',where='mid')
+                else:
+                    y_vals = self.y[i*n:(i+1)*n]
 
-            xmin = self.Spec.xzoom[0]
-            xmax = self.Spec.xzoom[1]
-            ymin = self.Spec.yzoom[0]
-            ymax = self.Spec.yzoom[1]
+                    if len(y_vals)==0:
+                        new_y.append(self.y[i])
+                    else:
+                        new_y.append(sum(y_vals)/len(y_vals))
+
+            SpectrumCanvas.PlotData(self, reBin = [[new_x],[new_y]])
+
+            print("Re-binned by "+str(binNum))
 
             
-            self.a.set_xlim([xmin,xmax])
-            self.a.set_ylim([ymin,ymax])
-            print("Re-binned")
-            self.fig.canvas.draw()
             
         except:
             print("No bins currently displayed")
         
-    def PlotData2D(self,drawGate=-1):
+    def PlotData2D(self,drawGate=-1, reBin = []):
         xmin = self.Spec2D.xzoom[0]
         xmax = self.Spec2D.xzoom[1]
         ymin = self.Spec2D.yzoom[0]
@@ -275,7 +278,18 @@ class SpectrumCanvas(FigureCanvas):
         X, Y = np.meshgrid(xe,ye)
         #print(X)
         #print(Y)
-        
+
+        self.X = X.astype(int)
+        self.Y = Y.astype(int)
+        self.H = H
+
+        if len(reBin)!=0:
+            H = np.array(reBin[0])
+            X = np.array(reBin[1]+[X[0][-1]])
+            Y = np.array(reBin[2]+[Y[-1][0]])
+
+            X,Y = np.meshgrid(X,Y)
+
         x = xe[xe>xmin]# & xe<xmax]
         x = x[x<xmax].astype(int)
         y = ye[ye>ymin]# & ye<ymax]
@@ -286,7 +300,8 @@ class SpectrumCanvas(FigureCanvas):
             Hmax = H[Xcut,Ycut].max()
             self.Spec2D.zmax = Hmax
         else:
-            Hmax = self.Spec2D.zmax
+           # Hmax = self.Spec2D.zmax
+            Hmax = np.amax(H)
         #Hmax = self.Spec2D.zmax
         Nc = 255
         cbreak = np.zeros(Nc+1)
@@ -302,6 +317,7 @@ class SpectrumCanvas(FigureCanvas):
             cbreak[0]=0.1
 
         norm = BoundaryNorm(cbreak,Nc)
+        self.norm = norm
         
         def format_coord(x, y):
             col = int(x)
@@ -309,13 +325,13 @@ class SpectrumCanvas(FigureCanvas):
             if col >= 0 and col < self.Spec2D.NBins and row >= 0 and row < self.Spec2D.NBins:
                 z = H[row, col]
                 return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(x, y, z)
-
-        self.a.format_coord = format_coord
+            
+     #   self.a.format_coord = format_coord
         self.a.clear()
         ##self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
         
-        ##self.image = self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols)
-        self.image = self.a.pcolormesh(H, norm = norm, cmap=self.cols)
+        self.image = self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols, shading = "auto")
+       # self.image = self.a.pcolormesh(H, norm = norm, cmap=self.cols)
         if self.lincb:
             self.lincb.update_normal(self.image)
         else:
@@ -350,8 +366,81 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
         
-        
+        self.twoD = True
 
+        
+    def ReBin2D(self,binNum):
+        try:
+            n = binNum
+            
+            
+            new_y = list(range(self.Y[0][0],len(self.Y[0])-1,n))
+            new_x = list(range(self.X[0][0],len(self.X[0])-1,n))
+
+    
+            new_H = []
+
+
+        
+            if new_x[-1]!=self.X[0][-2]:
+                new_x.append(self.X[0][-2])
+                
+            if new_y[-1]!=self.Y[-2][0]:
+                new_y.append(self.Y[-2][0])
+
+            nonZero = []
+            for i in range(len(new_y)):
+            
+                new_h = []
+                
+                if i == len(new_y)-1:
+                    y_indices = list(range(n*i,self.Y[-2][0]))
+
+                    if len(y_indices) == 0:
+                        y_indices = [1]
+
+                else:
+                    y_indices = list(range(n*i,(i+1)*n))
+
+                for j in range(len(new_x)):
+                    H_val = 0
+                    for k in range(len(y_indices)):
+                   
+                        
+                        if j == len(new_x)-1:
+
+                            
+                            #h_val = self.H[j*n:len(new_x),i]
+                            h_val = self.H[i,j*n:len(new_x)]
+                            if len(h_val) == 0:
+                                h_val = self.H[i,-1]
+
+                        else:
+                        
+                           h_val =  self.H[i,j*n:(j+1)*n]
+                           if len(h_val) == 0:
+                               h_val = self.H[i,j]
+                    
+                        H_val += np.sum(h_val)
+                    
+            
+                    if H_val!=0:
+                        nonZero.append(H_val)
+                        
+                    H_val/=(np.size(h_val)*len(y_indices))
+                    
+                    new_h.append(H_val)
+                    
+            
+                new_H.append(new_h)
+           
+        
+            new_H = np.array(new_H)
+           
+            print("Re-binned by "+str(n))
+            SpectrumCanvas.PlotData2D(self, reBin = [new_H,new_x,new_y])
+        except:
+            print("No bins currently displayed")
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
         ##xmin  = self.a.get_xlim()[0]
@@ -385,21 +474,21 @@ class SpectrumCanvas(FigureCanvas):
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
 
-            if self.autobin:
+          #  if self.autobin:
                 ## Auto rebin.
                 ## The principle, here, is to plot a maximum of
                 ## nBinMax bins, so rebin the data to fit
-                nBinMax = 1000
-                byBin = round((xmax-xmin)/1000)
-                print("auto binning by: ",byBin)
-                x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-                y_rebin = np.zeros(len(x_rebin))
-                for i in range(len(x_rebin)):
+           #     nBinMax = 1000
+            #    byBin = round((xmax-xmin)/1000)
+             #   print("auto binning by: ",byBin)
+              #  x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
+               # y_rebin = np.zeros(len(x_rebin))
+                #for i in range(len(x_rebin)):
                     #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-                    y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-            else:
-                x_rebin = x
-                y_rebin = y
+                 #   y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
+           # else:
+            x_rebin = x
+            y_rebin = y
             
             self.a.clear()
             if not self.dots:
