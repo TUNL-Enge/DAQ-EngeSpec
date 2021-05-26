@@ -41,6 +41,8 @@ class SpectrumCanvas(FigureCanvas):
         self.dots = False
         self.n1 = 1
         self.n2 = 1
+
+        self.isZoomed = False
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
@@ -621,6 +623,11 @@ class SpectrumCanvas(FigureCanvas):
             #print('in margin')
             self.cydata.append(-1)       
 
+        if self.isZoomed == True:
+            if self.NClicks == 1:
+                self.zoomMarker =  self.a.axvline(x=ix,ls="--")
+                self.fig.canvas.draw()
+
         if self.NClicks == 0 or event.button == 3:
             #print("disconnecting clicker")
             self.fc.mpl_disconnect(self,cid)
@@ -630,6 +637,7 @@ class SpectrumCanvas(FigureCanvas):
             
     def JamZoom(self):
         print("Click on the zoom limits")
+        self.isZoomed = True
         self.getNClicks(2)
         xlow,xhigh = self.a.get_xlim()
         if self.cxdata[0] == -1:
@@ -652,7 +660,8 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec2D.yzoom = self.a.get_ylim()
         else:
             self.Spec.xzoom = self.a.get_xlim()
-
+        self.isZoomed = False
+        self.zoomMarker.remove()
         self.updateSlider()
         self.fig.canvas.draw()
 
@@ -1029,7 +1038,7 @@ class SpectrumCanvas(FigureCanvas):
             
             ## Plotting fits
             #self.a.plot(gChn, result.init_fit, 'c--')
-            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 5.0)
+            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
             self.fig.canvas.draw()
             
             ## Plotting fit components
