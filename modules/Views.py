@@ -449,7 +449,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,
                                          allitems[0].parent().spec.is2D,allitems[0].index)
         self.rebinSlider.setValue(self.n)
-        Ui_MainWindow.rebin_action(self)
+        if self.n > 1:
+            Ui_MainWindow.rebin_action(self)
     ## Build the list of scalers
     def PopulateScalers(self):
         ## Build a bunch of labels in the right-hand scaler frame
