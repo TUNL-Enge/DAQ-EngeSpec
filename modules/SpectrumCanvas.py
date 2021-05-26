@@ -384,11 +384,11 @@ class SpectrumCanvas(FigureCanvas):
 
 
         
-            if new_x[-1]!=self.X[0][-2]:
-                new_x.append(self.X[0][-2])
+           # if new_x[-1]!=self.X[0][-2]:
+            #    new_x.append(self.X[0][-2])
                 
-            if new_y[-1]!=self.Y[-2][0]:
-                new_y.append(self.Y[-2][0])
+           # if new_y[-1]!=self.Y[-2][0]:
+            #    new_y.append(self.Y[-2][0])
 
             
             for i in range(len(new_y)):
@@ -399,45 +399,54 @@ class SpectrumCanvas(FigureCanvas):
                     y_indices = list(range(n*i,self.Y[-2][0]))
 
                     if len(y_indices) == 0:
-                        y_indices = [1]
+                        y_indices = [self.Y[-2][0]]
 
                 else:
                     y_indices = list(range(n*i,(i+1)*n))
-
+            
                 for j in range(len(new_x)):
-                    H_val = 0
-                    for k in range(len(y_indices)):
+                   # for k in range(len(y_indices)):
                    
                         
-                        if j == len(new_x)-1:
+                   if j == len(new_x)-1:
 
                             
                             #h_val = self.H[j*n:len(new_x),i]
-                            h_val = self.H[i,j*n:len(new_x)]
-                            if len(h_val) == 0:
-                                h_val = self.H[i,-1]
+                       h_val = self.H[y_indices[0]:y_indices[-1]+1,j*n:len(new_x)]
+                       if np.size(h_val) == 0:
+                           h_val = self.H[y_indices[0]:y_indices[-1]+1,-1]
 
-                        else:
+                           if np.size(h_val) == 0:
+                               h_val = self.H[y_indices[0],-1]
+                               
                         
-                           h_val =  self.H[i,j*n:(j+1)*n]
-                           if len(h_val) == 0:
-                               h_val = self.H[i,j]
-                    
-                        H_val += np.sum(h_val)
+                   else:
+                        
+                       h_val =  self.H[y_indices[0]:y_indices[-1]+1,j*n:(j+1)*n]
+                       if np.size(h_val) == 0:
+                           h_val = self.H[y_indices[0]:y_indices[-1]+1,j]
+
+                           
+                           if np.size(h_val) == 0:
+                               h_val = self.H[y_indices[0],j]
+
+                   H_val = np.sum(h_val)
                     
             
-                   
-                        
-                    H_val/=(np.size(h_val)*len(y_indices))
-                    
-                    new_h.append(H_val)
+            
+                   H_val/=(np.size(h_val))
+
+                  
+                   new_h.append(H_val)
                     
             
                 new_H.append(new_h)
            
         
             new_H = np.array(new_H)
-           
+          #  for i in range(len(new_H)):
+           #     print(new_H[i])
+
             print("Re-binned by "+str(n))
             self.n2 = n
             SpectrumCanvas.PlotData2D(self, reBin = [new_H,new_x,new_y])
