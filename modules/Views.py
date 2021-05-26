@@ -51,6 +51,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.rebinSlider.setTickInterval(1)
         self.rebinSlider.setTickPosition(QtWidgets.QSlider.TicksAbove)
         self.rebinSlider.valueChanged.connect(self.rebin_action)
+        self.n = 1
         
         self.rebinLabel = QtWidgets.QLabel()
         self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
@@ -201,16 +202,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
 
-        ##Creates slider for re-binning
-
-        v = QtWidgets.QHBoxLayout()
-        
-        
-        
-        
-        v.addWidget(self.rebinLabel)
-        v.addWidget(self.rebinSlider)
-       # gridDataFrame.addLayout(v,0,0)
 
     def fileQuit(self):
         self.close()
@@ -237,10 +228,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def rebin_action(self):
          self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
+         self.n = self.rebinSlider.value()
          if self.SpecCanvas.twoD == False:
-             self.SpecCanvas.ReBin(self.rebinSlider.value())
+             self.SpecCanvas.ReBin(self.n)
          else:
-             self.SpecCanvas.ReBin2D(self.rebinSlider.value())
+             self.SpecCanvas.ReBin2D(self.n)
     ## --------------------------------------------------
     ## Function to write to the command editor
     def append_text(self, text, col=None):
@@ -339,6 +331,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Clear the old spectrum collection
         self.SpecColl.ClearCollection()
         self.SpecCanvas.LoadASCIIData()
+        self.rebinSlider.setValue(self.n)
+        Ui_MainWindow.rebin_action(self)
         self.PopulateTree()
 
     def SaveASCIIData(self):
@@ -348,11 +342,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##self.SpecColl.addSpectrum("New Spectrum")
         ##self.SpecCanvas.setSpecIndex(len(self.SpecColl.spec1d)-1, is2D=False)
         self.SpecCanvas.LoadASCIIData()
+        self.rebinSlider.setValue(self.n)
+        Ui_MainWindow.rebin_action(self)
         self.PopulateTree()
 
     def LoadPickleData(self):
         print("Loading Pickle Data")
         self.SpecCanvas.LoadPickleData()
+        self.rebinSlider.setValue(self.n)
+        Ui_MainWindow.rebin_action(self)
         self.PopulateTree()
 
     def SavePickleData(self):
@@ -439,6 +437,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def itemclicked(self,it,col):
         ## Loop through all items to find the clicked ones
         allitems = self.treeWidget.selectedItems()
+        
         ##print("Old item: ",allitems[0])
         ##print("Selected: ",allitems)
         ##print("Parent: ",allitems[0].parent())
@@ -449,8 +448,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,
                                          allitems[0].parent().spec.is2D,allitems[0].index)
-
- 
+        self.rebinSlider.setValue(self.n)
+        Ui_MainWindow.rebin_action(self)
     ## Build the list of scalers
     def PopulateScalers(self):
         ## Build a bunch of labels in the right-hand scaler frame
