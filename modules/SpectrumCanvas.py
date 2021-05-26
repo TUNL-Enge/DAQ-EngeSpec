@@ -372,7 +372,7 @@ class SpectrumCanvas(FigureCanvas):
 
         
     def ReBin2D(self,binNum):
-        if True==True:
+        try:
             n = binNum
             
             
@@ -450,7 +450,7 @@ class SpectrumCanvas(FigureCanvas):
             print("Re-binned by "+str(n))
             self.n2 = n
             SpectrumCanvas.PlotData2D(self, reBin = [new_H,new_x,new_y])
-        else:
+        except:
             print("No bins currently displayed")
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
