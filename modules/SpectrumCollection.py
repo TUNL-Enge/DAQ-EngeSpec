@@ -130,13 +130,20 @@ class SpectrumCollection:
 
     ## Replay midas
     def offlinemidas(self):
-        filename = QFileDialog.getOpenFileNames(None,
-                                               "Sort MIDAS File(s)", "./",
-                                               "MIDAS Files (*.mid *.mid.*)")
-        self.offlinefiles = filename[0]#"run00031.mid.lz4"
+#        filename = QFileDialog.getOpenFileNames(None,
+#                                               "Sort MIDAS File(s)", "./",
+#                                               "MIDAS Files (*.mid *.mid.*)")
+#        self.offlinefiles = filename[0]#"run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
         self.isOnline = False
 
+    ## Load the list of files to be sorted
+    def sort(self):
+        filename = QFileDialog.getOpenFileNames(None,
+                                                "Sort MIDAS File(s)", "./",
+                                                "MIDAS Files (*.mid *.mid.*)")
+        self.offlinefiles = filename[0]
+        
     ## Actually run the analyzer
     def startmidas(self):
         if not self.MIDASisRunning:

@@ -270,27 +270,45 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Save pickle data
         self.file_menu.addAction('&Save Pickle File',
                                  self.SavePickleData)
-        ## Connect to MIDAS
-        self.file_menu.addAction('&Connect MIDAS',
-                                 self.connectmidas)
-        ## Connect to MIDAS offline
-        self.file_menu.addAction('&Offline MIDAS',
-                                 self.offlinemidas)
+        
         ## Quit
         self.file_menu.addAction('&Quit', self.fileQuit,
            QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
         ## -----
+        ## Connection options
+        self.connections_menu = QtWidgets.QMenu('&Connect MIDAS', self)
+        self.menuBar().addSeparator()
+        self.menuBar().addMenu(self.connections_menu)
+
+        ## Connect to MIDAS
+        self.connectOnlineAction = QtWidgets.QAction('&Online MIDAS')
+        self.connectOnlineAction.triggered.connect(self.connectmidas)
+        self.connections_menu.addAction(self.connectOnlineAction)
+
+        self.connections_menu.addSeparator()
+        ## Connect to MIDAS offline
+        self.connectOfflineAction = QtWidgets.QAction('&Offline MIDAS')
+        self.connectOfflineAction.triggered.connect(self.offlinemidas)
+        self.connections_menu.addAction(self.connectOfflineAction)
+
+        ## Sort a file in offline mode
+        self.sortAction = QtWidgets.QAction('&Queue sort file(s)', self)
+        self.sortAction.setEnabled(False)
+        self.sortAction.triggered.connect(self.sort)
+        self.connections_menu.addAction(self.sortAction)
+        
+        ## -----
         ## Settings Menu
         self.settings_menu = QtWidgets.QMenu('&Settings', self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.settings_menu)
-       # autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
-       # autobinAction.setCheckable(True)
-       # autobinAction.setChecked(False)
-       # autobinAction.triggered.connect(self.setting_autobin)
-       # self.settings_menu.addAction(autobinAction)
+        # autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
+        # autobinAction.setCheckable(True)
+        # autobinAction.setChecked(False)
+        # autobinAction.triggered.connect(self.setting_autobin)
+        # self.settings_menu.addAction(autobinAction)
         
         dotsAction = QtWidgets.QAction('&dots',self.settings_menu)
         dotsAction.setCheckable(True)
@@ -376,8 +394,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
 
-        
-##        self.scaler_thread.start()
+        ## Grey out unsafe menu items!
+        self.connectOnlineAction.setEnabled(False)
+        self.connectOfflineAction.setEnabled(False)
 
     def offlinemidas(self):
         self.SpecColl.offlinemidas()
@@ -387,6 +406,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
 
+        ## Grey out unsafe menu items!
+        self.sortAction.setEnabled(True)
+        self.connectOnlineAction.setEnabled(False)
+        self.connectOfflineAction.setEnabled(False)
+        
+    def sort(self):
+        self.SpecColl.sort()
+        
     def startmidas(self):
         ##print("Running midas")
 
