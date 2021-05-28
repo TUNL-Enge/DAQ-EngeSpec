@@ -2,7 +2,6 @@
 *.so
 *.dylib
 *.pyc
-*.png
 *.bak
 *#
 *~
