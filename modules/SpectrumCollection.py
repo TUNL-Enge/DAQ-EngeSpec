@@ -157,7 +157,10 @@ class SpectrumCollection:
                 self.midas_collection_thread.start()
                 self.MIDASLastAgg = True
                 self.MIDASisRunning = False
-        
+            #else:
+             #   print("Finished")
+              #  self.MIDASLastAgg = True
+               # self.MIDASisRunning = False
 ## Run MIDAS in a separate thread so it doesn't lock up the GUI
 class MidasThread(QThread):
     def __init__(self,specColl):
@@ -251,7 +254,7 @@ class MidasThread(QThread):
         while self.specColl.dm.getIsRunning():
             time.sleep(1)
             
-        #print("MIDAS finished running")
+        print("MIDAS finished running")
         ## Collect the last bunch of data 
         #self.specColl.midas_collection_thread.start()
         #self.specColl.MIDASisRunning = False

@@ -2,6 +2,8 @@ import sys, os
 import matplotlib
 ##from PyQt5.QtCore import Qt, QThread, QTimer
 from PySide2 import QtCore, QtWidgets, QtGui
+from PySide2.QtWebEngineWidgets import QWebEngineView
+from PySide2.QtCore import QUrl
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 import time
@@ -149,6 +151,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ## Make the spectrum tabs
         tabWidget = QtWidgets.QTabWidget()
+        self.tabWidget = tabWidget
         ## Tab 1
         tab1 = QtWidgets.QWidget()
 
@@ -173,6 +176,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         tabWidget.setTabText(tabWidget.indexOf(tab1), "Spectrum Inspector")
         ## Tab 2
         tab2 = QtWidgets.QWidget()
+        self.tab2 = tab2
         tabWidget.addTab(tab2,"There's nothing in this tab!")
         tabWidget.setTabText(tabWidget.indexOf(tab2), "Empty Tab")
         
@@ -361,8 +365,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.SpecCanvas.setSpecIndex(0,False)
+
+        view = QWebEngineView()
+        view.load(QUrl("http://localhost:8080/"))
+        view.show()
+        self.tabWidget.removeTab(1)
+        self.tabWidget.addTab(view,"Midas info")
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
+
+        
 ##        self.scaler_thread.start()
 
     def offlinemidas(self):
@@ -378,6 +390,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.startmidas()
         if not self.scalersRunning:
             self.scaler_thread.start()
+
+       
         
     def stopmidas(self):
         ##print("Stopping midas")
@@ -449,8 +463,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,
                                          allitems[0].parent().spec.is2D,allitems[0].index)
         self.rebinSlider.setValue(self.n)
-        if self.n > 1:
-            Ui_MainWindow.rebin_action(self)
+        Ui_MainWindow.rebin_action(self)
     ## Build the list of scalers
     def PopulateScalers(self):
         ## Build a bunch of labels in the right-hand scaler frame
