@@ -1044,7 +1044,8 @@ class SpectrumCanvas(FigureCanvas):
             ## Plotting fit components
             comps = result.eval_components()
             #self.a.plot(gChn, comps['gaussian'], 'b--')
-            self.a.plot(gChn, comps['line'], 'C3--')
+           # self.a.plot(gChn, comps['line'], 'C3--')
+            self.a.plot([bgx[0],bgx[-1]],[bgy[0],bgy[-1]],'C3--')
             self.fig.canvas.draw()
 
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 

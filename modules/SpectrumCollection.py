@@ -1,6 +1,6 @@
 ## All of the stuff for opening spectra
 from PyQt5.QtCore import Qt, QThread, QTimer
-from PySide2.QtWidgets import QApplication, QFileDialog
+from PySide2.QtWidgets import QApplication, QFileDialog, QStatusBar
 import numpy as np
 import pandas as pd
 #import matplotlib.pyplot as plt
@@ -24,7 +24,9 @@ class SpectrumCollection:
         self.Name = "Test Collection of Spectra"
 
         self.sclr = [ScalerObject(0)]
-
+        self.statusBar = QStatusBar()
+        
+        
         ## Load the data library
         if os.path.exists('EngeSort.so'):
             self.dm = EngeSort.EngeSort()
@@ -250,11 +252,15 @@ class MidasThread(QThread):
         print("Running MIDAS")
         #self.specColl.MIDASisRunning = True
         self.specColl.dm.runMidasAnalyzer(self.specColl.offlinefiles)
+
+       # self.setStatusBar(self.runningIndicator)
+        
         ## Nothing executes past runMidasAnalyzer
         while self.specColl.dm.getIsRunning():
             time.sleep(1)
             
         print("MIDAS finished running")
+        self.specColl.statusBar.showMessage("")
         ## Collect the last bunch of data 
         #self.specColl.midas_collection_thread.start()
         #self.specColl.MIDASisRunning = False

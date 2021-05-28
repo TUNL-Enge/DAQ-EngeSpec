@@ -58,6 +58,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.rebinLabel = QtWidgets.QLabel()
         self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
 
+        self.runningIndicator = self.SpecColl.statusBar
+        self.setStatusBar(self.runningIndicator)
         
         ## Start with two vertical groups
         ## - toolbar holds all of the run start, stop, gates, etc.
@@ -368,9 +370,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         view = QWebEngineView()
         view.load(QUrl("http://localhost:8080/"))
-        view.show()
         self.tabWidget.removeTab(1)
         self.tabWidget.addTab(view,"Midas info")
+       # view.show()
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
 
@@ -387,15 +389,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def startmidas(self):
         ##print("Running midas")
+
+
+        
         self.SpecColl.startmidas()
+        self.runningIndicator.showMessage("MIDAS is running...")
+        
         if not self.scalersRunning:
             self.scaler_thread.start()
 
-       
+
         
     def stopmidas(self):
         ##print("Stopping midas")
         self.SpecColl.stopmidas()
+        self.runningIndicator.showMessage("")
         #if self.SpecColl.isOnline:
             #os.system("odbedit -c stop")
         #self.MIDASisRunning = False
@@ -513,6 +521,7 @@ class ScalerCollectionThread(QtCore.QThread):
         while True: ##self.specColl.MIDASisRunning:
             self.view.UpdateScalers()
             time.sleep(1)
+            
 
 class MyCustomToolbar(NavigationToolbar): 
     def __init__(self, plotCanvas, parent=None):
