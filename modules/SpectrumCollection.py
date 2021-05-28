@@ -36,6 +36,7 @@ class SpectrumCollection:
         self.MIDASisRunning = False
         self.MIDASLastAgg = False
 
+        self.filedir = None
         self.offlinefiles = [""]
         
     def __str__(self):
@@ -139,11 +140,15 @@ class SpectrumCollection:
 
     ## Load the list of files to be sorted
     def sort(self):
+        if self.filedir is None:
+            self.filedir = os.getenv("HOME")
         filename = QFileDialog.getOpenFileNames(None,
-                                                "Sort MIDAS File(s)", "./",
+                                                "Sort MIDAS File(s)", self.filedir,
                                                 "MIDAS Files (*.mid *.mid.*)")
         self.offlinefiles = filename[0]
-        
+        print("Queued files:", filename[0])
+        self.filedir = os.path.dirname(filename[0][0])
+
     ## Actually run the analyzer
     def startmidas(self):
         if not self.MIDASisRunning:

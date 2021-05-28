@@ -264,13 +264,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Load ADDITIONAL ascii spectrum
         self.file_menu.addAction('&Load Additional Spectrum File (ascii)',
                                  self.LoadAdditionalASCIIData)
+
+        self.file_menu.addSeparator()
         ## Load pickle data
         self.file_menu.addAction('&Load Pickle File',
                                  self.LoadPickleData)
         ## Save pickle data
         self.file_menu.addAction('&Save Pickle File',
                                  self.SavePickleData)
-        
+
+        self.file_menu.addSeparator()
         ## Quit
         self.file_menu.addAction('&Quit', self.fileQuit,
            QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
