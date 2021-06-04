@@ -331,7 +331,7 @@ class SpectrumCanvas(FigureCanvas):
                 z = H[row, col]
                 return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(x, y, z)
             
-     #   self.a.format_coord = format_coord
+        self.a.format_coord = format_coord
         self.a.clear()
         ##self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
         
