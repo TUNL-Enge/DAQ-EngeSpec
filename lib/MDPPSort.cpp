@@ -23,6 +23,7 @@ int comp1d = 4;   // The amount of compression to apply to
 
 // 1D Spectra
 Histogram *hDet1;
+Histogram *hDet1_pu;
 Histogram *hDet2;
 
 Histogram *hTDC_Det1;
@@ -44,6 +45,7 @@ void EngeSort::Initialize(){
   //--------------------
   // 1D Histograms
   hDet1 = new Histogram("Det 1", Channels1D, 1);
+  hDet1_pu = new Histogram("Det 1 - no pileup", Channels1D, 1);
   hDet2 = new Histogram("Det 2", Channels1D, 1);
 
   hTDC_Det1 = new Histogram("TDC Det1", Channels1D, 1);
@@ -109,23 +111,28 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
      Here is where the raw data gets split into voltage and timing information
   */
   int dADC[16] = {0};   // stores energies
+  int dADC_pu[16] = {0}; // Energies removing pileup flagged pulses
   int dTDC[16] = {0};   // stores times
   
   for(int i = 0; i < nMDPP; i++){
     if ((dMDPP[i] & 0xF0000000) != 0x10000000){
       continue;
     }
-
+    //    if ((dMDPP[i] & 0x800000)== 0x800000){
+    //  printf("Hey!\n");
+    // continue;
+    //  }
     int signal = dMDPP[i] & 0xFFFF;    // either time or energy
     int chn = (dMDPP[i] >> 16) & 0x1F;
-
     // ERROR: Channels 1-16 are energy readings
     //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
+    int pu = (dMDPP[i] >> 23) & 0x1;
     // std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
     // << "\n";
    
     if(chn <= 15){
       dADC[chn] = signal;
+      if(!pu)dADC_pu[chn] = signal;
     }
     else if(chn > 15){
       dTDC[chn-16] = signal;
@@ -136,6 +143,7 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
 
   // Define the channels
   int cDet1 = (int)std::round(dADC[0]/comp1d);
+  int cDet1_pu = (int)std::round(dADC_pu[0]/comp1d);
   int cDet2 = (int)std::round(dADC[1]/comp1d);
   //  int cDet1 = dADC[0];
   //  int cDet2 = dADC[1];
@@ -185,6 +193,7 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   
   // Increment 1D histograms
   hDet1 -> inc(cDet1);
+  hDet1_pu -> inc(cDet1_pu);
   hDet2 -> inc(cDet2);
 
   //std::cout << "Incremented 1d spec" << std::endl;
