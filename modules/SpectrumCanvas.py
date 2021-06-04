@@ -23,7 +23,7 @@ from lmfit import Model
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, SpecColl=None, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, SpecColl=None, parent=None, width=5, height=4, dpi=50):
 
         ## Keep track of what spectrum is currently being displayed on this canvas
         self.sindex1d = 0
@@ -60,6 +60,7 @@ class SpectrumCanvas(FigureCanvas):
         #self.a.set_ylim([0,800])
         self.a.set_xlabel("channel")
         self.a.set_ylabel("counts")
+        self.a.tick_params(labelsize=20)
 
         self.maximumX    = self.Spec.NBins-1
         ##self.isLogPlot  = False
