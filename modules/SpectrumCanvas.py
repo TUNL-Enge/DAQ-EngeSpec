@@ -1046,9 +1046,13 @@ class SpectrumCanvas(FigureCanvas):
             comps = result.eval_components()
             #self.a.plot(gChn, comps['gaussian'], 'b--')
            # self.a.plot(gChn, comps['line'], 'C3--')
-            self.a.plot([bgx[0],bgx[-1]],[bgy[0],bgy[-1]],'C3--')
+            mid1 = sum(bg1points[0])/len(bg1points[0])
+            mid2 = sum(bg2points[0])/len(bg2points[0])
+            m = result.best_values.get('m')
+            b = result.best_values.get('b')
+            
+            self.a.plot([mid1,mid2],[mid1*m+b,mid2*m+b],'C3--')
             self.fig.canvas.draw()
-
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
             ## rounding
             dprecis = self.getprecis(ucent)

@@ -164,14 +164,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         h = QtWidgets.QHBoxLayout()
         h.addWidget(self.SpecCanvas)
+
         vscroll = QtWidgets.QScrollBar(QtCore.Qt.Vertical)
         self.SpecCanvas.setupVSlider(vscroll)
         h.addWidget(vscroll)
         l.addLayout(h)
-        
         hscroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
         self.SpecCanvas.setupSlider(hscroll)
         l.addWidget(hscroll)
+
         tab1.setLayout(l)
         
         tabWidget.addTab(tab1,"")
