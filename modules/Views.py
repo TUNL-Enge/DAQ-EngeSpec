@@ -170,6 +170,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         h.addWidget(vscroll)
         l.addLayout(h)
         hscroll = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
+        hscroll.setPageStep(0)
         self.SpecCanvas.setupSlider(hscroll)
         l.addWidget(hscroll)
 
