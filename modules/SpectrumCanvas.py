@@ -665,7 +665,11 @@ class SpectrumCanvas(FigureCanvas):
         self.zoomMarker.remove()
         self.updateSlider()
         self.fig.canvas.draw()
-
+        self.newIncrement = np.ceil((newhighx-newlowx)/50)
+        try:
+            self.scroll.setSingleStep(self.newIncrement)
+        except:
+            pass
     def JamZoomy(self):
         print("Click on the y-limits\n")
         #x = self.fig.ginput(2)
@@ -716,6 +720,11 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
+        self.newIncrement = np.ceil((newhighx-newlowx)/50)
+        try:
+            self.scroll.setSingleStep(self.newIncrement)
+        except:
+            pass
         self.fig.canvas.draw()
         self.updateSlider()
      
@@ -744,6 +753,11 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
+        self.newIncrement = np.ceil((newhighx-newlowx)/50)
+        try:
+            self.scroll.setSingleStep(self.newIncrement)
+        except:
+            pass
         self.fig.canvas.draw()
         self.updateSlider()
 
@@ -786,7 +800,9 @@ class SpectrumCanvas(FigureCanvas):
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
         page = (xmax-xmin)
-        self.scroll.setPageStep(page)
+        self.scroll.setPageStep(0)
+        
+        
         self.scroll.setRange(page/2, self.Spec.NBins-page/2)
         self.scroll.setValue(round((xmax+xmin)/2))
 
