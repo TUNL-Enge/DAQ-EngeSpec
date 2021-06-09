@@ -1115,7 +1115,7 @@ class SpectrumCanvas(FigureCanvas):
                         signs.append(-1)
                     else:
                         signs.append(0)
-                    print("Oy!")
+                
                 p_values.append(p_value)
             p_values = np.array(p_values)
             z_values = signs*(np.sqrt(2)*erfinv(1-2*p_values))
