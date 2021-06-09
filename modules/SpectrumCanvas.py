@@ -1,4 +1,5 @@
 import matplotlib
+import matplotlib.gridspec as gridspec
 import numpy as np
 from PySide2.QtWidgets import QSizePolicy
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, \
@@ -17,6 +18,8 @@ import copy
 import time
 # Victor's additional libraries:
 #import IPython.display as display
+from scipy.special import gammaincc as gam
+from scipy.special import erfinv
 from scipy.optimize import curve_fit as cf
 # Will's additional libraries:
 from lmfit import Model
@@ -46,8 +49,10 @@ class SpectrumCanvas(FigureCanvas):
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
-        self.a = self.fig.add_subplot(111)
-
+        self.gs = gridspec.GridSpec(2,1,height_ratios=[8,1])
+        self.a = self.fig.add_subplot(self.gs[0])
+        self.fig.tight_layout()
+#        self.fig.subplots_adjust(hspace = .01)
         #self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
         
         ## Colormaps
@@ -1052,11 +1057,23 @@ class SpectrumCanvas(FigureCanvas):
             #print("UFWHM: ", ufwhm) # Uncertainty in FWHM
             print("NetArea (fit): ", netarea) # Net area of peak
             print("uNetArea (fit)", unetarea) # Uncertainty in net area
-            
+
+           
             ## Plotting fits
             #self.a.plot(gChn, result.init_fit, 'c--')
             self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
             self.fig.canvas.draw()
+
+
+           
+
+          #  print(len(self.fig.axes))
+           # self.fig.axes[0].change_geometry(2, 1, 2)
+
+            
+          
+
+
             
             ## Plotting fit components
             comps = result.eval_components()
@@ -1068,6 +1085,42 @@ class SpectrumCanvas(FigureCanvas):
             b = result.best_values.get('b')
             
             self.a.plot([mid1,mid2],[mid1*m+b,mid2*m+b],'C3--')
+            self.fig.canvas.draw()
+
+
+             ### ax2 = self.fig.add_subplot(self.gs[4,:])
+            ax2 = self.fig.add_subplot(self.gs[1])
+
+            height = result.best_values.get('A')
+            x_vals = np.arange(bgx[0],bgx[-1]+1,1)
+            exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
+            obs_y =  [self.Spec.spec[i] for i in x_vals]
+
+            p_values = []
+            signs = []
+            for i in range(len(obs_y)):
+                D = obs_y[i]
+                B = exp_y[i]
+                
+                if D>B:
+                    p_value = 1-gam(D,B)
+                    if p_value < .5:
+                        signs.append(1)
+                    else:
+                        signs.append(0)
+                else:
+                    p_value = gam(D+1,B)
+
+                    if p_value < .5:
+                        signs.append(-1)
+                    else:
+                        signs.append(0)
+                    print("Oy!")
+                p_values.append(p_value)
+            p_values = np.array(p_values)
+            z_values = signs*(np.sqrt(2)*erfinv(1-2*p_values))
+
+            ax2.plot(x_vals,z_values)
             self.fig.canvas.draw()
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
             ## rounding
