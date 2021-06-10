@@ -49,10 +49,10 @@ class SpectrumCanvas(FigureCanvas):
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
-        self.gs = gridspec.GridSpec(2,1,height_ratios=[8,1])
+        self.gs = gridspec.GridSpec(2,1,height_ratios=[11,1])
         self.a = self.fig.add_subplot(self.gs[0])
         self.fig.tight_layout()
-#        self.fig.subplots_adjust(hspace = .01)
+        self.fig.subplots_adjust(hspace = .07)
         #self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
         
         ## Colormaps
@@ -1120,8 +1120,17 @@ class SpectrumCanvas(FigureCanvas):
             p_values = np.array(p_values)
             z_values = signs*(np.sqrt(2)*erfinv(1-2*p_values))
 
-            ax2.plot(x_vals,z_values)
+            ax2.step(x_vals,z_values,where="mid")
+            ax2.set_xlim(self.Spec.xzoom)
+            ax2.set_ylim([-5,5])
+            ax2.axis('off')
+            ax2.plot([min(x_vals),max(x_vals)],[0,0],   linestyle="--", c="black")
+            ax2.plot([min(x_vals),max(x_vals)],[2,2],   linestyle="--", c="red")
+            ax2.plot([min(x_vals),max(x_vals)],[-2,-2], linestyle="--", c="red")
+            ax2.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
+
             self.fig.canvas.draw()
+
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
             ## rounding
             dprecis = self.getprecis(ucent)
