@@ -534,7 +534,10 @@ class SpectrumCanvas(FigureCanvas):
 
             SpectrumCanvas.ReBin2D(self,self.n2)
            #self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
-
+        try:
+            self.fig.delaxes(self.ax2)
+        except:
+            pass
         self.updateSlider()
         self.fig.canvas.draw()
     
@@ -1090,7 +1093,7 @@ class SpectrumCanvas(FigureCanvas):
 
              ### ax2 = self.fig.add_subplot(self.gs[4,:])
             ax2 = self.fig.add_subplot(self.gs[1])
-
+            self.ax2 = ax2
             height = result.best_values.get('A')
             x_vals = np.arange(bgx[0],bgx[-1]+1,1)
             exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
