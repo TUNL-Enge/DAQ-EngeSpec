@@ -678,6 +678,21 @@ class SpectrumCanvas(FigureCanvas):
             self.scroll.setSingleStep(self.newIncrement)
         except:
             pass
+        try:
+            if newlowx > self.x[0]:
+                zval_xlow = newlowx
+            else:
+                zval_xlow = self.x[0]
+
+            if newhighx<self.x[-1]:
+                zval_xhigh = newhighx
+            else:
+                zval_xhigh = self.x[-1]
+        
+            self.ax2.set_xlim(zval_xlow,zval_xhigh)
+            self.fig.canvas.draw()
+        except:
+            pass
     def JamZoomy(self):
         print("Click on the y-limits\n")
         #x = self.fig.ginput(2)
@@ -1096,6 +1111,7 @@ class SpectrumCanvas(FigureCanvas):
             self.ax2 = ax2
             height = result.best_values.get('A')
             x_vals = np.arange(bgx[0],bgx[-1]+1,1)
+            self.x = x_vals
             exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
             obs_y =  [self.Spec.spec[i] for i in x_vals]
 
