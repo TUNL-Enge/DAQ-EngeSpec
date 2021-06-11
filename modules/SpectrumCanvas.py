@@ -642,8 +642,12 @@ class SpectrumCanvas(FigureCanvas):
             self.fc.mpl_disconnect(self,cid)
             self.fc.stop_event_loop(self)
             #print("now we're unblocked")
-
-            
+    def RescaleZPlot(self):
+        try:
+            self.ax2.set_xlim(self.Spec.xzoom)
+            self.fig.canvas.draw()
+        except:
+            pass
     def JamZoom(self):
         print("Click on the zoom limits")
         self.isZoomed = True
@@ -678,7 +682,7 @@ class SpectrumCanvas(FigureCanvas):
             self.scroll.setSingleStep(self.newIncrement)
         except:
             pass
-        try:
+        
            # if newlowx > self.x[0]:
             #    zval_xlow = newlowx
            # else:
@@ -690,10 +694,8 @@ class SpectrumCanvas(FigureCanvas):
             #    zval_xhigh = self.x[-1]
         
            # self.ax2.set_xlim(zval_xlow,zval_xhigh)
-            self.ax2.set_xlim(self.Spec.xzoom)
-            self.fig.canvas.draw()
-        except:
-            pass
+        self.RescaleZPlot()
+   
     def JamZoomy(self):
         print("Click on the y-limits\n")
         #x = self.fig.ginput(2)
@@ -750,6 +752,7 @@ class SpectrumCanvas(FigureCanvas):
         except:
             pass
         self.fig.canvas.draw()
+        self.RescaleZPlot()
         self.updateSlider()
      
     def xZoomOut(self):
@@ -783,6 +786,7 @@ class SpectrumCanvas(FigureCanvas):
         except:
             pass
         self.fig.canvas.draw()
+        self.RescaleZPlot()
         self.updateSlider()
 
     def yZoomIn(self):
@@ -825,7 +829,7 @@ class SpectrumCanvas(FigureCanvas):
         xmax = self.Spec.xzoom[1]
         page = (xmax-xmin)
         self.scroll.setPageStep(0)
-        
+           
         
         self.scroll.setRange(page/2, self.Spec.NBins-page/2)
         self.scroll.setValue(round((xmax+xmin)/2))
@@ -846,6 +850,7 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
+        self.RescaleZPlot()
         self.fig.canvas.draw()
 
     def setupVSlider(self,vscroll):
