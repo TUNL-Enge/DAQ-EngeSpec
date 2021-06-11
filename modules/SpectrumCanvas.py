@@ -679,17 +679,18 @@ class SpectrumCanvas(FigureCanvas):
         except:
             pass
         try:
-            if newlowx > self.x[0]:
-                zval_xlow = newlowx
-            else:
-                zval_xlow = self.x[0]
+           # if newlowx > self.x[0]:
+            #    zval_xlow = newlowx
+           # else:
+            #    zval_xlow = self.x[0]
 
-            if newhighx<self.x[-1]:
-                zval_xhigh = newhighx
-            else:
-                zval_xhigh = self.x[-1]
+           # if newhighx<self.x[-1]:
+            #    zval_xhigh = newhighx
+           # else:
+            #    zval_xhigh = self.x[-1]
         
-            self.ax2.set_xlim(zval_xlow,zval_xhigh)
+           # self.ax2.set_xlim(zval_xlow,zval_xhigh)
+            self.ax2.set_xlim(self.Spec.xzoom)
             self.fig.canvas.draw()
         except:
             pass
