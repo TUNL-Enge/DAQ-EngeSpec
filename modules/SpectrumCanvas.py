@@ -1113,6 +1113,14 @@ class SpectrumCanvas(FigureCanvas):
 
 
              ### ax2 = self.fig.add_subplot(self.gs[4,:])
+
+            #Clears z value plot is one is already present
+
+            try:
+                self.fig.delaxes(self.ax2)
+            except:
+                pass
+        
             ax2 = self.fig.add_subplot(self.gs[1])
             self.ax2 = ax2
             height = result.best_values.get('A')
