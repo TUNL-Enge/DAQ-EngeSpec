@@ -126,13 +126,14 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     int chn = (dMDPP[i] >> 16) & 0x1F;
     // ERROR: Channels 1-16 are energy readings
     //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
-    int pu = (dMDPP[i] >> 23) & 0x1;
+    int pu = (dMDPP[i] >> 23) & 0x1;  // pile-up
+    int ov = (dMDPP[i] >> 24) & 0x1;  // overflow
     // std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
     // << "\n";
    
     if(chn <= 15){
       dADC[chn] = signal;
-      if(!pu)dADC_pu[chn] = signal;
+      if((!pu ) & (!ov))dADC_pu[chn] = signal;
     }
     else if(chn > 15){
       dTDC[chn-16] = signal;
