@@ -9,7 +9,7 @@
 Messages messages;
 
 std::string EngeSort::sayhello( ) {
-  return messages.sayhello("EngeSort");
+  return messages.sayhello("MDPPSort");
 }
 std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
