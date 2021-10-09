@@ -18,7 +18,7 @@ class SpectrumObject:
         self.is2D = False
         self.isLog = False
 
-        self.NBins = 2**13
+        self.NBins = 2**12
         
         self.spec = np.zeros(self.NBins)
         self.spec_temp = np.zeros(self.NBins)   ## The temporary spectrum in memory

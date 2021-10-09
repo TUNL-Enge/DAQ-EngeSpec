@@ -497,8 +497,8 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 
   if(event->event_id == 1){
 
-    //event->FindAllBanks();
-    //std::cout << event->BankListToString() << std::endl;
+    event->FindAllBanks();
+    std::cout << event->BankListToString() << std::endl;
     
     // Get the ADC Bank
     TMBank* bMDPP = event->FindBank("MDPP");

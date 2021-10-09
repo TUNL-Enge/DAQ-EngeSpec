@@ -57,17 +57,17 @@ int totalCounter=0;
 int gateCounter=0;
 
 // Scalers
-Scaler *sGates;
-Scaler *sGatesLive;
-Scaler *sClock;
-Scaler *sClockLive;
-Scaler *sFrontLE;
-Scaler *sFrontHE;
-Scaler *sBackLE;
-Scaler *sBackHE;
-Scaler *sE;
-Scaler *sDE;
-Scaler *BCI;
+//Scaler *sGates;
+//Scaler *sGatesLive;
+//Scaler *sClock;
+//Scaler *sClockLive;
+//Scaler *sFrontLE;
+//Scaler *sFrontHE;
+//Scaler *sBackLE;
+//Scaler *sBackHE;
+//Scaler *sE;
+//Scaler *sDE;
+//Scaler *BCI;
 
 
 void EngeSort::Initialize(){
@@ -135,30 +135,30 @@ void EngeSort::Initialize(){
 
 
   // Build the scalers
-  sGates = new Scaler("Total Gates", 0);    // Name, index
-  sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
-  
-  sClock = new Scaler("Clock",2);
-  sClockLive = new Scaler("Clock Live",3);
-  sFrontLE = new Scaler("Front HE",4);
-  sFrontHE = new Scaler("Front LE",5);
-  sBackLE = new Scaler("Back HE",6);
-  sBackHE = new Scaler("Back LE",7);
-  sE = new Scaler("E",8);
-  sDE = new Scaler("DE",9);
-  BCI = new Scaler("BCI",15);
+  // sGates = new Scaler("Total Gates", 0);    // Name, index
+  // sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
+  // 
+  // sClock = new Scaler("Clock",2);
+  // sClockLive = new Scaler("Clock Live",3);
+  // sFrontLE = new Scaler("Front HE",4);
+  // sFrontHE = new Scaler("Front LE",5);
+  // sBackLE = new Scaler("Back HE",6);
+  // sBackHE = new Scaler("Back LE",7);
+  // sE = new Scaler("E",8);
+  // sDE = new Scaler("DE",9);
+  // BCI = new Scaler("BCI",15);
 
  
 }
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
-void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
+void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 
   totalCounter++;
 
-  double ADCsize = sizeof(&dADC)/sizeof(&dADC[0]);
-  double TDCsize = sizeof(dTDC)/sizeof(dTDC[0]);
+  double ADCsize = nADC; //sizeof(&dADC)/sizeof(&dADC[0]);
+  double TDCsize = nTDC; //sizeof(dTDC)/sizeof(dTDC[0]);
 
   //std::cout << ADCsize << "  " << TDCsize << std::endl;
   //std::cout << dADC << "  " << dTDC << std::endl;
@@ -269,19 +269,21 @@ void EngeSort::sort(uint32_t *dADC, uint32_t *dTDC){
 // defined we should assume that the user wants to increment it
 void EngeSort::incScalers(uint32_t *dSCAL){
 
-  //sGates -> inc(dSCAL[sGates->getIndex()]);
-  sGates -> inc(dSCAL);
-  sGatesLive -> inc(dSCAL);
-  sClock-> inc(dSCAL);
-  sClockLive -> inc(dSCAL);
-  sFrontLE -> inc(dSCAL);
-  sFrontHE -> inc(dSCAL);
-  sBackLE -> inc(dSCAL);
-  sBackHE -> inc(dSCAL);
-  sE -> inc(dSCAL);
-  sDE -> inc(dSCAL);
-  BCI -> inc(dSCAL);
+  std::cout << "Incrementing scalers" << std::endl;
+  
+  //sGates -> inc(dSCAL);
+  //sGatesLive -> inc(dSCAL);
+  //sClock-> inc(dSCAL);
+  //sClockLive -> inc(dSCAL);
+  //sFrontLE -> inc(dSCAL);
+  //sFrontHE -> inc(dSCAL);
+  //sBackLE -> inc(dSCAL);
+  //sBackHE -> inc(dSCAL);
+  //sE -> inc(dSCAL);
+  //sDE -> inc(dSCAL);
+  //BCI -> inc(dSCAL);
 }
+
 
 // Connect the analyzer to midas
 int EngeSort::connectMidasAnalyzer(){
@@ -505,10 +507,8 @@ void EngeSort::ClearData(){
     Sclr -> Clear();
   }
   totalCounter=0;
-  gateCounter=0;
   
 }
-
 //----------------------------------------------------------------------
 
 /* 
@@ -551,11 +551,14 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
     
     //  std::cout << "ADC Size: " << bADC->data_size << std::endl;
-  
+    // Get the size
+    int nADC = (bADC->data_size)/4;
+    int nTDC = (bTDC->data_size)/4;
+    
     fRunEventCounter++;
     fModule->fTotalEventCounter++;
     //  std::cout << "Calling sort" << std::endl;
-    fModule->eA->sort(dADC, dTDC);
+    fModule->eA->sort(dADC, nADC, dTDC, nTDC);
 
   } else if(event->event_id == 2){
 
@@ -563,7 +566,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     TMBank* bSCAL = event->FindBank("SCLR");
     uint32_t *dSCAL = (uint32_t*)event->GetBankData(bSCAL);
 
-    fModule->eA->incScalers(dSCAL);
+    //fModule->eA->incScalers(dSCAL);
   }
 
   //  std::cout << bSCAL << "  " << dSCAL << std::endl;
@@ -578,17 +581,16 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Begin run %d\n",runinfo->fRunNo);
   uint32_t run_start_time_binary = 0;
-  runinfo->fOdb->RU32("/Runinfo/Start time binary", &run_start_time_binary);
+  //runinfo->fOdb->RU32("/Runinfo/Start time binary", &run_start_time_binary);
   time_t run_start_time = run_start_time_binary;
-  //  time_t run_start_time = runinfo->fOdb->RU32("/Runinfo/Start time binary", 0, 0);
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
   fRunEventCounter = 0;
 }
+
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
-  std::cout << "Total counts: " << totalCounter << "   Gated counts: " << gateCounter << std::endl;
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
