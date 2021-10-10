@@ -293,7 +293,7 @@ class MidasCollectionThread(QThread):
         self.NGates = self.specColl.dm.getNGates()
 
     def run(self):
-        print("Collecting MIDAS data")
+        ##print("Collecting MIDAS data")
         while True: ##self.specColl.MIDASisRunning:
 ##            print("isRunning!")
             dat = np.transpose(self.specColl.dm.getData())

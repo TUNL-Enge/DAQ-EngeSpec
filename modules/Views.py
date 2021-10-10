@@ -389,6 +389,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def connectmidas(self):
         self.SpecColl.connectmidas()
         self.PopulateTree()
+        self.PopulateScalers()
         self.SpecCanvas.setSpecIndex(0,False)
 
         view = QWebEngineView()
@@ -429,7 +430,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         if not self.scalersRunning:
             self.scaler_thread.start()
-
+            self.scalersRunning=True
 
         
     def stopmidas(self):
@@ -549,10 +550,14 @@ class ScalerCollectionThread(QtCore.QThread):
         ##    print(" - ",name)
 
     def run(self):
-        ##print("Collecting Scalers")
+        
         while True: ##self.specColl.MIDASisRunning:
+            ##print("Collecting Scalers")
+            sclrvals = self.specColl.dm.getScalers()
+            for i in range(len(self.specColl.sclr)):
+                self.specColl.sclr[i].N = sclrvals[i]
             self.view.UpdateScalers()
-            time.sleep(1)
+            time.sleep(5)
             
 
 class MyCustomToolbar(NavigationToolbar): 

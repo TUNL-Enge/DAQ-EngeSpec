@@ -57,17 +57,17 @@ int totalCounter=0;
 int gateCounter=0;
 
 // Scalers
-//Scaler *sGates;
-//Scaler *sGatesLive;
-//Scaler *sClock;
-//Scaler *sClockLive;
-//Scaler *sFrontLE;
-//Scaler *sFrontHE;
-//Scaler *sBackLE;
-//Scaler *sBackHE;
-//Scaler *sE;
-//Scaler *sDE;
-//Scaler *BCI;
+Scaler *sGates;
+Scaler *sGatesLive;
+Scaler *sClock;
+Scaler *sClockLive;
+Scaler *sFrontLE;
+Scaler *sFrontHE;
+Scaler *sBackLE;
+Scaler *sBackHE;
+Scaler *sE;
+Scaler *sDE;
+Scaler *BCI;
 
 
 void EngeSort::Initialize(){
@@ -135,18 +135,18 @@ void EngeSort::Initialize(){
 
 
   // Build the scalers
-  // sGates = new Scaler("Total Gates", 0);    // Name, index
-  // sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
-  // 
-  // sClock = new Scaler("Clock",2);
-  // sClockLive = new Scaler("Clock Live",3);
-  // sFrontLE = new Scaler("Front HE",4);
-  // sFrontHE = new Scaler("Front LE",5);
-  // sBackLE = new Scaler("Back HE",6);
-  // sBackHE = new Scaler("Back LE",7);
-  // sE = new Scaler("E",8);
-  // sDE = new Scaler("DE",9);
-  // BCI = new Scaler("BCI",15);
+  sGates = new Scaler("Total Gates", 0);    // Name, index
+  sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
+  
+  sClock = new Scaler("Clock",2);
+  sClockLive = new Scaler("Clock Live",3);
+  sFrontLE = new Scaler("Front HE",4);
+  sFrontHE = new Scaler("Front LE",5);
+  sBackLE = new Scaler("Back HE",6);
+  sBackHE = new Scaler("Back LE",7);
+  sE = new Scaler("E",8);
+  sDE = new Scaler("DE",9);
+  BCI = new Scaler("BCI",15);
 
  
 }
@@ -269,19 +269,19 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 // defined we should assume that the user wants to increment it
 void EngeSort::incScalers(uint32_t *dSCAL){
 
-  std::cout << "Incrementing scalers" << std::endl;
+  //std::cout << "Incrementing scalers" << std::endl;
   
-  //sGates -> inc(dSCAL);
-  //sGatesLive -> inc(dSCAL);
-  //sClock-> inc(dSCAL);
-  //sClockLive -> inc(dSCAL);
-  //sFrontLE -> inc(dSCAL);
-  //sFrontHE -> inc(dSCAL);
-  //sBackLE -> inc(dSCAL);
-  //sBackHE -> inc(dSCAL);
-  //sE -> inc(dSCAL);
-  //sDE -> inc(dSCAL);
-  //BCI -> inc(dSCAL);
+  sGates -> inc(dSCAL);
+  sGatesLive -> inc(dSCAL);
+  sClock-> inc(dSCAL);
+  sClockLive -> inc(dSCAL);
+  sFrontLE -> inc(dSCAL);
+  sFrontHE -> inc(dSCAL);
+  sBackLE -> inc(dSCAL);
+  sBackHE -> inc(dSCAL);
+  sE -> inc(dSCAL);
+  sDE -> inc(dSCAL);
+  BCI -> inc(dSCAL);
 }
 
 
@@ -566,7 +566,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     TMBank* bSCAL = event->FindBank("SCLR");
     uint32_t *dSCAL = (uint32_t*)event->GetBankData(bSCAL);
 
-    //fModule->eA->incScalers(dSCAL);
+    fModule->eA->incScalers(dSCAL);
   }
 
   //  std::cout << bSCAL << "  " << dSCAL << std::endl;

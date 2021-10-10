@@ -201,6 +201,7 @@ Scaler::Scaler(std::string name, int index){
 
   Name = name;
   Index = index;
+  count = 0;
   //std::cout << "Made a scaler called " << name << " with index: " << index << std::endl;
 
   Scalers.push_back(this);

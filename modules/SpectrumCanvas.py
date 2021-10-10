@@ -268,7 +268,7 @@ class SpectrumCanvas(FigureCanvas):
 
             SpectrumCanvas.PlotData(self, reBin = [[new_x],[new_y]])
 
-            print("Re-binned by "+str(binNum))
+            ##print("Re-binned by "+str(binNum))
             self.n1 = n
             
             
@@ -455,7 +455,7 @@ class SpectrumCanvas(FigureCanvas):
           #  for i in range(len(new_H)):
            #     print(new_H[i])
 
-            print("Re-binned by "+str(n))
+            ##print("Re-binned by "+str(n))
             self.n2 = n
             SpectrumCanvas.PlotData2D(self, reBin = [new_H,new_x,new_y])
         except:
