@@ -332,9 +332,10 @@ class SpectrumCanvas(FigureCanvas):
         def format_coord(x, y):
             col = int(x/self.n2)
             row = int(y/self.n2)
-            if col >= 0 and col < self.Spec2D.NBins and row >= 0 and row < self.Spec2D.NBins:
+            if col >= 0 and col < (self.Spec2D.NBins-1) and row >= 0 and row < (self.Spec2D.NBins-1):
                 z = H[row, col]
                 return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(x, y, z)
+            return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(0, 0, 0)
             
         self.a.format_coord = format_coord
         self.a.clear()
