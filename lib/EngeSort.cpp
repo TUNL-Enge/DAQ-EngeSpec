@@ -164,27 +164,30 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
   //std::cout << dADC << "  " << dTDC << std::endl;
   
   // Thresholds
-  int Threshold = 10;
+  int Threshold = 150;
   for(int i=0; i<ADCsize; i++)
     if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
   for(int i=0; i<TDCsize; i++)
     if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
 
   //  std::cout << "Done thresholding" << std::endl;
-  
+  int cE=0, cDE=0, cPos1=0, cPos2=0, cSiE=0, cSiDE=0;
+  int cTDC_E=0, cTDC_DE=0, cTDC_Pos1=0, cTDC_Pos2=0;
   // Define the channels
-  int cE = dADC[0];
-  int cDE = dADC[1];
-  int cPos1 = dADC[2];
-  int cPos2 = dADC[3];
-  int cSiE = dADC[5];
-  int cSiDE = dADC[7];
-
-  int cTDC_E = dTDC[0];
-  int cTDC_DE = dTDC[1];
-  int cTDC_Pos1 = dTDC[2];
-  int cTDC_Pos2 = dTDC[3];
-
+  if(ADCsize > 6){
+    cE = dADC[0];
+    cDE = dADC[1];
+    cPos1 = dADC[2];
+    cPos2 = dADC[3];
+    cSiE = dADC[5];
+    cSiDE = dADC[7];
+  }
+  if(TDCsize > 3){
+    cTDC_E = dTDC[0];
+    cTDC_DE = dTDC[1];
+    cTDC_Pos1 = dTDC[2];
+    cTDC_Pos2 = dTDC[3];
+  } 
   //  std::cout << cPos1 << std::endl;
   
   // Calculate some things
@@ -537,7 +540,7 @@ TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
 TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 				    TAFlags* flags, TAFlowEvent* flow){
 
-  //  std::cout << "Analyzing" << std::endl;
+  //std::cout << "Event ID:" << event->event_id << std::endl;
 
   if(event->event_id == 1){
 
@@ -550,14 +553,16 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     TMBank* bTDC = event->FindBank("TDC1");
     uint32_t* dTDC = (uint32_t*)event->GetBankData(bTDC);
     
-    //  std::cout << "ADC Size: " << bADC->data_size << std::endl;
+    //std::cout << "ADC Size: " << bADC->data_size << std::endl;
+    //std::cout << "TDC Size: " << bTDC->data_size << std::endl;
+    
     // Get the size
     int nADC = (bADC->data_size)/4;
     int nTDC = (bTDC->data_size)/4;
     
     fRunEventCounter++;
     fModule->fTotalEventCounter++;
-    //  std::cout << "Calling sort" << std::endl;
+    //std::cout << "Calling sort" << std::endl;
     fModule->eA->sort(dADC, nADC, dTDC, nTDC);
 
   } else if(event->event_id == 2){
