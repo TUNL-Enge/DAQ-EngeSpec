@@ -312,7 +312,10 @@ class SpectrumCanvas(FigureCanvas):
         else:
            # Hmax = self.Spec2D.zmax
             Hmax = np.amax(H)
-        #Hmax = self.Spec2D.zmax
+
+        if Hmax == 0:
+            Hmax = 1
+            #Hmax = self.Spec2D.zmax
         Nc = 255
         cbreak = np.zeros(Nc+1)
         if not self.Spec2D.isLog:
