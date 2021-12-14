@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <random>
 #include <chrono>
@@ -47,6 +48,9 @@ Histogram *hPos1_gDEvPos1_G2;
 
 Histogram *hE_gE_G1;
 
+Histogram *h2dSiDEvsSiTotalE_G_SiDEvsSiE;  // Silicon DE vs total E
+Histogram *hSiTotalE_G_SiDEvsSiE;          // Total silicon energy
+
 // 2D Gates on the DE vs Pos1 spectrum
 //Gate *g2d_DEvsPos1_1;
 //Gate *g2d_DEvsPos1_2;
@@ -69,6 +73,7 @@ Scaler *sE;
 Scaler *sDE;
 Scaler *BCI;
 
+double pSiSlope = 0.0;
 
 void EngeSort::Initialize(){
 
@@ -106,6 +111,11 @@ void EngeSort::Initialize(){
   hPos1_gDEvPos1_G2 = new Histogram("Pos 1; GDEvPos1-G2", Channels1D, 1);
 
   hE_gE_G1 = new Histogram("E; GE-G1", Channels1D, 1);
+
+  hSiTotalE_G_SiDEvsSiE = new Histogram("SiTotE; GSiDEvsSiE", Channels1D, 1);
+  h2dSiDEvsSiTotalE_G_SiDEvsSiE = new Histogram("SiDE vs SiTotE; GSiDEvsSiE",
+						Channels2D, 2);
+  
   //--------------------
   // Gates
   //g2d_DEvsPos1_1 = new Gate("Gate 1");
@@ -118,6 +128,8 @@ void EngeSort::Initialize(){
   hDEvsPos1 -> addGate("Deuterons");
   //hDEvsPos1 -> addGate(g2d_DEvsPos1_2);
   //hDEvsPos1 -> addGate(g2d_DEvsPos1_3);
+
+  hSiDEvsSiE -> addGate("Silicon Gate");
   
   /*
   // Loop through and print all histograms
@@ -148,7 +160,6 @@ void EngeSort::Initialize(){
   sDE = new Scaler("DE",9);
   BCI = new Scaler("BCI",15);
 
- 
 }
 
 //======================================================================
@@ -209,7 +220,9 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
   int cSiDEcomp = (int) std::floor(cSiDE / compression);
 	
   // std::cout << "Compressed data" << std::endl;
-
+  // Calculate the total silicon energy
+  int cSiTotalE = (int) std::floor((cSiE + pSiSlope*cSiDE) / (1.0+pSiSlope));
+  int cSiTotalEcomp = (int) std::floor(cSiTotalE / compression);
   
   // Increment 1D histograms
   hPos1 -> inc(cPos1);
@@ -264,6 +277,12 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
     hPos1_gDEvPos1_G2->inc(cPos1);
   }
 
+  // The silicon cates
+  Gate &G3 = hSiDEvsSiE->getGate(0);
+  if(G3.inGate(cSiEcomp, cSiDEcomp)){
+    hSiTotalE_G_SiDEvsSiE->inc(cSiTotalE);
+    h2dSiDEvsSiTotalE_G_SiDEvsSiE->inc(cSiTotalEcomp,cSiDEcomp);
+  }
   
 }
 
@@ -590,6 +609,15 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   time_t run_start_time = run_start_time_binary;
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
+  // Read the parameters
+  std::ifstream infile;
+  infile.open("Parameters.dat",std::ifstream::in);
+  
+  infile >> pSiSlope;
+  infile.close();
+
+  printf("Silicon slope = %f\n",pSiSlope);
+  
   fRunEventCounter = 0;
 }
 
