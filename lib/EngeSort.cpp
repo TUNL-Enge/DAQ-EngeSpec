@@ -40,6 +40,9 @@ Histogram *hDEvsE;
 Histogram *hPos2vsPos1;
 Histogram *hThetavsPos1;
 
+std::vector<int> vPos1;
+Histogram *h2dPos1vsEvt;
+
 Histogram *hSiDEvsSiE;
 
 // Gated Spectra
@@ -59,6 +62,7 @@ Histogram *hSiTotalE_G_SiDEvsSiE;          // Total silicon energy
 // Counters
 int totalCounter=0;
 int gateCounter=0;
+int EventNo=0;
 
 // Scalers
 Scaler *sGates;
@@ -103,6 +107,9 @@ void EngeSort::Initialize(){
   hPos2vsPos1 = new Histogram("Pos 2 vs Pos 1", Channels2D, 2);
   hThetavsPos1 = new Histogram("Theta vs Pos 1", Channels2D, 2);
 
+  h2dPos1vsEvt = new Histogram("Pos 1 vs Event", Channels2D, 2);
+
+  
   hSiDEvsSiE = new Histogram("Si DE vs Si E", Channels2D, 2);
   
   //--------------------
@@ -115,6 +122,7 @@ void EngeSort::Initialize(){
   hSiTotalE_G_SiDEvsSiE = new Histogram("SiTotE; GSiDEvsSiE", Channels1D, 1);
   h2dSiDEvsSiTotalE_G_SiDEvsSiE = new Histogram("SiDE vs SiTotE; GSiDEvsSiE",
 						Channels2D, 2);
+
   
   //--------------------
   // Gates
@@ -167,6 +175,7 @@ void EngeSort::Initialize(){
 void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 
   totalCounter++;
+  EventNo++;
 
   double ADCsize = nADC; //sizeof(&dADC)/sizeof(&dADC[0]);
   double TDCsize = nTDC; //sizeof(dTDC)/sizeof(dTDC[0]);
@@ -200,6 +209,8 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
     cTDC_Pos2 = dTDC[3];
   } 
   //  std::cout << cPos1 << std::endl;
+
+  vPos1.push_back(cPos1);
   
   // Calculate some things
   int cTheta = (int)std::round(10000.0*atan((cPos2-cPos1)/100.)/3.1415 - 4000.);
@@ -285,6 +296,23 @@ void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
   }
   
 }
+
+void EngeSort::FillEndOfRun(int nEvents){
+
+  double EvtCompression = (double)Channels2D/(double)nEvents;
+  double PosCompression = (double)Channels2D/(double)Channels1D;
+
+  std::cout << "To convert x to event in Pos 1 vs Event spectrum: Event # = x * " <<
+    1/EvtCompression << std::endl;
+  
+  for(int i=0; i<nEvents; i++){
+    int e = (int) std::floor(EvtCompression * i);
+    int p = (int) std::floor(PosCompression * vPos1[i]);
+    h2dPos1vsEvt -> inc(e, p);
+  }
+  
+}
+
 
 // Increment the scalers
 // TODO: make this automatic. If the scaler is
@@ -547,6 +575,7 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
 }
 void MidasAnalyzerModule::Finish(){
   printf("Finish!\n");
+  eA->FillEndOfRun(fTotalEventCounter);
   printf("Counted %d events\n",fTotalEventCounter);
   std::cout << "number of spectra: " << eA->getSpectrumNames().size() << std::endl;
   eA->setIsRunning(false);
