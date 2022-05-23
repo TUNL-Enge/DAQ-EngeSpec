@@ -1,6 +1,6 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.2 )
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
  
 project( BoostPythonMakeData )
  
@@ -15,9 +15,9 @@ find_package( Boost COMPONENTS numpy REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 MESSAGE(STATUS "Boost: " ${Boost_INCLUDE_DIR})
 
-#find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP REQUIRED )
-#include_directories( ${ROOT_INCLUDE_DIRS} )
-#MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
+find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP REQUIRED )
+include_directories( ${ROOT_INCLUDE_DIRS} )
+MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
 #set(NO_ROOT "1")
 
 set(MIDASSYS "$ENV{MIDASSYS}")

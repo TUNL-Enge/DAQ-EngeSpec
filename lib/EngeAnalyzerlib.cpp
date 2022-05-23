@@ -20,6 +20,11 @@ std::string Messages::saygoodbye( ) {
   return "Goodbye! I hope I served you well";
 }
 
+std::string Messages::saysomething(std::string mesg){
+  std::string s = "EngeSort: " + mesg;
+  return s;
+}
+
 //----------------------------------------------------------------------
 // HISTOGRAMS
 

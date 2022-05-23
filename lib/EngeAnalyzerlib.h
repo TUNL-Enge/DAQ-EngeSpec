@@ -11,6 +11,7 @@ class Messages{
 
   std::string sayhello(std::string mesg);
   std::string saygoodbye();
+  std::string saysomething(std::string mesg);
 
 };
 

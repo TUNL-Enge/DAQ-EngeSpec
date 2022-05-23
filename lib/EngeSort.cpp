@@ -15,6 +15,10 @@ std::string EngeSort::sayhello( ) {
 std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
 }
+std::string EngeSort::saysomething(std::string str) {
+  
+  return messages.saysomething(str);
+}
 
 int Channels1D = 4096;
 int Channels2D = 512;
@@ -576,8 +580,8 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args){
 void MidasAnalyzerModule::Finish(){
   printf("Finish!\n");
   eA->FillEndOfRun(fTotalEventCounter);
-  printf("Counted %d events\n",fTotalEventCounter);
-  std::cout << "number of spectra: " << eA->getSpectrumNames().size() << std::endl;
+  //  printf("Counted %d events\n",fTotalEventCounter);
+  //  std::cout << "number of spectra: " << eA->getSpectrumNames().size() << std::endl;
   eA->setIsRunning(false);
 }
 TARunObject* MidasAnalyzerModule::NewRunObject(TARunInfo* runinfo){
@@ -633,10 +637,15 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 */
 void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Begin run %d\n",runinfo->fRunNo);
-  uint32_t run_start_time_binary = 0;
-  //runinfo->fOdb->RU32("/Runinfo/Start time binary", &run_start_time_binary);
-  time_t run_start_time = run_start_time_binary;
+  time_t run_start_time = runinfo->fOdb->odbReadUint32("/Runinfo/Start time binary", 0, 0);
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
+
+  auto start = std::chrono::system_clock::now();
+  std::time_t start_time = std::chrono::system_clock::to_time_t(start);
+
+  std::cout << "Start time = " << std::ctime(&start_time) << "\n";
+  //  time_t run_start_time = run_start_time_binary;
+  //  printf("ODB Run start time: %s\n",  run_start_time);
 
   // Read the parameters
   std::ifstream infile;
@@ -653,6 +662,16 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
+
+  time_t run_stop_time = runinfo->fOdb->odbReadUint32("/Runinfo/Stop time binary", 0, 0);
+  printf("ODB Run stop time: %d: %s", (int)run_stop_time, ctime(&run_stop_time));
+
+  auto stop = std::chrono::system_clock::now();
+  std::time_t stop_time = std::chrono::system_clock::to_time_t(stop);
+  std::cout << "Stop time = " << std::ctime(&stop_time) << "\n";
+
+  printf("BCI was %d\n",fModule->eA->getScalers()[10]);
+  
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
@@ -679,6 +698,7 @@ BOOST_PYTHON_MODULE(EngeSort)
   class_<EngeSort>("EngeSort")
     .def("sayhello", &EngeSort::sayhello)          // string
     .def("saygoodbye", &EngeSort::saygoodbye)          // string
+    .def("saysomething", &EngeSort::saysomething)      // string
     .def("Initialize", &EngeSort::Initialize)          // void
     .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
     .def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int

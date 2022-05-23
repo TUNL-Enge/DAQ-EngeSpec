@@ -33,6 +33,7 @@ class EngeSort {
   
   std::string sayhello( );
   std::string saygoodbye( );
+  std::string saysomething(std::string mesg);
   void Initialize();
   void ClearData();
   void SimulateData();
