@@ -15,7 +15,7 @@ find_package( Boost COMPONENTS numpy REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 MESSAGE(STATUS "Boost: " ${Boost_INCLUDE_DIR})
 
-find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP REQUIRED )
+find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP )
 include_directories( ${ROOT_INCLUDE_DIRS} )
 MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
 #set(NO_ROOT "1")
