@@ -637,8 +637,8 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 */
 void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Begin run %d\n",runinfo->fRunNo);
-  time_t run_start_time = runinfo->fOdb->odbReadUint32("/Runinfo/Start time binary", 0, 0);
-  printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
+  //  time_t run_start_time = runinfo->fOdb->odbReadUint32("/Runinfo/Start time binary", 0, 0);
+  //printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
   auto start = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(start);
@@ -663,8 +663,8 @@ void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
 
-  time_t run_stop_time = runinfo->fOdb->odbReadUint32("/Runinfo/Stop time binary", 0, 0);
-  printf("ODB Run stop time: %d: %s", (int)run_stop_time, ctime(&run_stop_time));
+  //  time_t run_stop_time = runinfo->fOdb->odbReadUint32("/Runinfo/Stop time binary", 0, 0);
+  //printf("ODB Run stop time: %d: %s", (int)run_stop_time, ctime(&run_stop_time));
 
   auto stop = std::chrono::system_clock::now();
   std::time_t stop_time = std::chrono::system_clock::to_time_t(stop);
