@@ -14,6 +14,9 @@ std::string EngeSort::sayhello( ) {
 std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
 }
+std::string EngeSort::saysomething(std::string str) {
+  return messages.saysomething(str);
+}
 
 int Channels1D = 8192;
 int Channels2D = 512;
@@ -498,7 +501,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id == 1){
 
     event->FindAllBanks();
-    std::cout << event->BankListToString() << std::endl;
+    //std::cout << event->BankListToString() << std::endl;
     
     // Get the ADC Bank
     TMBank* bMDPP = event->FindBank("MDPP");
@@ -570,6 +573,7 @@ BOOST_PYTHON_MODULE(EngeSort)
   class_<EngeSort>("EngeSort")
     .def("sayhello", &EngeSort::sayhello)          // string
     .def("saygoodbye", &EngeSort::saygoodbye)          // string
+		.def("saysomething", &EngeSort::saysomething)      // string
     .def("Initialize", &EngeSort::Initialize)          // void
     .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer) // int
     .def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
