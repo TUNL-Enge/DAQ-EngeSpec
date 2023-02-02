@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from PySide2 import QtCore
-from PySide2.QtWidgets import QApplication
+from PySide6 import QtCore
+from PySide6.QtWidgets import QApplication
 import sys
 import random
 

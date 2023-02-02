@@ -1,9 +1,9 @@
 import sys, os
 import matplotlib
 ##from PyQt5.QtCore import Qt, QThread, QTimer
-from PySide2 import QtCore, QtWidgets, QtGui
-from PySide2.QtWebEngineWidgets import QWebEngineView
-from PySide2.QtCore import QUrl
+from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtCore import QUrl
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 import time
@@ -278,7 +278,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.file_menu.addSeparator()
         ## Quit
         self.file_menu.addAction('&Quit', self.fileQuit,
-           QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
+           QtCore.Qt.CTRL | QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
         ## -----
@@ -288,18 +288,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.menuBar().addMenu(self.connections_menu)
 
         ## Connect to MIDAS
-        self.connectOnlineAction = QtWidgets.QAction('&Online MIDAS')
+        self.connectOnlineAction = QtGui.QAction('&Online MIDAS')
         self.connectOnlineAction.triggered.connect(self.connectmidas)
         self.connections_menu.addAction(self.connectOnlineAction)
 
         self.connections_menu.addSeparator()
         ## Connect to MIDAS offline
-        self.connectOfflineAction = QtWidgets.QAction('&Offline MIDAS')
+        self.connectOfflineAction = QtGui.QAction('&Offline MIDAS')
         self.connectOfflineAction.triggered.connect(self.offlinemidas)
         self.connections_menu.addAction(self.connectOfflineAction)
 
         ## Sort a file in offline mode
-        self.sortAction = QtWidgets.QAction('&Queue sort file(s)', self)
+        self.sortAction = QtGui.QAction('&Queue sort file(s)', self)
         self.sortAction.setEnabled(False)
         self.sortAction.triggered.connect(self.sort)
         self.connections_menu.addAction(self.sortAction)
@@ -309,13 +309,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.settings_menu = QtWidgets.QMenu('&Settings', self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.settings_menu)
-        # autobinAction = QtWidgets.QAction('&Auto bin',self.settings_menu)
+        # autobinAction = QtGui.QAction('&Auto bin',self.settings_menu)
         # autobinAction.setCheckable(True)
         # autobinAction.setChecked(False)
         # autobinAction.triggered.connect(self.setting_autobin)
         # self.settings_menu.addAction(autobinAction)
         
-        dotsAction = QtWidgets.QAction('&dots',self.settings_menu)
+        dotsAction = QtGui.QAction('&dots',self.settings_menu)
         dotsAction.setCheckable(True)
         dotsAction.setChecked(False)
         dotsAction.triggered.connect(self.setting_dots)
@@ -332,13 +332,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def makeToolbar(self):
         iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
                                "..", "images", "icons", "")
-        exitAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Exit.ico'), 'Exit', self)
+        exitAction = QtGui.QAction(QtGui.QIcon(iconDir + 'Exit.ico'), 'Exit', self)
         exitAction.triggered.connect(self.close)
-        startAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run/Sort', self)
+        startAction = QtGui.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run/Sort', self)
         startAction.triggered.connect(self.startmidas)
-        stopAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'Stop.ico'), 'Stop Run', self)
+        stopAction = QtGui.QAction(QtGui.QIcon(iconDir + 'Stop.ico'), 'Stop Run', self)
         stopAction.triggered.connect(self.stopmidas)
-        gateAction = QtWidgets.QAction(QtGui.QIcon(iconDir + 'MakeGate.ico'), 'Set Gate', self)
+        gateAction = QtGui.QAction(QtGui.QIcon(iconDir + 'MakeGate.ico'), 'Set Gate', self)
         gateAction.triggered.connect(self.setgate)
 
         self.runControlsToolbar = self.addToolBar('Exit')
@@ -721,7 +721,7 @@ class MyReceiver(QtCore.QObject):
         while True:
             text = self.queue.get()
             self.mysignal.emit(text)
-            if text is "Exiting":
+            if text == "Exiting":
                 break
 
 

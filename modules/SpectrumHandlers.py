@@ -1,5 +1,5 @@
 ## All of the stuff for opening spectra
-from PySide2.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog
 import numpy as np
 import pandas as pd
 import csv
