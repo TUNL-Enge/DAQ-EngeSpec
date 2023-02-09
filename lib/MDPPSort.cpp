@@ -18,16 +18,33 @@ std::string EngeSort::saysomething(std::string str) {
   return messages.saysomething(str);
 }
 
-int Channels1D = 8192;
+int Channels1D = 65536;
 int Channels2D = 512;
 
-int comp1d = 4;   // The amount of compression to apply to
+int comp1d = 1;   // The amount of compression to apply to
 		  // measurements so they fit in the spectra
 
 // 1D Spectra
 Histogram *hDet1;
 Histogram *hDet1_pu;
 Histogram *hDet2;
+Histogram *hDet3;
+Histogram *hDet4;
+Histogram *hDet5;
+Histogram *hDet6;
+Histogram *hDet7;
+Histogram *hDet8;
+Histogram *hDet9;
+Histogram *hDet10;
+Histogram *hDet11;
+Histogram *hDet12;
+Histogram *hDet13;
+Histogram *hDet14;
+Histogram *hDet15;
+Histogram *hDet16;
+
+
+
 
 Histogram *hTDC_Det1;
 Histogram *hTDC_Det2;
@@ -50,6 +67,20 @@ void EngeSort::Initialize(){
   hDet1 = new Histogram("Det 1", Channels1D, 1);
   hDet1_pu = new Histogram("Det 1 - no pileup", Channels1D, 1);
   hDet2 = new Histogram("Det 2", Channels1D, 1);
+	hDet3 = new Histogram("Det 3", Channels1D, 1);
+	hDet4 = new Histogram("Det 4", Channels1D, 1);
+	hDet5 = new Histogram("Det 5", Channels1D, 1);
+	hDet6 = new Histogram("Det 6", Channels1D, 1);
+	hDet7 = new Histogram("Det 7", Channels1D, 1);
+	hDet8 = new Histogram("Det 8", Channels1D, 1);
+	hDet9 = new Histogram("Det 9", Channels1D, 1);
+	hDet10 = new Histogram("Det 10", Channels1D, 1);
+	hDet11 = new Histogram("Det 11", Channels1D, 1);
+	hDet12 = new Histogram("Det 12", Channels1D, 1);
+	hDet13 = new Histogram("Det 13", Channels1D, 1);
+	hDet14 = new Histogram("Det 14", Channels1D, 1);
+	hDet15 = new Histogram("Det 15", Channels1D, 1);
+	hDet16 = new Histogram("Det 16", Channels1D, 1);
 
   hTDC_Det1 = new Histogram("TDC Det1", Channels1D, 1);
   hTDC_Det2 = new Histogram("TDC Det2", Channels1D, 1);
@@ -94,7 +125,6 @@ void EngeSort::Initialize(){
 void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
 
   totalCounter++;
-
   //  double ADCsize = sizeof(&dADC)/sizeof(&dADC[0]);
   //std::cout << ADCsize << "  " << TDCsize << std::endl;
   
@@ -151,8 +181,8 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int cDet2 = (int)std::round(dADC[1]/comp1d);
   //  int cDet1 = dADC[0];
   //  int cDet2 = dADC[1];
-  /* int cDet3 = dADC[2];
-   int cDet4 = dADC[3];
+  int cDet3 = dADC[2];
+  int cDet4 = dADC[3];
   int cDet5 = dADC[4];
   int cDet6 = dADC[5];
   int cDet7 = dADC[6];
@@ -165,25 +195,25 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int cDet14 = dADC[13];
   int cDet15 = dADC[14];
   int cDet16 = dADC[15];
-  */
+  
 
 
   int cTDC_Det1 = dTDC[0]; //(int)std::round(dTDC[0]/comp1d);
   int cTDC_Det2 = dTDC[1]; //(int)std::round(dTDC[1]/comp1d);
-  /* int cTDC_Det3 = dTDC[2];
-  int cTDC_Det4 = dTDC[3];
-  int cTDC_Det5 = dTDC[4];
-  int cTDC_Det6 = dTDC[5];
-  int cTDC_Det7 = dTDC[6];
-  int cTDC_Det8 = dTDC[7]; 
-  int cTDC_Det9 = dTDC[8];
-  int cTDC_Det10 = dTDC[9];
-  int cTDC_Det11 = dTDC[10];
-  int cTDC_Det12 = dTDC[11];
-  int cTDC_Det13 = dTDC[12];
-  int cTDC_Det14 = dTDC[13];
-  int cTDC_Det15 = dTDC[14];
-  int cTDC_Det16 = dTDC[15]; */
+  // int cTDC_Det3 = dTDC[2];
+  // int cTDC_Det4 = dTDC[3];
+  // int cTDC_Det5 = dTDC[4];
+  // int cTDC_Det6 = dTDC[5];
+  // int cTDC_Det7 = dTDC[6];
+  // int cTDC_Det8 = dTDC[7]; 
+  // int cTDC_Det9 = dTDC[8];
+  // int cTDC_Det10 = dTDC[9];
+  // int cTDC_Det11 = dTDC[10];
+  // int cTDC_Det12 = dTDC[11];
+  // int cTDC_Det13 = dTDC[12];
+  // int cTDC_Det14 = dTDC[13];
+  // int cTDC_Det15 = dTDC[14];
+  // int cTDC_Det16 = dTDC[15];
 
   // Below this point only deal in 'c' values, which are the
   // compressed values
@@ -192,14 +222,28 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
   double compression = (double)Channels1D/ (double)Channels2D;
-  int cDet1comp = (int) std::floor(cDet1 / compression);
-  int cDet2comp = (int) std::floor(cDet2 / compression);
+  int cDet1comp = (int) std::floor(cDet6 / compression);
+  int cDet2comp = (int) std::floor(cDet14 / compression);
   
   // Increment 1D histograms
   hDet1 -> inc(cDet1);
   hDet1_pu -> inc(cDet1_pu);
   hDet2 -> inc(cDet2);
-
+	hDet3 -> inc(cDet3);
+	hDet4 -> inc(cDet4);
+	hDet5 -> inc(cDet5);
+	hDet6 -> inc(cDet6);
+	hDet7 -> inc(cDet7);
+	hDet8 -> inc(cDet8);
+	hDet9 -> inc(cDet9);
+	hDet10 -> inc(cDet10);
+	hDet11 -> inc(cDet11);
+	hDet12 -> inc(cDet12);
+	hDet13 -> inc(cDet13);
+	hDet14 -> inc(cDet14);
+	hDet15 -> inc(cDet15);
+	hDet16 -> inc(cDet16);
+	
   //std::cout << "Incremented 1d spec" << std::endl;
   
   hTDC_Det1 -> inc(cTDC_Det1);
