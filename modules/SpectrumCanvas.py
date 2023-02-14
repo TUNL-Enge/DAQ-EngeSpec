@@ -637,7 +637,7 @@ class SpectrumCanvas(FigureCanvas):
             self.cydata.append(-1)       
 
         if self.isZoomed == True:
-            if self.NClicks == 1:
+            if self.NClicks == 1 and ix is not None:              
                 self.zoomMarker =  self.a.axvline(x=ix,ls="--")
                 self.fig.canvas.draw()
 
@@ -678,7 +678,9 @@ class SpectrumCanvas(FigureCanvas):
         else:
             self.Spec.xzoom = self.a.get_xlim()
         self.isZoomed = False
-        self.zoomMarker.remove()
+        if 'self.zoomMarker' in locals():
+            self.zoomMarker.remove()
+        
         self.updateSlider()
         self.fig.canvas.draw()
         self.newIncrement = np.ceil((newhighx-newlowx)/50)
