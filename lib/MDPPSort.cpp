@@ -18,54 +18,77 @@ std::string EngeSort::saysomething(std::string str) {
   return messages.saysomething(str);
 }
 
+
+/* ------------- 
+Global Variables 
+----------------*/
+
+// binning to use in the histograms
 int Channels1D = 65536;
 int Channels2D = 512;
 
-int comp1d = 1;   // The amount of compression to apply to
-		  // measurements so they fit in the spectra
 
 // Scalers
 Scaler *sPulser;
 Scaler *sTriggers;
 
 // 1D Spectra
-Histogram *hDet1;
-Histogram *hDet1_pu;
-Histogram *hDet2;
-Histogram *hDet3;
-Histogram *hDet4;
-Histogram *hDet5;
-Histogram *hDet6;
-Histogram *hDet7;
-Histogram *hDet8;
-Histogram *hDet9;
-Histogram *hDet10;
-Histogram *hDet11;
-Histogram *hDet12;
-Histogram *hDet13;
-Histogram *hDet14;
-Histogram *hDet15;
-Histogram *hDet16;
 
+// Annulus Energy Histograms
+Histogram *hADCNaI0;
+Histogram *hADCNaI1;
+Histogram *hADCNaI2;
+Histogram *hADCNaI3;
+Histogram *hADCNaI4;
+Histogram *hADCNaI5;
+Histogram *hADCNaI6;
+Histogram *hADCNaI7;
+Histogram *hADCNaI8;
+Histogram *hADCNaI9;
+Histogram *hADCNaI10;
+Histogram *hADCNaI11;
+Histogram *hADCNaI12;
+Histogram *hADCNaI13;
+Histogram *hADCNaI14;
+Histogram *hADCNaI15;
 
+// Annulus Timing Histograms
+Histogram *hTDCNaI0;
+Histogram *hTDCNaI1;
+Histogram *hTDCNaI2;
+Histogram *hTDCNaI3;
+Histogram *hTDCNaI4;
+Histogram *hTDCNaI5;
+Histogram *hTDCNaI6;
+Histogram *hTDCNaI7;
+Histogram *hTDCNaI8;
+Histogram *hTDCNaI9;
+Histogram *hTDCNaI10;
+Histogram *hTDCNaI11;
+Histogram *hTDCNaI12;
+Histogram *hTDCNaI13;
+Histogram *hTDCNaI14;
+Histogram *hTDCNaI15;
 
-Histogram *hTDC_Det0;
-Histogram *hTDC_Det1;
-Histogram *hTDC_Det2;
+// Annulus Group Variables
+Histogram *hNaIsum;
+Histogram *hNaITDC;
+Histogram *hMulti;
+
+// HPGe Singles
+Histogram *hHPGe;
+
+// Pulser
+Histogram *hPulser;
 
 // 2D Spectra
-Histogram *hDet2vsDet1;
+Histogram *hHPGevNaIsum;
+Histogram *hHPGevNaITDC;
+
 
 // Gated Spectra
-Histogram *hDet1_gDet2vsDet1_G1;
-
-// 1D Gated Timing?
-Histogram *hDet0_gTDC0;
-Histogram *hDet1_gTDC1;
-Histogram *hDet2_gTDC2;
-
-// Summed Spectra
-Histogram *hsumNaI;
+Histogram *ghHPGeE;
+Histogram *ghHPGeT;
 
 // Counters
 int totalCounter=0;
@@ -73,33 +96,64 @@ int totalCounter=0;
 void EngeSort::Initialize(){
 
   std::string hname;
-  
+
+	// We initialize the histograms defined above.
+
+	
   //--------------------
   // 1D Histograms
-  hDet1 = new Histogram("Det 1", Channels1D, 1);
-  hDet1_pu = new Histogram("Det 1 - no pileup", Channels1D, 1);
-  hDet2 = new Histogram("Det 2", Channels1D, 1);
-	hDet3 = new Histogram("Det 3", Channels1D, 1);
-	hDet4 = new Histogram("Det 4", Channels1D, 1);
-	hDet5 = new Histogram("Det 5", Channels1D, 1);
-	hDet6 = new Histogram("Det 6", Channels1D, 1);
-	hDet7 = new Histogram("Det 7", Channels1D, 1);
-	hDet8 = new Histogram("Det 8", Channels1D, 1);
-	hDet9 = new Histogram("Det 9", Channels1D, 1);
-	hDet10 = new Histogram("Det 10", Channels1D, 1);
-	hDet11 = new Histogram("Det 11", Channels1D, 1);
-	hDet12 = new Histogram("Det 12", Channels1D, 1);
-	hDet13 = new Histogram("Det 13", Channels1D, 1);
-	hDet14 = new Histogram("Det 14", Channels1D, 1);
-	hDet15 = new Histogram("Det 15", Channels1D, 1);
-	hDet16 = new Histogram("Det 16", Channels1D, 1);
 
-  hTDC_Det0 = new Histogram("TDC Det0", Channels1D, 1);
-  hTDC_Det1 = new Histogram("TDC Det1", Channels1D, 1);
-  hTDC_Det2 = new Histogram("TDC Det2", Channels1D, 1);
-  //--------------------
+	hADCNaI0 = new Histogram("NaI 0", Channels1D, 1); 
+	hADCNaI1 = new Histogram("NaI 1", Channels1D, 1); 
+	hADCNaI2 = new Histogram("NaI 2", Channels1D, 1); 
+	hADCNaI3 = new Histogram("NaI 3", Channels1D, 1); 
+	hADCNaI4 = new Histogram("NaI 4", Channels1D, 1); 
+	hADCNaI5 = new Histogram("NaI 5", Channels1D, 1); 
+	hADCNaI6 = new Histogram("NaI 6", Channels1D, 1); 
+	hADCNaI7 = new Histogram("NaI 7", Channels1D, 1); 
+	hADCNaI8 = new Histogram("NaI 8", Channels1D, 1); 
+	hADCNaI9 = new Histogram("NaI 9", Channels1D, 1); 
+	hADCNaI10 = new Histogram("NaI 10", Channels1D, 1);
+	hADCNaI11 = new Histogram("NaI 11", Channels1D, 1);
+	hADCNaI12 = new Histogram("NaI 12", Channels1D, 1);
+	hADCNaI13 = new Histogram("NaI 13", Channels1D, 1);
+	hADCNaI14 = new Histogram("NaI 14", Channels1D, 1);
+	hADCNaI15 = new Histogram("NaI 15", Channels1D, 1);
+
+
+	hTDCNaI0 = new Histogram("TDC 0", Channels1D, 1); 
+	hTDCNaI1 = new Histogram("TDC 1", Channels1D, 1); 
+	hTDCNaI2 = new Histogram("TDC 2", Channels1D, 1); 
+	hTDCNaI3 = new Histogram("TDC 3", Channels1D, 1); 
+	hTDCNaI4 = new Histogram("TDC 4", Channels1D, 1); 
+	hTDCNaI5 = new Histogram("TDC 5", Channels1D, 1); 
+	hTDCNaI6 = new Histogram("TDC 6", Channels1D, 1); 
+	hTDCNaI7 = new Histogram("TDC 7", Channels1D, 1); 
+	hTDCNaI8 = new Histogram("TDC 8", Channels1D, 1); 
+	hTDCNaI9 = new Histogram("TDC 9", Channels1D, 1); 
+	hTDCNaI10 = new Histogram("TDC 10", Channels1D, 1);
+	hTDCNaI11 = new Histogram("TDC 11", Channels1D, 1);
+	hTDCNaI12 = new Histogram("TDC 12", Channels1D, 1);
+	hTDCNaI13 = new Histogram("TDC 13", Channels1D, 1);
+	hTDCNaI14 = new Histogram("TDC 14", Channels1D, 1);
+	hTDCNaI15 = new Histogram("TDC 15", Channels1D, 1);
+
+
+
+	
+	hNaIsum = new Histogram("NaI Sum", Channels1D, 1);
+	hNaITDC = new Histogram("NaI Total TDC", Channels1D, 1);
+	hMulti = new Histogram("NaI Multi", Channels1D, 1);
+
+	hHPGe = new Histogram("HPGe", Channels1D, 1);
+
+	hPulser = new Histogram("Pulser", Channels1D, 1);
+
 
 	//--------------------
+
+	//--------------------
+	// Scalers
   sPulser = new Scaler("Pulser", 0);    // Name, index
   sTriggers = new Scaler("Triggers", 1);    // Name, index
   //--------------------
@@ -107,159 +161,133 @@ void EngeSort::Initialize(){
 	
   //--------------------
   // 2D Histograms
-  hDet2vsDet1 = new Histogram("DE vs Pos1", Channels2D, 2);
   //--------------------
 
+	hHPGevNaIsum = new Histogram("HPGe v NaI", Channels2D, 2);
+	hHPGevNaITDC = new Histogram("HPGe v TDC NaI", Channels2D, 2);
+
+	
 	//--------------------
   // Gated Histograms
-  hDet1_gDet2vsDet1_G1 = new Histogram("Det 1; GDet2vsDet1-G1", Channels1D, 1);
-
-	hDet0_gTDC0 = new Histogram("Det 0; GDet0vsTDC0_G0",Channels1D, 1);
-	hDet1_gTDC1 = new Histogram("Det 1; GDet1vsTDC1_G1",Channels1D, 1);
-	hDet2_gTDC2 = new Histogram("Det 2; GDet2vsTDC2_G2",Channels1D, 1);
   //--------------------
 
-	//--------------------
-	//Summed Spectra
-	hsumNaI = new Histogram("Summed NaI Spectra",Channels1D, 1);
+	ghHPGeE = new Histogram("Gated E", Channels1D, 1);
+	ghHPGeT = new Histogram("Gated T", Channels1D, 1);
 
-	//--------------------
-
-
+	
 	// Gates
-  //  hE -> addGate("Energy Gate");
   
-  hDet2vsDet1 -> addGate("Gate");
-
-	hTDC_Det0 -> addGate("Gate");
-	hTDC_Det1 -> addGate("Gate");
-	hTDC_Det2 -> addGate("Gate");
+	hHPGevNaIsum -> addGate("Energy Gate");
+	hHPGevNaITDC -> addGate("Time Gate");
 	
 	
-  /*
-  // Loop through and print all histograms
-  for(auto h: Histograms){
-    if(h->getnDims() == 1) {
-      std::cout << "Found a 1D histogram!" << std::endl;
-      h->Print(0,10);
-    } else if(h->getnDims() == 2) {
-      std::cout << "Found a 2D histogram!" << std::endl;
-      h->Print(0,10,0,10);
-    }
-    std::cout << std::endl;
-  }
-  */
-
-
-  // Build the scalers
-  // Not currently used
 
  
+}
+
+enum EventType {long_integral, tdc, none};
+
+struct QDCEvent {
+	int channel;
+	EventType event_type;
+};
+
+// Convert the raw channel number from the bank to the appropriate channel 
+QDCEvent qdc_channel_assign(int nchannels, int raw_channel){
+
+	// gets rounded down to give the case statement
+	int chan_case = raw_channel/nchannels; 
+
+	QDCEvent evt;
+	
+	switch(chan_case){
+		
+	case 0 :
+		// This is the case of long integration value.
+		evt.channel = raw_channel;
+		evt.event_type = long_integral;
+		break;
+		
+	case 1 :
+		// TDC value
+		evt.channel = (raw_channel - nchannels);
+		evt.event_type = tdc;
+		break;
+		
+	default :
+		evt.channel = -1;
+		evt.event_type = none;
+		// I don't care about the rest for now.
+	}
+
+	return evt;
 }
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
 // Arguments are the raw events
 void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
-
   totalCounter++;
-  //  double ADCsize = sizeof(&dADC)/sizeof(&dADC[0]);
-  //std::cout << nMDPP << std::endl;
-  
-  // Thresholds
-  /*
-  int Threshold = 10;
-  for(int i=0; i<ADCsize; i++)
-    if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
-  for(int i=0; i<TDCsize; i++)
-    if(dTDC[i] < Threshold || dTDC[i] > Channels1D)dTDC[i]=0;
-  */
 
-  // Cade: here's an example
-  //  std::cout << "nMDPP = " << nMDPP << "\n";
-  
-  /* 
-     Here is where the raw data gets split into voltage and timing information
-  */
-  int dADC[16] = {0};   // stores energies
-  int dADC_pu[16] = {0}; // Energies removing pileup flagged pulses
-  int dTDC[16] = {0};   // stores times
+  int dADC[32] = {0};   // stores energies
+  int dTDC[32] = {0};   // stores times
   
   for(int i = 0; i < nMDPP; i++){
-		// if (((dMDPP[i] >> 30) & 0x3) == 3){
-		// 	int temp = dMDPP[i] & 0x3FFFFFFF;
-		// 	if (temp != 1073741823){
-		// 	printf("Event: %d\n", temp);
-		// 	}
-		// 	continue;
-		// }
+
+		// skip non-data events
     if ((dMDPP[i] & 0xF0000000) != 0x10000000){
       continue;
     }
     int signal = dMDPP[i] & 0xFFFF;    // either time or energy
-    int chn = (dMDPP[i] >> 16) & 0x1F;
-    // ERROR: Channels 1-16 are energy readings
-    //        Channels 17-32 are time readings (chn = chn-16) Manual P. 25
-    int pu = (dMDPP[i] >> 23) & 0x1;  // pile-up
+		
+		int chn = (dMDPP[i] >> 16) & 0xFF; // 32 channels is 7 bit address
+		//std::cout << "Channel: " << chn << " Energy: " << signal <<std::endl;
+
     int ov = (dMDPP[i] >> 24) & 0x1;  // overflow
-    // std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
-		// 					 << "\n" ;
-   
-    if(chn <= 15){
-      dADC[chn] = signal;
-      if((!pu ) & (!ov))dADC_pu[chn] = signal;
-    }
-    else if(chn > 15){
-      dTDC[chn-16] = signal;
-    }
+
+		// CAM: Trying to make this a bit more flexible, but it might be needlessly complicated.
+		QDCEvent evt = qdc_channel_assign(32, chn);
+
+		switch(evt.event_type){
+
+		case long_integral :
+			dADC[evt.channel] = signal;
+			break;
+			
+		case tdc :
+			dTDC[evt.channel] = signal;
+			break;
+			
+		case none :
+			break;
+						
+		}
+		
   }
 
-	int cSumNaI = 0; //sum of spectra 
+	int SumNaI = 0; //sum of spectra
+	int multi = 0; // multiplicity
+	int NaITDC = 0; // combined timing spectra
 	for (int i = 0; i < 16; i++){
-		cSumNaI += dADC[i];
+		if (i == 2){
+			// plug is the HPGe for now
+			continue;
+		}
+		SumNaI += dADC[i];
+		if (dADC[i] > 0){
+			multi += 1;
+		}
+		// take the first hit
+		if (dTDC[i] > 0) {
+			if (((NaITDC != 0) && (dTDC[i] < NaITDC)) | (NaITDC == 0)) {
+					NaITDC = dTDC[i];
+			}
+			
+		}
 	}
 
-	//  std::cout << "Assigned data to channels\n";
 
-  // Define the channels
-  int cDet1 = (int)std::round(dADC[0]/comp1d);
-  int cDet1_pu = (int)std::round(dADC_pu[0]/comp1d);
-  int cDet2 = (int)std::round(dADC[1]/comp1d);
-  //  int cDet1 = dADC[0];
-  //  int cDet2 = dADC[1];
-  int cDet3 = dADC[2];
-  int cDet4 = dADC[3];
-  int cDet5 = dADC[4];
-  int cDet6 = dADC[5];
-  int cDet7 = dADC[6];
-  int cDet8 = dADC[7]; 
-  int cDet9 = dADC[8];
-  int cDet10 = dADC[9];
-  int cDet11 = dADC[10];
-  int cDet12 = dADC[11];
-  int cDet13 = dADC[12];
-  int cDet14 = dADC[13];
-  int cDet15 = dADC[14];
-  int cDet16 = dADC[15];
-  
-
-
-  int cTDC_Det0 = dTDC[0]; //(int)std::round(dTDC[0]/comp1d);
-  int cTDC_Det1 = dTDC[1]; //(int)std::round(dTDC[1]/comp1d);
-	int cTDC_Det2 = dTDC[2];
-  int cTDC_Det3 = dTDC[3];
-  int cTDC_Det4 = dTDC[4];
-  int cTDC_Det5 = dTDC[5];
-  int cTDC_Det6 = dTDC[6];
-  int cTDC_Det7 = dTDC[7]; 
-  int cTDC_Det8 = dTDC[8];
-  int cTDC_Det9 = dTDC[9];
-  int cTDC_Det10 = dTDC[10];
-  int cTDC_Det11 = dTDC[11];
-  int cTDC_Det12 = dTDC[12];
-  int cTDC_Det13 = dTDC[13];
-  int cTDC_Det14 = dTDC[14];
-  int cTDC_Det15 = dTDC[15];
+	
 
   // Below this point only deal in 'c' values, which are the
   // compressed values
@@ -267,70 +295,75 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
-  double compression = 10.0; //(double)Channels1D/ (double)Channels2D;
-  int cDet1comp = (int) std::floor(cDet7 / compression);
-  int cDet2comp = (int) std::floor(cDet15 / 20.0);
+  double compressionE = 5000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
+	double compressionT = 1000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
+  int cSum = (int) std::floor(SumNaI / compressionE);
+  int cHPGe = (int) std::floor(dADC[2] / compressionE);
+  int cTDC = (int) std::floor(dADC[2] / compressionT);
+	
   
   // Increment 1D histograms
-  hDet1 -> inc(cDet1);
-  hDet1_pu -> inc(cDet1_pu);
-  hDet2 -> inc(cDet2);
-	hDet3 -> inc(cDet3);
-	hDet4 -> inc(cDet4);
-	hDet5 -> inc(cDet5);
-	hDet6 -> inc(cDet6);
-	hDet7 -> inc(cDet7);
-	hDet8 -> inc(cDet8);
-	hDet9 -> inc(cDet9);
-	hDet10 -> inc(cDet10);
-	hDet11 -> inc(cDet11);
-	hDet12 -> inc(cDet12);
-	hDet13 -> inc(cDet13);
-	hDet14 -> inc(cDet14);
-	hDet15 -> inc(cDet15);
-	hDet16 -> inc(cDet16);
+	hADCNaI0  -> inc(dADC[0]);
+	hADCNaI1  -> inc(dADC[1]);
+	hADCNaI2  -> inc(0); // not implemented right now.
+	hADCNaI3  -> inc(dADC[3]);  
+	hADCNaI4  -> inc(dADC[4]);
+	hADCNaI5  -> inc(dADC[5]);
+	hADCNaI6  -> inc(dADC[6]);
+	hADCNaI7  -> inc(dADC[7]);
+	hADCNaI8  -> inc(dADC[8]);
+	hADCNaI9 	-> inc(dADC[9]);
+	hADCNaI10	-> inc(dADC[10]);
+	hADCNaI11	-> inc(dADC[11]);
+	hADCNaI12	-> inc(dADC[12]);
+	hADCNaI13	-> inc(dADC[13]);
+	hADCNaI14	-> inc(dADC[14]);
+	hADCNaI15	-> inc(dADC[15]);
+
+	hTDCNaI0  -> inc(dTDC[0]);
+	hTDCNaI1  -> inc(dTDC[1]);
+	hTDCNaI2  -> inc(0); // not implemented right now.
+	hTDCNaI3  -> inc(dTDC[3]);  
+	hTDCNaI4  -> inc(dTDC[4]);
+	hTDCNaI5  -> inc(dTDC[5]);
+	hTDCNaI6  -> inc(dTDC[6]);
+	hTDCNaI7  -> inc(dTDC[7]);
+	hTDCNaI8  -> inc(dTDC[8]);
+	hTDCNaI9 	-> inc(dTDC[9]);
+	hTDCNaI10	-> inc(dTDC[10]);
+	hTDCNaI11	-> inc(dTDC[11]);
+	hTDCNaI12	-> inc(dTDC[12]);
+	hTDCNaI13	-> inc(dTDC[13]);
+	hTDCNaI14	-> inc(dTDC[14]);
+	hTDCNaI15	-> inc(dTDC[15]);
 	
-  //std::cout << "Incremented 1d spec" << std::endl;
-  
-  hTDC_Det0 -> inc(cTDC_Det0);
-  hTDC_Det1 -> inc(cTDC_Det1);
-  hTDC_Det2 -> inc(cTDC_Det2);
+  hNaIsum -> inc(SumNaI);
+	hMulti -> inc(multi);
+	hNaITDC -> inc(NaITDC);
 
-	//std::cout << "Incremented TDC" << std::endl;
+	hHPGe -> inc(dADC[2]);
 
-	hsumNaI -> inc(cSumNaI);
-
+	hPulser -> inc(dADC[16]);
 	
   // Increment 2D histograms
-  hDet2vsDet1 -> inc(cDet1comp, cDet2comp);
+  hHPGevNaIsum -> inc(cHPGe, cSum);
+  hHPGevNaITDC -> inc(cHPGe, cTDC);
 
-  //std::cout << "2D spect" << std::endl;
   
   // The gated spectrum
-  //std::cout << "gated spec" << std::endl; 
 
-  Gate &G1 = hDet2vsDet1 -> getGate(0);
-	Gate &TG0 = hTDC_Det0 -> getGate(0);
-	Gate &TG1 = hTDC_Det1 -> getGate(0);
-	Gate &TG2 = hTDC_Det2 -> getGate(0);
+  Gate &G1 = hHPGevNaIsum -> getGate(0);
+	Gate &G2 = hHPGevNaITDC -> getGate(0);
 	
 	
-	//	G1.Print();
-  if(G1.inGate(cDet1comp,cDet2comp)){
-    hDet1_gDet2vsDet1_G1->inc(cDet7);
+  if(G1.inGate(cHPGe, cSum)){
+    ghHPGeE->inc(dADC[2]);
   }
-	
-	if(TG0.inGate(cTDC_Det0)){
-		hDet0_gTDC0->inc(cDet1);
-	}
 
-	if(TG1.inGate(cTDC_Det1)){
-		hDet1_gTDC1->inc(cDet2);
-	}
+	if(G2.inGate(cHPGe, cTDC)){
+    ghHPGeT->inc(dADC[2]);
+  }
 
-	if(TG2.inGate(cTDC_Det2)){
-		hDet2_gTDC2->inc(cDet3);
-	}
 }
 
 
