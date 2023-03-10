@@ -1,5 +1,5 @@
 ## All of the stuff for opening spectra
-from PySide2.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog
 import numpy as np
 import pandas as pd
 import csv
@@ -18,7 +18,7 @@ class SpectrumObject:
         self.is2D = False
         self.isLog = False
 
-        self.NBins = 2**13
+        self.NBins = 2**16 # you changed this from 2**13
         
         self.spec = np.zeros(self.NBins)
         self.spec_temp = np.zeros(self.NBins)   ## The temporary spectrum in memory

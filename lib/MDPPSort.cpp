@@ -18,17 +18,38 @@ std::string EngeSort::saysomething(std::string str) {
   return messages.saysomething(str);
 }
 
-int Channels1D = 8192;
+int Channels1D = 65536;
 int Channels2D = 512;
 
-int comp1d = 4;   // The amount of compression to apply to
+int comp1d = 1;   // The amount of compression to apply to
 		  // measurements so they fit in the spectra
+
+// Scalers
+Scaler *sPulser;
+Scaler *sTriggers;
 
 // 1D Spectra
 Histogram *hDet1;
 Histogram *hDet1_pu;
 Histogram *hDet2;
+Histogram *hDet3;
+Histogram *hDet4;
+Histogram *hDet5;
+Histogram *hDet6;
+Histogram *hDet7;
+Histogram *hDet8;
+Histogram *hDet9;
+Histogram *hDet10;
+Histogram *hDet11;
+Histogram *hDet12;
+Histogram *hDet13;
+Histogram *hDet14;
+Histogram *hDet15;
+Histogram *hDet16;
 
+
+
+Histogram *hTDC_Det0;
 Histogram *hTDC_Det1;
 Histogram *hTDC_Det2;
 
@@ -37,6 +58,14 @@ Histogram *hDet2vsDet1;
 
 // Gated Spectra
 Histogram *hDet1_gDet2vsDet1_G1;
+
+// 1D Gated Timing?
+Histogram *hDet0_gTDC0;
+Histogram *hDet1_gTDC1;
+Histogram *hDet2_gTDC2;
+
+// Summed Spectra
+Histogram *hsumNaI;
 
 // Counters
 int totalCounter=0;
@@ -50,23 +79,63 @@ void EngeSort::Initialize(){
   hDet1 = new Histogram("Det 1", Channels1D, 1);
   hDet1_pu = new Histogram("Det 1 - no pileup", Channels1D, 1);
   hDet2 = new Histogram("Det 2", Channels1D, 1);
+	hDet3 = new Histogram("Det 3", Channels1D, 1);
+	hDet4 = new Histogram("Det 4", Channels1D, 1);
+	hDet5 = new Histogram("Det 5", Channels1D, 1);
+	hDet6 = new Histogram("Det 6", Channels1D, 1);
+	hDet7 = new Histogram("Det 7", Channels1D, 1);
+	hDet8 = new Histogram("Det 8", Channels1D, 1);
+	hDet9 = new Histogram("Det 9", Channels1D, 1);
+	hDet10 = new Histogram("Det 10", Channels1D, 1);
+	hDet11 = new Histogram("Det 11", Channels1D, 1);
+	hDet12 = new Histogram("Det 12", Channels1D, 1);
+	hDet13 = new Histogram("Det 13", Channels1D, 1);
+	hDet14 = new Histogram("Det 14", Channels1D, 1);
+	hDet15 = new Histogram("Det 15", Channels1D, 1);
+	hDet16 = new Histogram("Det 16", Channels1D, 1);
 
+  hTDC_Det0 = new Histogram("TDC Det0", Channels1D, 1);
   hTDC_Det1 = new Histogram("TDC Det1", Channels1D, 1);
   hTDC_Det2 = new Histogram("TDC Det2", Channels1D, 1);
-  
+  //--------------------
+
+	//--------------------
+  sPulser = new Scaler("Pulser", 0);    // Name, index
+  sTriggers = new Scaler("Triggers", 1);    // Name, index
+  //--------------------
+
+	
   //--------------------
   // 2D Histograms
   hDet2vsDet1 = new Histogram("DE vs Pos1", Channels2D, 2);
+  //--------------------
 
+	//--------------------
   // Gated Histograms
   hDet1_gDet2vsDet1_G1 = new Histogram("Det 1; GDet2vsDet1-G1", Channels1D, 1);
 
+	hDet0_gTDC0 = new Histogram("Det 0; GDet0vsTDC0_G0",Channels1D, 1);
+	hDet1_gTDC1 = new Histogram("Det 1; GDet1vsTDC1_G1",Channels1D, 1);
+	hDet2_gTDC2 = new Histogram("Det 2; GDet2vsTDC2_G2",Channels1D, 1);
   //--------------------
-  // Gates
+
+	//--------------------
+	//Summed Spectra
+	hsumNaI = new Histogram("Summed NaI Spectra",Channels1D, 1);
+
+	//--------------------
+
+
+	// Gates
   //  hE -> addGate("Energy Gate");
   
   hDet2vsDet1 -> addGate("Gate");
-  
+
+	hTDC_Det0 -> addGate("Gate");
+	hTDC_Det1 -> addGate("Gate");
+	hTDC_Det2 -> addGate("Gate");
+	
+	
   /*
   // Loop through and print all histograms
   for(auto h: Histograms){
@@ -94,9 +163,8 @@ void EngeSort::Initialize(){
 void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
 
   totalCounter++;
-
   //  double ADCsize = sizeof(&dADC)/sizeof(&dADC[0]);
-  //std::cout << ADCsize << "  " << TDCsize << std::endl;
+  //std::cout << nMDPP << std::endl;
   
   // Thresholds
   /*
@@ -118,13 +186,16 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int dTDC[16] = {0};   // stores times
   
   for(int i = 0; i < nMDPP; i++){
+		// if (((dMDPP[i] >> 30) & 0x3) == 3){
+		// 	int temp = dMDPP[i] & 0x3FFFFFFF;
+		// 	if (temp != 1073741823){
+		// 	printf("Event: %d\n", temp);
+		// 	}
+		// 	continue;
+		// }
     if ((dMDPP[i] & 0xF0000000) != 0x10000000){
       continue;
     }
-    //    if ((dMDPP[i] & 0x800000)== 0x800000){
-    //  printf("Hey!\n");
-    // continue;
-    //  }
     int signal = dMDPP[i] & 0xFFFF;    // either time or energy
     int chn = (dMDPP[i] >> 16) & 0x1F;
     // ERROR: Channels 1-16 are energy readings
@@ -132,7 +203,7 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     int pu = (dMDPP[i] >> 23) & 0x1;  // pile-up
     int ov = (dMDPP[i] >> 24) & 0x1;  // overflow
     // std::cout << "i: " << i << " chn = " << chn << " signal = " << signal
-    // << "\n";
+		// 					 << "\n" ;
    
     if(chn <= 15){
       dADC[chn] = signal;
@@ -143,7 +214,12 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     }
   }
 
-  //  std::cout << "Assigned data to channels\n";
+	int cSumNaI = 0; //sum of spectra 
+	for (int i = 0; i < 16; i++){
+		cSumNaI += dADC[i];
+	}
+
+	//  std::cout << "Assigned data to channels\n";
 
   // Define the channels
   int cDet1 = (int)std::round(dADC[0]/comp1d);
@@ -151,8 +227,8 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int cDet2 = (int)std::round(dADC[1]/comp1d);
   //  int cDet1 = dADC[0];
   //  int cDet2 = dADC[1];
-  /* int cDet3 = dADC[2];
-   int cDet4 = dADC[3];
+  int cDet3 = dADC[2];
+  int cDet4 = dADC[3];
   int cDet5 = dADC[4];
   int cDet6 = dADC[5];
   int cDet7 = dADC[6];
@@ -165,25 +241,25 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   int cDet14 = dADC[13];
   int cDet15 = dADC[14];
   int cDet16 = dADC[15];
-  */
+  
 
 
-  int cTDC_Det1 = dTDC[0]; //(int)std::round(dTDC[0]/comp1d);
-  int cTDC_Det2 = dTDC[1]; //(int)std::round(dTDC[1]/comp1d);
-  /* int cTDC_Det3 = dTDC[2];
-  int cTDC_Det4 = dTDC[3];
-  int cTDC_Det5 = dTDC[4];
-  int cTDC_Det6 = dTDC[5];
-  int cTDC_Det7 = dTDC[6];
-  int cTDC_Det8 = dTDC[7]; 
-  int cTDC_Det9 = dTDC[8];
-  int cTDC_Det10 = dTDC[9];
-  int cTDC_Det11 = dTDC[10];
-  int cTDC_Det12 = dTDC[11];
-  int cTDC_Det13 = dTDC[12];
-  int cTDC_Det14 = dTDC[13];
-  int cTDC_Det15 = dTDC[14];
-  int cTDC_Det16 = dTDC[15]; */
+  int cTDC_Det0 = dTDC[0]; //(int)std::round(dTDC[0]/comp1d);
+  int cTDC_Det1 = dTDC[1]; //(int)std::round(dTDC[1]/comp1d);
+	int cTDC_Det2 = dTDC[2];
+  int cTDC_Det3 = dTDC[3];
+  int cTDC_Det4 = dTDC[4];
+  int cTDC_Det5 = dTDC[5];
+  int cTDC_Det6 = dTDC[6];
+  int cTDC_Det7 = dTDC[7]; 
+  int cTDC_Det8 = dTDC[8];
+  int cTDC_Det9 = dTDC[9];
+  int cTDC_Det10 = dTDC[10];
+  int cTDC_Det11 = dTDC[11];
+  int cTDC_Det12 = dTDC[12];
+  int cTDC_Det13 = dTDC[13];
+  int cTDC_Det14 = dTDC[14];
+  int cTDC_Det15 = dTDC[15];
 
   // Below this point only deal in 'c' values, which are the
   // compressed values
@@ -191,22 +267,40 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
-  double compression = (double)Channels1D/ (double)Channels2D;
-  int cDet1comp = (int) std::floor(cDet1 / compression);
-  int cDet2comp = (int) std::floor(cDet2 / compression);
+  double compression = 10.0; //(double)Channels1D/ (double)Channels2D;
+  int cDet1comp = (int) std::floor(cDet7 / compression);
+  int cDet2comp = (int) std::floor(cDet15 / 20.0);
   
   // Increment 1D histograms
   hDet1 -> inc(cDet1);
   hDet1_pu -> inc(cDet1_pu);
   hDet2 -> inc(cDet2);
-
+	hDet3 -> inc(cDet3);
+	hDet4 -> inc(cDet4);
+	hDet5 -> inc(cDet5);
+	hDet6 -> inc(cDet6);
+	hDet7 -> inc(cDet7);
+	hDet8 -> inc(cDet8);
+	hDet9 -> inc(cDet9);
+	hDet10 -> inc(cDet10);
+	hDet11 -> inc(cDet11);
+	hDet12 -> inc(cDet12);
+	hDet13 -> inc(cDet13);
+	hDet14 -> inc(cDet14);
+	hDet15 -> inc(cDet15);
+	hDet16 -> inc(cDet16);
+	
   //std::cout << "Incremented 1d spec" << std::endl;
   
+  hTDC_Det0 -> inc(cTDC_Det0);
   hTDC_Det1 -> inc(cTDC_Det1);
   hTDC_Det2 -> inc(cTDC_Det2);
 
-  //std::cout << "Incremented TDC" << std::endl;
-  
+	//std::cout << "Incremented TDC" << std::endl;
+
+	hsumNaI -> inc(cSumNaI);
+
+	
   // Increment 2D histograms
   hDet2vsDet1 -> inc(cDet1comp, cDet2comp);
 
@@ -215,32 +309,37 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   // The gated spectrum
   //std::cout << "gated spec" << std::endl; 
 
-  Gate &G1 = hDet2vsDet1->getGate(0);
-  //G1.Print();
+  Gate &G1 = hDet2vsDet1 -> getGate(0);
+	Gate &TG0 = hTDC_Det0 -> getGate(0);
+	Gate &TG1 = hTDC_Det1 -> getGate(0);
+	Gate &TG2 = hTDC_Det2 -> getGate(0);
+	
+	
+	//	G1.Print();
   if(G1.inGate(cDet1comp,cDet2comp)){
-    hDet1_gDet2vsDet1_G1->inc(cDet1);
+    hDet1_gDet2vsDet1_G1->inc(cDet7);
   }
+	
+	if(TG0.inGate(cTDC_Det0)){
+		hDet0_gTDC0->inc(cDet1);
+	}
 
+	if(TG1.inGate(cTDC_Det1)){
+		hDet1_gTDC1->inc(cDet2);
+	}
+
+	if(TG2.inGate(cTDC_Det2)){
+		hDet2_gTDC2->inc(cDet3);
+	}
 }
+
 
 // Increment the scalers
 // TODO: make this automatic. If the scaler is
 // defined we should assume that the user wants to increment it
 void EngeSort::incScalers(uint32_t *dSCAL){
-
-  /*
-  sGates -> inc(dSCAL);
-  sGatesLive -> inc(dSCAL);
-  sClock-> inc(dSCAL);
-  sClockLive -> inc(dSCAL);
-  sFrontLE -> inc(dSCAL);
-  sFrontHE -> inc(dSCAL);
-  sBackLE -> inc(dSCAL);
-  sBackHE -> inc(dSCAL);
-  sE -> inc(dSCAL);
-  sDE -> inc(dSCAL);
-  BCI -> inc(dSCAL);
-  */
+	sPulser -> inc(dSCAL);
+	sTriggers -> inc(dSCAL);
 }
 
 // Connect the analyzer to midas
@@ -360,9 +459,9 @@ np::ndarray EngeSort::getData(){
     {
       if(h -> getnDims()==1){
 	//h.Print(1000,2000);
-	shape = p::make_tuple(h -> getnChannels());
-	converted[i] = np::from_data(h -> getData1D().data(), dtype, shape, stride, own);
-	i++;
+				shape = p::make_tuple(h -> getnChannels());
+				converted[i] = np::from_data(h -> getData1D().data(), dtype, shape, stride, own);
+				i++;
       }
     }
 
@@ -521,8 +620,11 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   } else if(event->event_id == 2){
 
     // Get the Scaler Bank
-    std::cout << "This is a scaler event. It should never happen!" << std::endl;
+    // Get the Scaler Bank
+    TMBank* bSCAL = event->FindBank("SCLR");
+    uint32_t *dSCAL = (uint32_t*)event->GetBankData(bSCAL);
 
+    fModule->eA->incScalers(dSCAL);
   }
 
   //  STD::cout << bSCAL << "  " << dSCAL << std::endl;

@@ -1,6 +1,6 @@
 ## All of the stuff for opening spectra
 from PyQt5.QtCore import Qt, QThread, QTimer
-from PySide2.QtWidgets import QApplication, QFileDialog, QStatusBar
+from PySide6.QtWidgets import QApplication, QFileDialog, QStatusBar
 import numpy as np
 import pandas as pd
 #import matplotlib.pyplot as plt

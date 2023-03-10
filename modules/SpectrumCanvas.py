@@ -1,7 +1,7 @@
 import matplotlib
 import matplotlib.gridspec as gridspec
 import numpy as np
-from PySide2.QtWidgets import QSizePolicy
+from PySide6.QtWidgets import QSizePolicy
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, \
                                                 NavigationToolbar2QT as NavigationToolbar)
 matplotlib.rcParams['toolbar'] = 'toolmanager'

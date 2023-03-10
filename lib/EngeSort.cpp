@@ -614,7 +614,6 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     
     fRunEventCounter++;
     fModule->fTotalEventCounter++;
-    //std::cout << "Calling sort" << std::endl;
     fModule->eA->sort(dADC, nADC, dTDC, nTDC);
 
   } else if(event->event_id == 2){
