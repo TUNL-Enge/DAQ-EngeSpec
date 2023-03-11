@@ -24,6 +24,7 @@ from scipy.optimize import curve_fit as cf
 # Will's additional libraries:
 from lmfit import Model
 
+
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
     def __init__(self, SpecColl=None, parent=None, width=5, height=4, dpi=50):
@@ -97,12 +98,46 @@ class SpectrumCanvas(FigureCanvas):
             print("Filling default data")
             self.PlotData()
 
-    def getNClicks(self,n):
+
+    class MouseCross(object):
+
+        def __init__(self, fig, ax, **kwargs):
+            self.ax = ax
+            self.fig = fig
+            self.xx = []
+            self.yy = []
+            self.line, = self.ax.plot([0], [0], visible=False, **kwargs)
+
+        def show_cross(self, event):
+            if event.inaxes == self.ax:
+                self.line.set_data([event.xdata], [event.ydata])
+                self.line.set_visible(True)
+            else:
+                self.line.set_visible(False)
+            self.fig.canvas.draw()
+
+        def show_line(self, event):
+            if 'ix' in globals():
+                #self.xx.append(ix)
+                #self.yy.append(iy)
+                
+                if event.inaxes == self.ax:
+                    self.line.set_data([ix,event.xdata], [iy,event.ydata])
+                    self.line.set_visible(True)
+                else:
+                    self.line.set_visible(False)
+                self.fig.canvas.draw()
+            
+
+    def getNClicks(self,is2D,n):
         self.NClicks = n
         self.cxdata = []
         self.cydata = []
         global cid
         cid = self.fc.mpl_connect(self, 'button_press_event', self.onclick)
+        cross = self.MouseCross(self.fig, self.a,) #, marker=r'$\bigoplus$',markersize=30,
+                                                   #color='red',)
+        self.fc.mpl_connect(self,'motion_notify_event', cross.show_line)
         #print("entering a blocking loop")
         self.fc.start_event_loop(self)#,timeout=-1)
         
@@ -655,7 +690,7 @@ class SpectrumCanvas(FigureCanvas):
     def JamZoom(self):
         print("Click on the zoom limits")
         self.isZoomed = True
-        self.getNClicks(2)
+        self.getNClicks(self.is2D,2)
         xlow,xhigh = self.a.get_xlim()
         if self.cxdata[0] == -1:
             self.cxdata[0] = xlow
@@ -706,7 +741,7 @@ class SpectrumCanvas(FigureCanvas):
         print("Click on the y-limits\n")
         #x = self.fig.ginput(2)
         #print(x)
-        self.getNClicks(2)
+        self.getNClicks(False,2)
         print(self.cydata)
         ylow,yhigh = self.a.get_ylim()
         if self.cydata[0] == -1:
@@ -903,7 +938,7 @@ class SpectrumCanvas(FigureCanvas):
     def getGate(self):
         if self.is2D:
             ##tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
-            self.getNClicks(-1)
+            self.getNClicks(self.is2D,-1)
             #x = [i[0] for i in tup]
             x = self.cxdata
             x.append(x[0])
@@ -921,7 +956,7 @@ class SpectrumCanvas(FigureCanvas):
                                      self.Spec2D.gates[ig].x,self.Spec2D.gates[ig].y)
         else:
             ##tup = self.fig.ginput(n=2)
-            self.getNClicks(2)
+            self.getNClicks(False,2)
             x = self.cxdata
             ##x = [i[0] for i in tup]
             y = self.cydata
@@ -947,7 +982,7 @@ class SpectrumCanvas(FigureCanvas):
         
     def getSingle(self,color="red"):
         ##clicks = self.fig.ginput(2)
-        self.getNClicks(2)
+        self.getNClicks(False,2)
         clicks = self.cxdata
         xcut = list(range(int(np.floor(clicks[0])),int(1+np.ceil(clicks[1]))))
         ##print(xcut)
@@ -984,7 +1019,7 @@ class SpectrumCanvas(FigureCanvas):
                   self.round_to_n(darea,dprecis))
         else:
             ##clicks = self.fig.ginput(4)
-            self.getNClicks(4)
+            self.getNClicks(False,4)
             clicks = self.cxdata
             
 
