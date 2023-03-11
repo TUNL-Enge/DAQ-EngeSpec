@@ -18,7 +18,7 @@ std::string EngeSort::saysomething(std::string str) {
   return messages.saysomething(str);
 }
 
-int Channels1D = 65536;
+int Channels1D = 4096;
 int Channels2D = 512;
 
 int comp1d = 1;   // The amount of compression to apply to
