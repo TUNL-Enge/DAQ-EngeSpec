@@ -90,6 +90,24 @@ Histogram *hHPGevNaITDC;
 Histogram *ghHPGeE;
 Histogram *ghHPGeT;
 
+// Gated Timing Spectra
+Histogram *ghNaI_0TDC_0;
+Histogram *ghNaI_1TDC_1;
+Histogram *ghNaI_2TDC_2;
+Histogram *ghNaI_3TDC_3;
+Histogram *ghNaI_4TDC_4;
+Histogram *ghNaI_5TDC_5;
+Histogram *ghNaI_6TDC_6;
+Histogram *ghNaI_7TDC_7;
+Histogram *ghNaI_8TDC_8;
+Histogram *ghNaI_9TDC_9;
+Histogram *ghNaI_10TDC_10;
+Histogram *ghNaI_11TDC_11;
+Histogram *ghNaI_12TDC_12;
+Histogram *ghNaI_13TDC_13;
+Histogram *ghNaI_14TDC_14;
+Histogram *ghNaI_15TDC_15;
+
 // Counters
 int totalCounter=0;
 
@@ -174,15 +192,44 @@ void EngeSort::Initialize(){
 	ghHPGeE = new Histogram("Gated E", Channels1D, 1);
 	ghHPGeT = new Histogram("Gated T", Channels1D, 1);
 
+	//Gated Timing Histogram
+	ghNaI_0TDC_0 = new Histogram("gated NaI_0 vs TDC 0", Channels1D,1);
+	ghNaI_1TDC_1 = new Histogram("gated NaI 1 vs TDC 1", Channels1D,1);
+	ghNaI_2TDC_2 = new Histogram("gated NaI 2 vs TDC 2", Channels1D,1);
+	ghNaI_3TDC_3 = new Histogram("gated NaI 3 vs TDC 3", Channels1D,1);
+	ghNaI_4TDC_4 = new Histogram("gated NaI 4 vs TDC 4", Channels1D,1);
+	ghNaI_5TDC_5 = new Histogram("gated NaI 5 vs TDC 5", Channels1D,1);
+	ghNaI_6TDC_6 = new Histogram("gated NaI 6 vs TDC 6", Channels1D,1);
+	ghNaI_7TDC_7 = new Histogram("gated NaI 7 vs TDC 7", Channels1D,1);
+	ghNaI_8TDC_8 = new Histogram("gated NaI 8 vs TDC 8", Channels1D,1);
+	ghNaI_9TDC_9 = new Histogram("gated NaI 9 vs TDC 9", Channels1D,1);
+	ghNaI_10TDC_10 = new Histogram("gated NaI 10 vs TDC 10", Channels1D,1);
+	ghNaI_11TDC_11 = new Histogram("gated NaI 11 vs TDC 11", Channels1D,1);
+	ghNaI_12TDC_12 = new Histogram("gated NaI 12 vs TDC 12", Channels1D,1);
+	ghNaI_13TDC_13 = new Histogram("gated NaI 13 vs TDC 13", Channels1D,1);
+	ghNaI_14TDC_14 = new Histogram("gated NaI 14 vs TDC 14", Channels1D,1);
+	ghNaI_15TDC_15 = new Histogram("gated NaI 15 vs TDC 15", Channels1D,1);
 	
 	// Gates
   
 	hHPGevNaIsum -> addGate("Energy Gate");
 	hHPGevNaITDC -> addGate("Time Gate");
-	
-	
-
- 
+	hTDCNaI0 -> addGate("Time Gate");
+  hTDCNaI1 -> addGate("Time Gate");
+	hTDCNaI2 -> addGate("Time Gate");
+	hTDCNaI3 -> addGate("Time Gate");
+  hTDCNaI4 -> addGate("Time Gate");
+	hTDCNaI5 -> addGate("Time Gate");
+	hTDCNaI6 -> addGate("Time Gate");
+  hTDCNaI7 -> addGate("Time Gate");
+	hTDCNaI8 -> addGate("Time Gate");
+	hTDCNaI9 -> addGate("Time Gate");
+  hTDCNaI10 -> addGate("Time Gate");
+	hTDCNaI11 -> addGate("Time Gate");
+	hTDCNaI12 -> addGate("Time Gate");
+  hTDCNaI13 -> addGate("Time Gate");
+	hTDCNaI14 -> addGate("Time Gate");
+	hTDCNaI15 -> addGate("Timing Gate");
 }
 
 enum EventType {long_integral, tdc, none};
@@ -351,10 +398,27 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
 
   
   // The gated spectrum
-
+	//TG : Timing Gate
+	
   Gate &G1 = hHPGevNaIsum -> getGate(0);
 	Gate &G2 = hHPGevNaITDC -> getGate(0);
-	
+	Gate &TG0 = ghNaI_0TDC_0 -> getGate(0);
+	Gate &TG1 = ghNaI_1TDC_1 -> getGate(0);
+	Gate &TG2 = ghNaI_2TDC_2 -> getGate(0);
+	Gate &TG3 = ghNaI_3TDC_3 -> getGate(0);
+	Gate &TG4 = ghNaI_4TDC_4 -> getGate(0);
+	Gate &TG5 = ghNaI_5TDC_5 -> getGate(0);
+	Gate &TG6 = ghNaI_6TDC_6 -> getGate(0);
+	Gate &TG7 = ghNaI_7TDC_7 -> getGate(0);
+	Gate &TG8 = ghNaI_8TDC_8 -> getGate(0);
+	Gate &TG9 = ghNaI_9TDC_9 -> getGate(0);
+	Gate &TG10 = ghNaI_10TDC_10 -> getGate(0);
+	Gate &TG11 = ghNaI_11TDC_11 -> getGate(0);
+	Gate &TG12 = ghNaI_12TDC_12 -> getGate(0);
+	Gate &TG13 = ghNaI_13TDC_13 -> getGate(0);
+	Gate &TG14 = ghNaI_14TDC_14 -> getGate(0);
+	Gate &TG15 = ghNaI_15TDC_15 -> getGate(0);
+
 	
   if(G1.inGate(cHPGe, cSum)){
     ghHPGeE->inc(dADC[2]);
@@ -364,6 +428,73 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
     ghHPGeT->inc(dADC[2]);
   }
 
+	if(TG0.inGate(dTDC[0])){
+		ghNaI_0TDC_0 -> inc(dADC[0]);
+		
+	}
+	if(TG1.inGate(dTDC[1])){
+		ghNaI_1TDC_1 -> inc(dADC[1]);
+		
+	}
+	if(TG2.inGate(dTDC[2])){
+		ghNaI_2TDC_2 -> inc(dADC[2]);
+		
+	}
+
+	if(TG3.inGate(dTDC[3])){
+		ghNaI_3TDC_3 -> inc(dADC[3]);
+		
+	}
+
+	if(TG4.inGate(dTDC[4])){
+		ghNaI_4TDC_4 -> inc(dADC[4]);
+		
+	}
+	if(TG5.inGate(dTDC[5])){
+		ghNaI_5TDC_5 -> inc(dADC[5]);
+		
+	}
+	if(TG6.inGate(dTDC[6])){
+		ghNaI_6TDC_6 -> inc(dADC[6]);
+		
+	}
+	if(TG7.inGate(dTDC[7])){
+		ghNaI_7TDC_7 -> inc(dADC[7]);
+		
+	}
+	if(TG8.inGate(dTDC[8])){
+		ghNaI_8TDC_8 -> inc(dADC[8]);
+		
+	}
+	if(TG9.inGate(dTDC[9])){
+		ghNaI_9TDC_9 -> inc(dADC[9]);
+		
+	}
+	if(TG10.inGate(dTDC[10])){
+		ghNaI_10TDC_10 -> inc(dADC[10]);
+		
+	}
+	if(TG11.inGate(dTDC[11])){
+		ghNaI_11TDC_11 -> inc(dADC[11]);
+		
+	}
+
+	if(TG12.inGate(dTDC[12])){
+		ghNaI_12TDC_12 -> inc(dADC[12]);
+		
+	}
+	if(TG13.inGate(dTDC[13])){
+		ghNaI_13TDC_13 -> inc(dADC[13]);
+		
+	}
+	if(TG14.inGate(dTDC[14])){
+		ghNaI_14TDC_14 -> inc(dADC[14]);
+		
+	}
+	if(TG15.inGate(dTDC[15])){
+		ghNaI_15TDC_15 -> inc(dADC[15]);
+		
+	}
 }
 
 
@@ -633,22 +764,23 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id == 1){
 
     event->FindAllBanks();
-    //std::cout << event->BankListToString() << std::endl;
+    std::cout << event->BankListToString() << std::endl;
     
-    // Get the ADC Bank
-    TMBank* bMDPP = event->FindBank("MDPP");
+    // Get the Bank
+    TMBank* bMDPP = event->FindBank("qdc1");
     uint32_t* dMDPP = (uint32_t*)event->GetBankData(bMDPP);
 
     // Get the size
+		if (bMDPP->data_size > 0) {
     
-    //  int nMDPP = (bMDPP->data_size - 2)/4;
-    int nMDPP = (bMDPP->data_size)/4;
-    //  std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
+				int nMDPP = (bMDPP->data_size)/4;
+				//  std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
   
-    fRunEventCounter++;
-    fModule->fTotalEventCounter++;
-    //  std::cout << "Calling sort" << std::endl;
-    fModule->eA->sort(dMDPP, nMDPP);
+				fRunEventCounter++;
+				fModule->fTotalEventCounter++;
+				//  std::cout << "Calling sort" << std::endl;
+				fModule->eA->sort(dMDPP, nMDPP);
+			}
 
   } else if(event->event_id == 2){
 
