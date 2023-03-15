@@ -767,20 +767,18 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
     std::cout << event->BankListToString() << std::endl;
     
     // Get the Bank
-    TMBank* bMDPP = event->FindBank("qdc1");
+    TMBank* bMDPP = event->FindBank("MDPP");
     uint32_t* dMDPP = (uint32_t*)event->GetBankData(bMDPP);
 
     // Get the size
-		if (bMDPP->data_size > 0) {
     
-				int nMDPP = (bMDPP->data_size)/4;
-				//  std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
+		int nMDPP = (bMDPP->data_size)/4;
+		//  std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
   
-				fRunEventCounter++;
-				fModule->fTotalEventCounter++;
-				//  std::cout << "Calling sort" << std::endl;
-				fModule->eA->sort(dMDPP, nMDPP);
-			}
+		fRunEventCounter++;
+		fModule->fTotalEventCounter++;
+		//  std::cout << "Calling sort" << std::endl;
+		fModule->eA->sort(dMDPP, nMDPP);
 
   } else if(event->event_id == 2){
 
