@@ -276,8 +276,8 @@ QDCEvent qdc_channel_assign(int nchannels, int raw_channel){
 void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   totalCounter++;
 
-  int dADC[32] = {0};   // stores energies
-  int dTDC[32] = {0};   // stores times
+  int dADC[132] = {0};   // stores energies
+  int dTDC[132] = {0};   // stores times
   
   for(int i = 0; i < nMDPP; i++){
 
@@ -292,7 +292,7 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
 
     int ov = (dMDPP[i] >> 24) & 0x1;  // overflow
 
-		// CAM: Trying to make this a bit more flexible, but it might be needlessly complicated.
+		// // CAM: Trying to make this a bit more flexible, but it might be needlessly complicated.
 		QDCEvent evt = qdc_channel_assign(32, chn);
 
 		switch(evt.event_type){
@@ -395,51 +395,57 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   // Increment 2D histograms
   hHPGevNaIsum -> inc(cHPGe, cSum);
   hHPGevNaITDC -> inc(cHPGe, cTDC);
-
   
   // The gated spectrum
 	//TG : Timing Gate
 	
   Gate &G1 = hHPGevNaIsum -> getGate(0);
 	Gate &G2 = hHPGevNaITDC -> getGate(0);
-	Gate &TG0 = ghNaI_0TDC_0 -> getGate(0);
-	Gate &TG1 = ghNaI_1TDC_1 -> getGate(0);
-	Gate &TG2 = ghNaI_2TDC_2 -> getGate(0);
-	Gate &TG3 = ghNaI_3TDC_3 -> getGate(0);
-	Gate &TG4 = ghNaI_4TDC_4 -> getGate(0);
-	Gate &TG5 = ghNaI_5TDC_5 -> getGate(0);
-	Gate &TG6 = ghNaI_6TDC_6 -> getGate(0);
-	Gate &TG7 = ghNaI_7TDC_7 -> getGate(0);
-	Gate &TG8 = ghNaI_8TDC_8 -> getGate(0);
-	Gate &TG9 = ghNaI_9TDC_9 -> getGate(0);
-	Gate &TG10 = ghNaI_10TDC_10 -> getGate(0);
-	Gate &TG11 = ghNaI_11TDC_11 -> getGate(0);
-	Gate &TG12 = ghNaI_12TDC_12 -> getGate(0);
-	Gate &TG13 = ghNaI_13TDC_13 -> getGate(0);
-	Gate &TG14 = ghNaI_14TDC_14 -> getGate(0);
-	Gate &TG15 = ghNaI_15TDC_15 -> getGate(0);
+	
+	Gate &TG0 = hTDCNaI0 -> getGate(0);
+	Gate &TG1 = hTDCNaI1 -> getGate(0);
+	Gate &TG2 = hTDCNaI2 -> getGate(0);
+	Gate &TG3 = hTDCNaI3 -> getGate(0);
+	Gate &TG4 = hTDCNaI4 -> getGate(0);
+	Gate &TG5 = hTDCNaI5 -> getGate(0);
+	Gate &TG6 = hTDCNaI6 -> getGate(0);
+	Gate &TG7 = hTDCNaI7 -> getGate(0);
+	Gate &TG8 = hTDCNaI8 -> getGate(0);
+	Gate &TG9 = hTDCNaI9 -> getGate(0);
+	Gate &TG10 = hTDCNaI10 -> getGate(0);
+	Gate &TG11 = hTDCNaI11 -> getGate(0);
+	Gate &TG12 = hTDCNaI12 -> getGate(0);
+	Gate &TG13 = hTDCNaI13 -> getGate(0);
+	Gate &TG14 = hTDCNaI14 -> getGate(0);
+	Gate &TG15 = hTDCNaI15 -> getGate(0);
+
 
 	
   if(G1.inGate(cHPGe, cSum)){
     ghHPGeE->inc(dADC[2]);
   }
 
+
 	if(G2.inGate(cHPGe, cTDC)){
     ghHPGeT->inc(dADC[2]);
   }
 
+
 	if(TG0.inGate(dTDC[0])){
 		ghNaI_0TDC_0 -> inc(dADC[0]);
-		
 	}
+	
 	if(TG1.inGate(dTDC[1])){
 		ghNaI_1TDC_1 -> inc(dADC[1]);
 		
 	}
+
+
 	if(TG2.inGate(dTDC[2])){
 		ghNaI_2TDC_2 -> inc(dADC[2]);
 		
 	}
+
 
 	if(TG3.inGate(dTDC[3])){
 		ghNaI_3TDC_3 -> inc(dADC[3]);
@@ -450,14 +456,17 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
 		ghNaI_4TDC_4 -> inc(dADC[4]);
 		
 	}
+
 	if(TG5.inGate(dTDC[5])){
 		ghNaI_5TDC_5 -> inc(dADC[5]);
 		
 	}
+
 	if(TG6.inGate(dTDC[6])){
 		ghNaI_6TDC_6 -> inc(dADC[6]);
 		
 	}
+
 	if(TG7.inGate(dTDC[7])){
 		ghNaI_7TDC_7 -> inc(dADC[7]);
 		
@@ -764,7 +773,7 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id == 1){
 
     event->FindAllBanks();
-    std::cout << event->BankListToString() << std::endl;
+    // std::cout << event->BankListToString() << std::endl;
     
     // Get the Bank
     TMBank* bMDPP = event->FindBank("MDPP");
