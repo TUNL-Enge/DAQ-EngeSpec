@@ -3,6 +3,7 @@
 #include <random>
 #include <chrono>
 
+#include "MDPPEventHandler.h"
 #include "MDPPSort.h"
 #include "TV792Data.hxx"
 
@@ -232,109 +233,25 @@ void EngeSort::Initialize(){
 	hTDCNaI15 -> addGate("Timing Gate");
 }
 
-enum EventType {long_integral, tdc, none};
-
-struct QDCEvent {
-	int channel;
-	EventType event_type;
-};
-
-// Convert the raw channel number from the bank to the appropriate channel 
-QDCEvent qdc_channel_assign(int nchannels, int raw_channel){
-
-	// gets rounded down to give the case statement
-	int chan_case = raw_channel/nchannels; 
-
-	QDCEvent evt;
-	
-	switch(chan_case){
-		
-	case 0 :
-		// This is the case of long integration value.
-		evt.channel = raw_channel;
-		evt.event_type = long_integral;
-		break;
-		
-	case 1 :
-		// TDC value
-		evt.channel = (raw_channel - nchannels);
-		evt.event_type = tdc;
-		break;
-		
-	default :
-		evt.channel = -1;
-		evt.event_type = none;
-		// I don't care about the rest for now.
-	}
-
-	return evt;
-}
 
 //======================================================================
 // This is the equivalent to the "sort" function in jam
 // Arguments are the raw events
-void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
+void EngeSort::sort(MDPPEvent& event_data){
   totalCounter++;
+	int dADC2 = event_data.get_data("scp1").adc[0];	
+	int dTDC2 = event_data.get_data("scp1").tdc[0];
 
-  int dADC[132] = {0};   // stores energies
-  int dTDC[132] = {0};   // stores times
-  
-  for(int i = 0; i < nMDPP; i++){
-
-		// skip non-data events
-    if ((dMDPP[i] & 0xF0000000) != 0x10000000){
-      continue;
-    }
-    int signal = dMDPP[i] & 0xFFFF;    // either time or energy
-		
-		int chn = (dMDPP[i] >> 16) & 0xFF; // 32 channels is 7 bit address
-		//std::cout << "Channel: " << chn << " Energy: " << signal <<std::endl;
-
-    int ov = (dMDPP[i] >> 24) & 0x1;  // overflow
-
-		// // CAM: Trying to make this a bit more flexible, but it might be needlessly complicated.
-		QDCEvent evt = qdc_channel_assign(32, chn);
-
-		switch(evt.event_type){
-
-		case long_integral :
-			dADC[evt.channel] = signal;
-			break;
-			
-		case tdc :
-			dTDC[evt.channel] = signal;
-			break;
-			
-		case none :
-			break;
-						
-		}
-		
-  }
-
-	int SumNaI = 0; //sum of spectra
-	int multi = 0; // multiplicity
-	int NaITDC = 0; // combined timing spectra
-	for (int i = 0; i < 16; i++){
-		if (i == 2){
-			// plug is the HPGe for now
-			continue;
-		}
-		SumNaI += dADC[i];
-		if (dADC[i] > 0){
-			multi += 1;
-		}
-		// take the first hit
-		if (dTDC[i] > 0) {
-			if (((NaITDC != 0) && (dTDC[i] < NaITDC)) | (NaITDC == 0)) {
-					NaITDC = dTDC[i];
-			}
-			
-		}
-	}
-
+	int dADC7 = event_data.get_data("qdc1").adc[7];	
+	int dTDC7 = event_data.get_data("qdc1").tdc[7];
+	
+	hHPGe  -> inc(dADC2);
+	hADCNaI7  -> inc(dADC7);
 
 	
+	// try just the plug for now
+	
+ 	
 
   // Below this point only deal in 'c' values, which are the
   // compressed values
@@ -343,167 +260,165 @@ void EngeSort::sort(uint32_t *dMDPP, int nMDPP){
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
   double compressionE = 5000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
-	double compressionT = 1000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
-  int cSum = (int) std::floor(SumNaI / compressionE);
-  int cHPGe = (int) std::floor(dADC[2] / compressionE);
-  int cTDC = (int) std::floor(dADC[2] / compressionT);
+	// double compressionT = 1000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
+  int cSum = (int) std::floor(dADC7 / compressionE);
+  int cHPGe = (int) std::floor(dADC2 / compressionE);
+  // int cTDC = (int) std::floor(dADC[2] / compressionT);
 	
   
-  // Increment 1D histograms
-	hADCNaI0  -> inc(dADC[0]);
-	hADCNaI1  -> inc(dADC[1]);
-	hADCNaI2  -> inc(0); // not implemented right now.
-	hADCNaI3  -> inc(dADC[3]);  
-	hADCNaI4  -> inc(dADC[4]);
-	hADCNaI5  -> inc(dADC[5]);
-	hADCNaI6  -> inc(dADC[6]);
-	hADCNaI7  -> inc(dADC[7]);
-	hADCNaI8  -> inc(dADC[8]);
-	hADCNaI9 	-> inc(dADC[9]);
-	hADCNaI10	-> inc(dADC[10]);
-	hADCNaI11	-> inc(dADC[11]);
-	hADCNaI12	-> inc(dADC[12]);
-	hADCNaI13	-> inc(dADC[13]);
-	hADCNaI14	-> inc(dADC[14]);
-	hADCNaI15	-> inc(dADC[15]);
+  // // Increment 1D histograms
+	// hADCNaI0  -> inc(dADC[0]);
+	// hADCNaI1  -> inc(dADC[1]);
+	// hADCNaI3  -> inc(dADC[3]);  
+	// hADCNaI4  -> inc(dADC[4]);
+	// hADCNaI5  -> inc(dADC[5]);
+	// hADCNaI6  -> inc(dADC[6]);
+	// hADCNaI7  -> inc(dADC[7]);
+	// hADCNaI8  -> inc(dADC[8]);
+	// hADCNaI9 	-> inc(dADC[9]);
+	// hADCNaI10	-> inc(dADC[10]);
+	// hADCNaI11	-> inc(dADC[11]);
+	// hADCNaI12	-> inc(dADC[12]);
+	// hADCNaI13	-> inc(dADC[13]);
+	// hADCNaI14	-> inc(dADC[14]);
+	// hADCNaI15	-> inc(dADC[15]);
 
-	hTDCNaI0  -> inc(dTDC[0]);
-	hTDCNaI1  -> inc(dTDC[1]);
-	hTDCNaI2  -> inc(0); // not implemented right now.
-	hTDCNaI3  -> inc(dTDC[3]);  
-	hTDCNaI4  -> inc(dTDC[4]);
-	hTDCNaI5  -> inc(dTDC[5]);
-	hTDCNaI6  -> inc(dTDC[6]);
-	hTDCNaI7  -> inc(dTDC[7]);
-	hTDCNaI8  -> inc(dTDC[8]);
-	hTDCNaI9 	-> inc(dTDC[9]);
-	hTDCNaI10	-> inc(dTDC[10]);
-	hTDCNaI11	-> inc(dTDC[11]);
-	hTDCNaI12	-> inc(dTDC[12]);
-	hTDCNaI13	-> inc(dTDC[13]);
-	hTDCNaI14	-> inc(dTDC[14]);
-	hTDCNaI15	-> inc(dTDC[15]);
+	// hTDCNaI0  -> inc(dTDC[0]);
+	// hTDCNaI1  -> inc(dTDC[1]);
+	// hTDCNaI3  -> inc(dTDC[3]);  
+	// hTDCNaI4  -> inc(dTDC[4]);
+	// hTDCNaI5  -> inc(dTDC[5]);
+	// hTDCNaI6  -> inc(dTDC[6]);
+	// hTDCNaI7  -> inc(dTDC[7]);
+	// hTDCNaI8  -> inc(dTDC[8]);
+	// hTDCNaI9 	-> inc(dTDC[9]);
+	// hTDCNaI10	-> inc(dTDC[10]);
+	// hTDCNaI11	-> inc(dTDC[11]);
+	// hTDCNaI12	-> inc(dTDC[12]);
+	// hTDCNaI13	-> inc(dTDC[13]);
+	// hTDCNaI14	-> inc(dTDC[14]);
+	// hTDCNaI15	-> inc(dTDC[15]);
 	
-  hNaIsum -> inc(SumNaI);
-	hMulti -> inc(multi);
-	hNaITDC -> inc(NaITDC);
+  // hNaIsum -> inc(SumNaI);
+	// hMulti -> inc(multi);
+	// hNaITDC -> inc(NaITDC);
 
-	hHPGe -> inc(dADC[2]);
+	// hHPGe -> inc(dADC[2]);
 
-	hPulser -> inc(dADC[16]);
+	// hPulser -> inc(dADC[16]);
 	
-  // Increment 2D histograms
+  // // Increment 2D histograms
   hHPGevNaIsum -> inc(cHPGe, cSum);
-  hHPGevNaITDC -> inc(cHPGe, cTDC);
+  // hHPGevNaITDC -> inc(cHPGe, cTDC);
   
-  // The gated spectrum
-	//TG : Timing Gate
+  // // The gated spectrum
+	// //TG : Timing Gate
 	
-  Gate &G1 = hHPGevNaIsum -> getGate(0);
-	Gate &G2 = hHPGevNaITDC -> getGate(0);
+  // Gate &G1 = hHPGevNaIsum -> getGate(0);
+	// Gate &G2 = hHPGevNaITDC -> getGate(0);
 	
-	Gate &TG0 = hTDCNaI0 -> getGate(0);
-	Gate &TG1 = hTDCNaI1 -> getGate(0);
-	Gate &TG2 = hTDCNaI2 -> getGate(0);
-	Gate &TG3 = hTDCNaI3 -> getGate(0);
-	Gate &TG4 = hTDCNaI4 -> getGate(0);
-	Gate &TG5 = hTDCNaI5 -> getGate(0);
-	Gate &TG6 = hTDCNaI6 -> getGate(0);
-	Gate &TG7 = hTDCNaI7 -> getGate(0);
-	Gate &TG8 = hTDCNaI8 -> getGate(0);
-	Gate &TG9 = hTDCNaI9 -> getGate(0);
-	Gate &TG10 = hTDCNaI10 -> getGate(0);
-	Gate &TG11 = hTDCNaI11 -> getGate(0);
-	Gate &TG12 = hTDCNaI12 -> getGate(0);
-	Gate &TG13 = hTDCNaI13 -> getGate(0);
-	Gate &TG14 = hTDCNaI14 -> getGate(0);
-	Gate &TG15 = hTDCNaI15 -> getGate(0);
+	// Gate &TG0 = hTDCNaI0 -> getGate(0);
+	// Gate &TG1 = hTDCNaI1 -> getGate(0);
+	// Gate &TG2 = hTDCNaI2 -> getGate(0);
+	// Gate &TG3 = hTDCNaI3 -> getGate(0);
+	// Gate &TG4 = hTDCNaI4 -> getGate(0);
+	// Gate &TG5 = hTDCNaI5 -> getGate(0);
+	// Gate &TG6 = hTDCNaI6 -> getGate(0);
+	// Gate &TG7 = hTDCNaI7 -> getGate(0);
+	// Gate &TG8 = hTDCNaI8 -> getGate(0);
+	// Gate &TG9 = hTDCNaI9 -> getGate(0);
+	// Gate &TG10 = hTDCNaI10 -> getGate(0);
+	// Gate &TG11 = hTDCNaI11 -> getGate(0);
+	// Gate &TG12 = hTDCNaI12 -> getGate(0);
+	// Gate &TG13 = hTDCNaI13 -> getGate(0);
+	// Gate &TG14 = hTDCNaI14 -> getGate(0);
+	// Gate &TG15 = hTDCNaI15 -> getGate(0);
 
 
 	
-  if(G1.inGate(cHPGe, cSum)){
-    ghHPGeE->inc(dADC[2]);
-  }
+  // if(G1.inGate(cHPGe, cSum)){
+  //   ghHPGeE->inc(dADC[2]);
+  // }
 
 
-	if(G2.inGate(cHPGe, cTDC)){
-    ghHPGeT->inc(dADC[2]);
-  }
+	// if(G2.inGate(cHPGe, cTDC)){
+  //   ghHPGeT->inc(dADC[2]);
+  // }
 
 
-	if(TG0.inGate(dTDC[0])){
-		ghNaI_0TDC_0 -> inc(dADC[0]);
-	}
+	// if(TG0.inGate(dTDC[0])){
+	// 	ghNaI_0TDC_0 -> inc(dADC[0]);
+	// }
 	
-	if(TG1.inGate(dTDC[1])){
-		ghNaI_1TDC_1 -> inc(dADC[1]);
+	// if(TG1.inGate(dTDC[1])){
+	// 	ghNaI_1TDC_1 -> inc(dADC[1]);
 		
-	}
+	// }
 
 
-	if(TG2.inGate(dTDC[2])){
-		ghNaI_2TDC_2 -> inc(dADC[2]);
+	// if(TG2.inGate(dTDC[2])){
+	// 	ghNaI_2TDC_2 -> inc(dADC[2]);
 		
-	}
+	// }
 
 
-	if(TG3.inGate(dTDC[3])){
-		ghNaI_3TDC_3 -> inc(dADC[3]);
+	// if(TG3.inGate(dTDC[3])){
+	// 	ghNaI_3TDC_3 -> inc(dADC[3]);
 		
-	}
+	// }
 
-	if(TG4.inGate(dTDC[4])){
-		ghNaI_4TDC_4 -> inc(dADC[4]);
+	// if(TG4.inGate(dTDC[4])){
+	// 	ghNaI_4TDC_4 -> inc(dADC[4]);
 		
-	}
+	// }
 
-	if(TG5.inGate(dTDC[5])){
-		ghNaI_5TDC_5 -> inc(dADC[5]);
+	// if(TG5.inGate(dTDC[5])){
+	// 	ghNaI_5TDC_5 -> inc(dADC[5]);
 		
-	}
+	// }
 
-	if(TG6.inGate(dTDC[6])){
-		ghNaI_6TDC_6 -> inc(dADC[6]);
+	// if(TG6.inGate(dTDC[6])){
+	// 	ghNaI_6TDC_6 -> inc(dADC[6]);
 		
-	}
+	// }
 
-	if(TG7.inGate(dTDC[7])){
-		ghNaI_7TDC_7 -> inc(dADC[7]);
+	// if(TG7.inGate(dTDC[7])){
+	// 	ghNaI_7TDC_7 -> inc(dADC[7]);
 		
-	}
-	if(TG8.inGate(dTDC[8])){
-		ghNaI_8TDC_8 -> inc(dADC[8]);
+	// }
+	// if(TG8.inGate(dTDC[8])){
+	// 	ghNaI_8TDC_8 -> inc(dADC[8]);
 		
-	}
-	if(TG9.inGate(dTDC[9])){
-		ghNaI_9TDC_9 -> inc(dADC[9]);
+	// }
+	// if(TG9.inGate(dTDC[9])){
+	// 	ghNaI_9TDC_9 -> inc(dADC[9]);
 		
-	}
-	if(TG10.inGate(dTDC[10])){
-		ghNaI_10TDC_10 -> inc(dADC[10]);
+	// }
+	// if(TG10.inGate(dTDC[10])){
+	// 	ghNaI_10TDC_10 -> inc(dADC[10]);
 		
-	}
-	if(TG11.inGate(dTDC[11])){
-		ghNaI_11TDC_11 -> inc(dADC[11]);
+	// }
+	// if(TG11.inGate(dTDC[11])){
+	// 	ghNaI_11TDC_11 -> inc(dADC[11]);
 		
-	}
+	// }
 
-	if(TG12.inGate(dTDC[12])){
-		ghNaI_12TDC_12 -> inc(dADC[12]);
+	// if(TG12.inGate(dTDC[12])){
+	// 	ghNaI_12TDC_12 -> inc(dADC[12]);
 		
-	}
-	if(TG13.inGate(dTDC[13])){
-		ghNaI_13TDC_13 -> inc(dADC[13]);
+	// }
+	// if(TG13.inGate(dTDC[13])){
+	// 	ghNaI_13TDC_13 -> inc(dADC[13]);
 		
-	}
-	if(TG14.inGate(dTDC[14])){
-		ghNaI_14TDC_14 -> inc(dADC[14]);
+	// }
+	// if(TG14.inGate(dTDC[14])){
+	// 	ghNaI_14TDC_14 -> inc(dADC[14]);
 		
-	}
-	if(TG15.inGate(dTDC[15])){
-		ghNaI_15TDC_15 -> inc(dADC[15]);
+	// }
+	// if(TG15.inGate(dTDC[15])){
+	// 	ghNaI_15TDC_15 -> inc(dADC[15]);
 		
-	}
+	// }
 }
 
 
@@ -773,22 +688,24 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
   if(event->event_id == 1){
 
     event->FindAllBanks();
-    // std::cout << event->BankListToString() << std::endl;
-    
-    // Get the Bank
-    TMBank* bMDPP = event->FindBank("MDPP");
-    uint32_t* dMDPP = (uint32_t*)event->GetBankData(bMDPP);
 
-    // Get the size
-    
-		int nMDPP = (bMDPP->data_size)/4;
-		//  std::cout << "ADC Size: " << bMDPP->data_size << std::endl;
-  
+
+		/* This is where the changes from the single card version start.
+			 
+			 The first order attempt will be to assume that the event contains
+			 at most a single bank from each card, and that banks in a single
+			 event are true coincidence data (i.e no event building)
+			 
+		 */
+
+		this->mdpp_event.read_banks(event);
+
 		fRunEventCounter++;
 		fModule->fTotalEventCounter++;
 		//  std::cout << "Calling sort" << std::endl;
-		fModule->eA->sort(dMDPP, nMDPP);
-
+		fModule->eA->sort(this->mdpp_event);
+		// ready the banks for the next iteration
+		this->mdpp_event.clear_data();
   } else if(event->event_id == 2){
 
     // Get the Scaler Bank
@@ -865,5 +782,5 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("data", range(&EngeSort::begin, &EngeSort::end))
     //    .def("Histogram1D", &Histogram1D::Histogram1D)
     ;
-
+	
 }

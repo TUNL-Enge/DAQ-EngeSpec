@@ -1,6 +1,7 @@
 //#ifndef EngeAnalyzer_H
 //#define EngeAnalyzer_H
 #include "EngeAnalyzerlib.h"
+#include "MDPPEventHandler.h"
 
 #include <vector>
 #include <random>
@@ -46,7 +47,7 @@ class EngeSort {
   np::ndarray getData();
   np::ndarray getData2D();
 
-  void sort(uint32_t *dMDPP, int nMDPP);
+  void sort(MDPPEvent& event_data);
   void incScalers(uint32_t *dSCAL);
   
   BoolVector getis2Ds();
@@ -135,4 +136,6 @@ class MidasAnalyzerRun: public TARunObject{
     
   int fRunEventCounter;
   MidasAnalyzerModule* fModule;
+	MDPPEvent mdpp_event;
+	
 };

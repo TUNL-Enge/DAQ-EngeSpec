@@ -31,6 +31,7 @@ link_directories( ${ROOTANASYS}/lib )
 MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 
 ##find_package(Boost REQUIRED COMPONENTS numpy)
+#set(CMAKE_SHARED_LINKER_FLAGS "-Wl, -Wno-undef") # complain about missing symbols
 
 LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
 
@@ -38,6 +39,11 @@ LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so conve
 
 # Define the general Enge analyzer library
 add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
+
+# Multi Card Crap
+add_library( MDPPevt SHARED MDPPEventHandler.cpp )
+add_library( tomlread SHARED mdpp_module_config.cpp )
+
 
 # Build our Sort Routine
 add_library( EngeSort SHARED EngeSort.cpp)
@@ -58,7 +64,7 @@ target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
 
-target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer 
+target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
  
 target_link_libraries( RBSSort ${Boost_LIBRARIES} EngeAnalyzer 
