@@ -239,7 +239,11 @@ void EngeSort::Initialize(){
 // Arguments are the raw events
 void EngeSort::sort(MDPPEvent& event_data){
   totalCounter++;
+
+	// pulser stuff
+	
 	int dADC2 = event_data.get_data("scp1").adc[0];	
+
 	int dTDC2 = event_data.get_data("scp1").tdc[0];
 
 	int dADC7 = event_data.get_data("qdc1").adc[7];	
@@ -308,7 +312,9 @@ void EngeSort::sort(MDPPEvent& event_data){
 	// hPulser -> inc(dADC[16]);
 	
   // // Increment 2D histograms
-  hHPGevNaIsum -> inc(cHPGe, cSum);
+
+	hHPGevNaIsum -> inc(cHPGe, cSum);
+	
   // hHPGevNaITDC -> inc(cHPGe, cTDC);
   
   // // The gated spectrum
@@ -708,7 +714,6 @@ TAFlowEvent* MidasAnalyzerRun::Analyze(TARunInfo* runinfo, TMEvent* event,
 		this->mdpp_event.clear_data();
   } else if(event->event_id == 2){
 
-    // Get the Scaler Bank
     // Get the Scaler Bank
     TMBank* bSCAL = event->FindBank("SCLR");
     uint32_t *dSCAL = (uint32_t*)event->GetBankData(bSCAL);

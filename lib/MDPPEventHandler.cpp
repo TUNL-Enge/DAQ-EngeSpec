@@ -9,16 +9,16 @@ MDPPBank::MDPPBank(int nchannels){
 
 	// initialize the adc and tdc vectors
 	this->adc.resize(nchannels);
-	std::fill(this->adc.begin(), this->adc.begin(), 0);
+	std::fill(this->adc.begin(), this->adc.end(), 0);
 
 	this->tdc.resize(nchannels);
-	std::fill(this->tdc.begin(), this->tdc.begin(), 0);
+	std::fill(this->tdc.begin(), this->tdc.end(), 0);
 	
 }
 
 void MDPPBank::clear_data(){
-	std::fill(this->adc.begin(), this->adc.begin(), 0);
-	std::fill(this->tdc.begin(), this->tdc.begin(), 0);
+	std::fill(this->adc.begin(), this->adc.end(), 0);
+	std::fill(this->tdc.begin(), this->tdc.end(), 0);
 }
 
 /*
