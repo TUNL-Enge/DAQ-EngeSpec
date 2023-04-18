@@ -57,6 +57,7 @@ class SpectrumObject:
 
     ## Save ascii file
     def SaveASCIIData(self):
+
         print("Save ASCII Data!")
         filename = QFileDialog.getSaveFileName(None,
                                                "Save Spectrum", "./",

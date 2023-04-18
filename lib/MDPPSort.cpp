@@ -240,191 +240,199 @@ void EngeSort::Initialize(){
 void EngeSort::sort(MDPPEvent& event_data){
   totalCounter++;
 
-	// pulser stuff
-	
-	int dADC2 = event_data.get_data("scp1").adc[0];	
 
-	int dTDC2 = event_data.get_data("scp1").tdc[0];
+	// get the data to make it easier for later
+	vec_u32 scp_adc = event_data.get_data("scp1").adc;
+	vec_u32 scp_tdc = event_data.get_data("scp1").tdc;
+	
+	vec_u32 qdc_adc = event_data.get_data("qdc1").adc;
+	vec_u32 qdc_tdc = event_data.get_data("qdc1").tdc;
+	 		
+  
+  // // Increment 1D histograms
+	hADCNaI0  -> inc(qdc_adc[0]);
+	hADCNaI1  -> inc(qdc_adc[1]);
+	hADCNaI3  -> inc(qdc_adc[3]);  
+	hADCNaI4  -> inc(qdc_adc[4]);
+	hADCNaI5  -> inc(qdc_adc[5]);
+	hADCNaI6  -> inc(qdc_adc[6]);
+	hADCNaI7  -> inc(qdc_adc[7]);
+	hADCNaI8  -> inc(qdc_adc[8]);
+	hADCNaI9 	-> inc(qdc_adc[9]);
+	hADCNaI10	-> inc(qdc_adc[10]);
+	hADCNaI11	-> inc(qdc_adc[11]);
+	hADCNaI12	-> inc(qdc_adc[12]);
+	hADCNaI13	-> inc(qdc_adc[13]);
+	hADCNaI14	-> inc(qdc_adc[14]);
+	hADCNaI15	-> inc(qdc_adc[15]);
 
-	int dADC7 = event_data.get_data("qdc1").adc[7];	
-	int dTDC7 = event_data.get_data("qdc1").tdc[7];
-	
-	hHPGe  -> inc(dADC2);
-	hADCNaI7  -> inc(dADC7);
+	hTDCNaI0  -> inc(qdc_tdc[0]);
+	hTDCNaI1  -> inc(qdc_tdc[1]);
+	hTDCNaI3  -> inc(qdc_tdc[3]);  
+	hTDCNaI4  -> inc(qdc_tdc[4]);
+	hTDCNaI5  -> inc(qdc_tdc[5]);
+	hTDCNaI6  -> inc(qdc_tdc[6]);
+	hTDCNaI7  -> inc(qdc_tdc[7]);
+	hTDCNaI8  -> inc(qdc_tdc[8]);
+	hTDCNaI9 	-> inc(qdc_tdc[9]);
+	hTDCNaI10	-> inc(qdc_tdc[10]);
+	hTDCNaI11	-> inc(qdc_tdc[11]);
+	hTDCNaI12	-> inc(qdc_tdc[12]);
+	hTDCNaI13	-> inc(qdc_tdc[13]);
+	hTDCNaI14	-> inc(qdc_tdc[14]);
+	hTDCNaI15	-> inc(qdc_tdc[15]);
 
 	
-	// try just the plug for now
+	int SumNaI = 0;
+	int multi = 0;
+	bool first_hit = true;
+	int NaITDC;
+	// sum up the annulus channels
+	for(int i=0; i < 16; i++){
+		SumNaI += qdc_adc[i];
+		if (qdc_adc[i] > 0) {
+			multi += 1;
+			if (first_hit) {
+					NaITDC = qdc_tdc[i];
+					first_hit = false;
+				}
+		}
+	}
 	
+  hNaIsum -> inc(SumNaI);
+	hMulti -> inc(multi);
+	hNaITDC -> inc(NaITDC);
+
+	hHPGe -> inc(scp_adc[0]); 
+
  	
-
-  // Below this point only deal in 'c' values, which are the
-  // compressed values
-
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
   double compressionE = 5000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
-	// double compressionT = 1000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
-  int cSum = (int) std::floor(dADC7 / compressionE);
-  int cHPGe = (int) std::floor(dADC2 / compressionE);
-  // int cTDC = (int) std::floor(dADC[2] / compressionT);
+	double compressionT = 1000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
+  int cSum = (int) std::floor(SumNaI / compressionE);
+  int cHPGe = (int) std::floor(scp_adc[0] / compressionE);
+  int cTDC = (int) std::floor(NaITDC / compressionT);
+
 	
-  
-  // // Increment 1D histograms
-	// hADCNaI0  -> inc(dADC[0]);
-	// hADCNaI1  -> inc(dADC[1]);
-	// hADCNaI3  -> inc(dADC[3]);  
-	// hADCNaI4  -> inc(dADC[4]);
-	// hADCNaI5  -> inc(dADC[5]);
-	// hADCNaI6  -> inc(dADC[6]);
-	// hADCNaI7  -> inc(dADC[7]);
-	// hADCNaI8  -> inc(dADC[8]);
-	// hADCNaI9 	-> inc(dADC[9]);
-	// hADCNaI10	-> inc(dADC[10]);
-	// hADCNaI11	-> inc(dADC[11]);
-	// hADCNaI12	-> inc(dADC[12]);
-	// hADCNaI13	-> inc(dADC[13]);
-	// hADCNaI14	-> inc(dADC[14]);
-	// hADCNaI15	-> inc(dADC[15]);
 
-	// hTDCNaI0  -> inc(dTDC[0]);
-	// hTDCNaI1  -> inc(dTDC[1]);
-	// hTDCNaI3  -> inc(dTDC[3]);  
-	// hTDCNaI4  -> inc(dTDC[4]);
-	// hTDCNaI5  -> inc(dTDC[5]);
-	// hTDCNaI6  -> inc(dTDC[6]);
-	// hTDCNaI7  -> inc(dTDC[7]);
-	// hTDCNaI8  -> inc(dTDC[8]);
-	// hTDCNaI9 	-> inc(dTDC[9]);
-	// hTDCNaI10	-> inc(dTDC[10]);
-	// hTDCNaI11	-> inc(dTDC[11]);
-	// hTDCNaI12	-> inc(dTDC[12]);
-	// hTDCNaI13	-> inc(dTDC[13]);
-	// hTDCNaI14	-> inc(dTDC[14]);
-	// hTDCNaI15	-> inc(dTDC[15]);
-	
-  // hNaIsum -> inc(SumNaI);
-	// hMulti -> inc(multi);
-	// hNaITDC -> inc(NaITDC);
-
-	// hHPGe -> inc(dADC[2]);
-
-	// hPulser -> inc(dADC[16]);
+	// hPulser -> inc(qdc_adc[16]);
 	
   // // Increment 2D histograms
 
 	hHPGevNaIsum -> inc(cHPGe, cSum);
 	
-  // hHPGevNaITDC -> inc(cHPGe, cTDC);
+  hHPGevNaITDC -> inc(cHPGe, cTDC);
   
   // // The gated spectrum
 	// //TG : Timing Gate
 	
-  // Gate &G1 = hHPGevNaIsum -> getGate(0);
-	// Gate &G2 = hHPGevNaITDC -> getGate(0);
+  Gate &G1 = hHPGevNaIsum -> getGate(0);
+	Gate &G2 = hHPGevNaITDC -> getGate(0);
 	
-	// Gate &TG0 = hTDCNaI0 -> getGate(0);
-	// Gate &TG1 = hTDCNaI1 -> getGate(0);
-	// Gate &TG2 = hTDCNaI2 -> getGate(0);
-	// Gate &TG3 = hTDCNaI3 -> getGate(0);
-	// Gate &TG4 = hTDCNaI4 -> getGate(0);
-	// Gate &TG5 = hTDCNaI5 -> getGate(0);
-	// Gate &TG6 = hTDCNaI6 -> getGate(0);
-	// Gate &TG7 = hTDCNaI7 -> getGate(0);
-	// Gate &TG8 = hTDCNaI8 -> getGate(0);
-	// Gate &TG9 = hTDCNaI9 -> getGate(0);
-	// Gate &TG10 = hTDCNaI10 -> getGate(0);
-	// Gate &TG11 = hTDCNaI11 -> getGate(0);
-	// Gate &TG12 = hTDCNaI12 -> getGate(0);
-	// Gate &TG13 = hTDCNaI13 -> getGate(0);
-	// Gate &TG14 = hTDCNaI14 -> getGate(0);
-	// Gate &TG15 = hTDCNaI15 -> getGate(0);
+	Gate &TG0 = hTDCNaI0 -> getGate(0);
+	Gate &TG1 = hTDCNaI1 -> getGate(0);
+	Gate &TG2 = hTDCNaI2 -> getGate(0);
+	Gate &TG3 = hTDCNaI3 -> getGate(0);
+	Gate &TG4 = hTDCNaI4 -> getGate(0);
+	Gate &TG5 = hTDCNaI5 -> getGate(0);
+	Gate &TG6 = hTDCNaI6 -> getGate(0);
+	Gate &TG7 = hTDCNaI7 -> getGate(0);
+	Gate &TG8 = hTDCNaI8 -> getGate(0);
+	Gate &TG9 = hTDCNaI9 -> getGate(0);
+	Gate &TG10 = hTDCNaI10 -> getGate(0);
+	Gate &TG11 = hTDCNaI11 -> getGate(0);
+	Gate &TG12 = hTDCNaI12 -> getGate(0);
+	Gate &TG13 = hTDCNaI13 -> getGate(0);
+	Gate &TG14 = hTDCNaI14 -> getGate(0);
+	Gate &TG15 = hTDCNaI15 -> getGate(0);
 
 
 	
-  // if(G1.inGate(cHPGe, cSum)){
-  //   ghHPGeE->inc(dADC[2]);
-  // }
+  if(G1.inGate(cHPGe, cSum)){
+    ghHPGeE->inc(scp_adc[0]);
+  }
 
 
-	// if(G2.inGate(cHPGe, cTDC)){
-  //   ghHPGeT->inc(dADC[2]);
-  // }
+	if(G2.inGate(cHPGe, cTDC)){
+    ghHPGeT->inc(scp_adc[0]);
+  }
 
 
-	// if(TG0.inGate(dTDC[0])){
-	// 	ghNaI_0TDC_0 -> inc(dADC[0]);
-	// }
+	if(TG0.inGate(qdc_tdc[0])){
+		ghNaI_0TDC_0 -> inc(qdc_adc[0]);
+	}
 	
-	// if(TG1.inGate(dTDC[1])){
-	// 	ghNaI_1TDC_1 -> inc(dADC[1]);
+	if(TG1.inGate(qdc_tdc[1])){
+		ghNaI_1TDC_1 -> inc(qdc_adc[1]);
 		
-	// }
+	}
 
 
-	// if(TG2.inGate(dTDC[2])){
-	// 	ghNaI_2TDC_2 -> inc(dADC[2]);
+	if(TG2.inGate(qdc_tdc[2])){
+		ghNaI_2TDC_2 -> inc(qdc_adc[2]);
 		
-	// }
+	}
 
 
-	// if(TG3.inGate(dTDC[3])){
-	// 	ghNaI_3TDC_3 -> inc(dADC[3]);
+	if(TG3.inGate(qdc_tdc[3])){
+		ghNaI_3TDC_3 -> inc(qdc_adc[3]);
 		
-	// }
+	}
 
-	// if(TG4.inGate(dTDC[4])){
-	// 	ghNaI_4TDC_4 -> inc(dADC[4]);
+	if(TG4.inGate(qdc_tdc[4])){
+		ghNaI_4TDC_4 -> inc(qdc_adc[4]);
 		
-	// }
+	}
 
-	// if(TG5.inGate(dTDC[5])){
-	// 	ghNaI_5TDC_5 -> inc(dADC[5]);
+	if(TG5.inGate(qdc_tdc[5])){
+		ghNaI_5TDC_5 -> inc(qdc_adc[5]);
 		
-	// }
+	}
 
-	// if(TG6.inGate(dTDC[6])){
-	// 	ghNaI_6TDC_6 -> inc(dADC[6]);
+	if(TG6.inGate(qdc_tdc[6])){
+		ghNaI_6TDC_6 -> inc(qdc_adc[6]);
 		
-	// }
+	}
 
-	// if(TG7.inGate(dTDC[7])){
-	// 	ghNaI_7TDC_7 -> inc(dADC[7]);
+	if(TG7.inGate(qdc_tdc[7])){
+		ghNaI_7TDC_7 -> inc(qdc_adc[7]);
 		
-	// }
-	// if(TG8.inGate(dTDC[8])){
-	// 	ghNaI_8TDC_8 -> inc(dADC[8]);
+	}
+	if(TG8.inGate(qdc_tdc[8])){
+		ghNaI_8TDC_8 -> inc(qdc_adc[8]);
 		
-	// }
-	// if(TG9.inGate(dTDC[9])){
-	// 	ghNaI_9TDC_9 -> inc(dADC[9]);
+	}
+	if(TG9.inGate(qdc_tdc[9])){
+		ghNaI_9TDC_9 -> inc(qdc_adc[9]);
 		
-	// }
-	// if(TG10.inGate(dTDC[10])){
-	// 	ghNaI_10TDC_10 -> inc(dADC[10]);
+	}
+	if(TG10.inGate(qdc_tdc[10])){
+		ghNaI_10TDC_10 -> inc(qdc_adc[10]);
 		
-	// }
-	// if(TG11.inGate(dTDC[11])){
-	// 	ghNaI_11TDC_11 -> inc(dADC[11]);
+	}
+	if(TG11.inGate(qdc_tdc[11])){
+		ghNaI_11TDC_11 -> inc(qdc_adc[11]);
 		
-	// }
+	}
 
-	// if(TG12.inGate(dTDC[12])){
-	// 	ghNaI_12TDC_12 -> inc(dADC[12]);
+	if(TG12.inGate(qdc_tdc[12])){
+		ghNaI_12TDC_12 -> inc(qdc_adc[12]);
 		
-	// }
-	// if(TG13.inGate(dTDC[13])){
-	// 	ghNaI_13TDC_13 -> inc(dADC[13]);
+	}
+	if(TG13.inGate(qdc_tdc[13])){
+		ghNaI_13TDC_13 -> inc(qdc_adc[13]);
 		
-	// }
-	// if(TG14.inGate(dTDC[14])){
-	// 	ghNaI_14TDC_14 -> inc(dADC[14]);
+	}
+	if(TG14.inGate(qdc_tdc[14])){
+		ghNaI_14TDC_14 -> inc(qdc_adc[14]);
 		
-	// }
-	// if(TG15.inGate(dTDC[15])){
-	// 	ghNaI_15TDC_15 -> inc(dADC[15]);
+	}
+	if(TG15.inGate(qdc_tdc[15])){
+		ghNaI_15TDC_15 -> inc(qdc_adc[15]);
 		
-	// }
+	}
 }
 
 

@@ -8,7 +8,6 @@
 
 using vec_u32 = std::vector<uint32_t>;
 
-// enum for bit masks
 enum bitmasks {
 	one_bit = 0x1,
 	two_bit = 0x3,
