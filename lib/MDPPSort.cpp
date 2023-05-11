@@ -2,10 +2,14 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <cmath>		
+#include <sstream>
 
 #include "MDPPEventHandler.h"
 #include "MDPPSort.h"
 #include "TV792Data.hxx"
+
+#include <fstream>
 
 Messages messages;
 
@@ -23,6 +27,7 @@ std::string EngeSort::saysomething(std::string str) {
 /* ------------- 
 Global Variables 
 ----------------*/
+
 
 // binning to use in the histograms
 int Channels1D = 65536;
@@ -76,6 +81,22 @@ Histogram *hNaIsum;
 Histogram *hNaITDC;
 Histogram *hMulti;
 
+// Plastic Scintillators
+Histogram *hADCPS1;
+Histogram *hADCPS2;
+Histogram *hADCPS3;
+Histogram *hADCPS4;
+Histogram *hADCPS5;
+Histogram *hADCPS6;
+Histogram *hADCPS7;
+Histogram *hADCPS8;
+Histogram *hADCPS9;
+
+// Energy Calibrated Spectra
+
+Histogram *hHPGe_E;
+
+
 // HPGe Singles
 Histogram *hHPGe;
 
@@ -108,6 +129,90 @@ Histogram *ghNaI_12TDC_12;
 Histogram *ghNaI_13TDC_13;
 Histogram *ghNaI_14TDC_14;
 Histogram *ghNaI_15TDC_15;
+
+// random number generator for calibration values.
+std::random_device rand_dev;
+std::mt19937 generator(rand_dev());
+std::uniform_int_distribution<int> uniform_sample(-1, 1);
+
+
+// Calibrator setup
+void Calibrator::load_file(std::string filename){
+	// store the fit calibration parameters
+	this->slope.resize(32);
+	std::fill(this->slope.begin(), this->slope.end(), 0);
+
+	this->intercept.resize(32);
+	std::fill(this->intercept.begin(), this->intercept.end(), 0);
+		
+	// read in the calibration
+	std::ifstream file(filename);
+	std::string line;
+	auto delim = ',';
+	std::string temp_string;
+	bool first_line = true;
+	
+	while (std::getline(file, line)){
+		// just skipping the headers for now.
+		if (first_line){
+			first_line = false;
+			continue; 
+		}
+
+		// convert so we can iterate over the delimiters
+		auto ss = std::stringstream(line);
+		// these are the line variables
+		int channel;
+		int slope;
+		int intercept;
+		int col = 0;
+			
+		while (std::getline(ss, temp_string, delim)){
+			// temp string holds each column
+			// col is incremented each time and keeps track of the column
+			switch (col) {
+			case 0 :
+				// bank name case, it is not implemented right now
+				break;
+
+			case 1:
+				channel = std::stoi(temp_string);
+				break;
+
+			case 2:
+				this->slope[channel] = std::stod(temp_string);
+				break;
+
+			case 3:
+				this->intercept[channel] = std::stod(temp_string);
+				break;
+				
+			default:
+				throw; 
+	
+			}
+			col += 1; 	
+		}			
+	}
+}
+
+IntVector Calibrator::calibrate(vec_u32 &adc_values){
+
+	IntVector result(adc_values.size(), 0); 
+
+	for (int i=0; i < adc_values.size(); i++){
+		// do the calibration
+		auto temp = (double)adc_values[i];
+		// check to make sure we have a adc value and that we have a calibration
+		if ((temp > 0) && (this->slope[i] > 0)){
+			result[i] = std::round((this->slope[i] * temp + this->intercept[i])
+														 + uniform_sample(generator));
+		}
+	}
+	
+	return result;
+}
+
 
 // Counters
 int totalCounter=0;
@@ -158,6 +263,16 @@ void EngeSort::Initialize(){
 	hTDCNaI15 = new Histogram("TDC 15", Channels1D, 1);
 
 
+	hADCPS1 = new Histogram("Plastic Scint. 1", Channels1D, 1);
+	hADCPS2 = new Histogram("Plastic Scint. 2", Channels1D, 1);
+	hADCPS3 = new Histogram("Plastic Scint. 3", Channels1D, 1);
+	hADCPS4 = new Histogram("Plastic Scint. 4", Channels1D, 1);
+	hADCPS5 = new Histogram("Plastic Scint. 5", Channels1D, 1);
+	hADCPS6 = new Histogram("Plastic Scint. 6", Channels1D, 1);
+	hADCPS7 = new Histogram("Plastic Scint. 7", Channels1D, 1);
+	hADCPS8 = new Histogram("Plastic Scint. 8", Channels1D, 1);
+	hADCPS9 = new Histogram("Plastic Scint. 9", Channels1D, 1);
+
 
 	
 	hNaIsum = new Histogram("NaI Sum", Channels1D, 1);
@@ -166,6 +281,9 @@ void EngeSort::Initialize(){
 
 	hHPGe = new Histogram("HPGe", Channels1D, 1);
 
+	hHPGe_E = new Histogram("HPGe_Cal", Channels1D, 1);
+
+	
 	hPulser = new Histogram("Pulser", Channels1D, 1);
 
 
@@ -231,6 +349,10 @@ void EngeSort::Initialize(){
   hTDCNaI13 -> addGate("Time Gate");
 	hTDCNaI14 -> addGate("Time Gate");
 	hTDCNaI15 -> addGate("Timing Gate");
+
+	// Initialize the calibrator
+	this->calibrator.load_file("60Co_two_point_run362.csv");
+	
 }
 
 
@@ -247,7 +369,9 @@ void EngeSort::sort(MDPPEvent& event_data){
 	
 	vec_u32 qdc_adc = event_data.get_data("qdc1").adc;
 	vec_u32 qdc_tdc = event_data.get_data("qdc1").tdc;
-	 		
+
+	IntVector cal_values = this->calibrator.calibrate(qdc_adc);
+	
   
   // // Increment 1D histograms
 	hADCNaI0  -> inc(qdc_adc[0]);
@@ -282,14 +406,24 @@ void EngeSort::sort(MDPPEvent& event_data){
 	hTDCNaI14	-> inc(qdc_tdc[14]);
 	hTDCNaI15	-> inc(qdc_tdc[15]);
 
+	hADCPS1 -> inc(qdc_adc[17]);
+	hADCPS2 -> inc(qdc_adc[18]);
+	hADCPS3 -> inc(qdc_adc[19]);
+	hADCPS4 -> inc(qdc_adc[20]);
+	hADCPS5 -> inc(qdc_adc[21]);
+	hADCPS6 -> inc(qdc_adc[22]);
+	hADCPS7 -> inc(qdc_adc[23]);
+	hADCPS8 -> inc(qdc_adc[24]);
+	hADCPS9 -> inc(qdc_adc[25]);
+
 	
 	int SumNaI = 0;
 	int multi = 0;
 	bool first_hit = true;
 	int NaITDC;
-	// sum up the annulus channels
+	// sum up the calibrated annulus
 	for(int i=0; i < 16; i++){
-		SumNaI += qdc_adc[i];
+		SumNaI += cal_values[i];
 		if (qdc_adc[i] > 0) {
 			multi += 1;
 			if (first_hit) {
@@ -298,13 +432,15 @@ void EngeSort::sort(MDPPEvent& event_data){
 				}
 		}
 	}
+
+	
 	
   hNaIsum -> inc(SumNaI);
 	hMulti -> inc(multi);
 	hNaITDC -> inc(NaITDC);
 
 	hHPGe -> inc(scp_adc[0]); 
-
+	hHPGe_E -> inc(cal_values[0]);
  	
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra

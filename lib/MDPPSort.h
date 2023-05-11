@@ -11,6 +11,7 @@
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "boost/multi_array.hpp"
+#include <fstream>
 
 #include "manalyzer.h"
 #include "midasio.h"
@@ -25,6 +26,22 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 typedef std::vector<int> IntVector;
 
+// This class holds the calibration for one module within the system.
+class Calibrator {
+
+public:
+
+	Calibrator () {}
+
+	void load_file(std::string filename);
+	
+	IntVector calibrate(vec_u32 &adc_values);
+
+private:
+	vec slope;
+	vec intercept;
+	
+};
 
 //class EngeAnalyzer: public TRootanaEventLoop {
 class EngeSort {
@@ -59,6 +76,8 @@ class EngeSort {
 
   void setIsRunning(bool isr){isRunning = isr;}
   bool getIsRunning(){return isRunning;}
+
+	Calibrator calibrator;
 
   
   // Gate passing

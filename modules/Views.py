@@ -320,6 +320,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dotsAction.setChecked(False)
         dotsAction.triggered.connect(self.setting_dots)
         self.settings_menu.addAction(dotsAction)
+
+        # calibration settings
+        # cal_action = QtGui.QAction('&Calibrate', self.settings_menu)
+        
+        # self.settings_menu.addAction(cal_action)
         
         ## -----
         ## Help Menu

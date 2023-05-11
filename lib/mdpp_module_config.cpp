@@ -6,10 +6,6 @@ MDPPConfig read_from_toml(const std::string& filename) {
 	// make sure we can parse the file
   try {
 		toml::table module_table = toml::parse_file(filename);
-  // std::optional<std::string> b = module_table["modules"][0]["mod_type"].value<std::string>();
-  // module.mod_type = scp;
-  // module.nchannels = *this->table["modules"][0]["nchannels"].value<int>();
-  // this->module_map[*b] = module;
 
 		MDPPConfig module_map; // map that will associate bank names with module type and channel numbers
 
