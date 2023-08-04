@@ -135,9 +135,9 @@ class SpectrumCanvas(FigureCanvas):
         self.cydata = []
         global cid
         cid = self.fc.mpl_connect(self, 'button_press_event', self.onclick)
-        cross = self.MouseCross(self.fig, self.a,) #, marker=r'$\bigoplus$',markersize=30,
+        ##cross = self.MouseCross(self.fig, self.a,) #, marker=r'$\bigoplus$',markersize=30,
                                                    #color='red',)
-        self.fc.mpl_connect(self,'motion_notify_event', cross.show_line)
+        ##self.fc.mpl_connect(self,'motion_notify_event', cross.show_line)
         #print("entering a blocking loop")
         self.fc.start_event_loop(self)#,timeout=-1)
         
