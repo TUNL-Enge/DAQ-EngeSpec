@@ -53,13 +53,13 @@ add_library( RBSSort SHARED RBSSort.cpp)
 
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt ) 
+  librootana.a -lz ${ROOT_LIBRARIES}  -lrt ) 
 
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES}  -lrt )
 
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES}  -lrt )
  
 target_link_libraries( RBSSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES}  -lrt )

@@ -387,7 +387,7 @@ class SpectrumCanvas(FigureCanvas):
             ##self.sm = cm.ScalarMappable(norm=norm,cmap= self.cols)
             divider = make_axes_locatable(self.a)
             cax = divider.append_axes("right", size="3%", pad="5%")
-            blah = divider.append_axes("right",size="5%",pad="5%",add_to_figure=False)
+            ##blah = divider.append_axes("right",size="5%",pad="5%",add_to_figure=False)
             ##cax = make_axes_locatable(self.a).new_horizontal(size="3%", pad="1%")
             self.lincb = self.fig.colorbar(self.image,cax=cax)
             ##self.lincb = matplotlib.pyplot.colorbar(image)#,cax=cax)
