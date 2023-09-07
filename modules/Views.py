@@ -519,6 +519,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             lab = QtWidgets.QLabel()
             val = QtWidgets.QLabel()
             val.setAlignment(QtCore.Qt.AlignRight)
+            val.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
             self.sclrlab.append(lab)
             self.sclrval.append(val)
             self.sclrlab[isclr].setText(sc.Name)

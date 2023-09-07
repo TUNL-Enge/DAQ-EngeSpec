@@ -46,10 +46,16 @@ add_library( EngeSort SHARED EngeSort.cpp)
 add_library( v1730Sort SHARED v1730Sort.cpp)
 
 # Build our Sort Routine
+add_library( v1730EngeSort SHARED v1730EngeSort.cpp)
+
+# Build our Sort Routine
 add_library( MDPPSort SHARED MDPPSort.cpp)
 
 # Build our Sort Routine
 add_library( RBSSort SHARED RBSSort.cpp)
+
+# Build our Sort Routine
+add_library( 88SrSort SHARED 88SrSort.cpp)
 
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
@@ -58,8 +64,14 @@ target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
 
+target_link_libraries( v1730EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
  
 target_link_libraries( RBSSort ${Boost_LIBRARIES} EngeAnalyzer 
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+
+target_link_libraries( 88SrSort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
