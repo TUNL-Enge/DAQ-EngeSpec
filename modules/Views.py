@@ -104,14 +104,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ## FENRIS logo
         pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
-        label = QtWidgets.QLabel()
-        label.resize(240, 100)
-        label.setPixmap(pixmap)
+        self.logolabel = QtWidgets.QLabel()
+        self.logolabel.resize(240, 100)
+        self.logolabel.setPixmap(pixmap)
         ## Within the tree frame, make a vertical box layout
         treeFramevbox = QtWidgets.QVBoxLayout()
         treeFramevbox.addWidget(self.treeWidget)
         #        treeFramevbox.addStretch(1)
-        treeFramevbox.addWidget(label)
+        treeFramevbox.addWidget(self.logolabel)
 
         treeFrame.setLayout(treeFramevbox)
 
@@ -399,6 +399,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
        # view.show()
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
+        ## Make a MIDAS status thread
+        self.midas_thread = MidasStatusThread(self)
 
         ## Grey out unsafe menu items!
         self.connectOnlineAction.setEnabled(False)
@@ -422,10 +424,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
     def startmidas(self):
         ##print("Running midas")
-
-
-        
+      
         self.SpecColl.startmidas()
+        self.midas_thread.start()
         self.runningIndicator.showMessage("MIDAS is running...")
         
         if not self.scalersRunning:
@@ -437,6 +438,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##print("Stopping midas")
         self.SpecColl.stopmidas()
         self.runningIndicator.showMessage("")
+        #time.sleep(2)
+        #self.midas_thread.stop()
         #if self.SpecColl.isOnline:
             #os.system("odbedit -c stop")
         #self.MIDASisRunning = False
@@ -559,6 +562,32 @@ class ScalerCollectionThread(QtCore.QThread):
                 self.specColl.sclr[i].N = sclrvals[i]
             self.view.UpdateScalers()
             time.sleep(5)
+
+class MidasStatusThread(QtCore.QThread):
+    def __init__(self,view):
+        super().__init__()
+
+        self.view = view
+        self.specColl = view.SpecCanvas.SpecColl
+        self.wasRunning = False
+
+    def run(self):
+        
+        while True: ##self.specColl.MIDASisRunning:
+            ##print("Collecting MIDAS Status")
+            isRunning = self.specColl.dm.getIsRunning()
+            ##print("isRunning = ",isRunning, " self.wasRunning = ",self.wasRunning)
+            if((not self.wasRunning) and isRunning):
+                ##print("Changing logo to running logo")
+                self.wasRunning = True
+                pixmap = QtGui.QPixmap('images/FENRISLogo-notext-running.png')
+                self.view.logolabel.setPixmap(pixmap)
+            if(self.wasRunning and (not isRunning)):
+                ##print("Changing logo to non-running logo")
+                self.wasRunning = False
+                pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
+                self.view.logolabel.setPixmap(pixmap)
+            time.sleep(1)
             
 
 class MyCustomToolbar(NavigationToolbar): 

@@ -2,6 +2,7 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <cmath>		
 
 #include "RBSSort.h"
 #include "TV792Data.hxx"
@@ -23,7 +24,9 @@ Histogram *hDet20;
 Histogram *hDet40;
 Histogram *hDet60;
 Histogram *hDet80;
+Histogram *hNaI;
 Histogram *hMonitor;
+Histogram *hNaICal;
 
 // Counters
 int totalCounter=0;
@@ -37,6 +40,11 @@ Scaler *sClockLive;
 Scaler *BCI;
 Scaler *sPulser;
 
+// random number generator for calibration values.
+std::random_device rand_dev;
+std::mt19937 generator(rand_dev());
+std::uniform_int_distribution<int> uniform_sample(-1, 1);
+
 
 void EngeSort::Initialize(){
 
@@ -49,6 +57,8 @@ void EngeSort::Initialize(){
   hDet60 = new Histogram("Detector 2", Channels1D, 1);
   hDet80 = new Histogram("Detector 3", Channels1D, 1);
   hMonitor = new Histogram("Monitor Detector", Channels1D, 1);
+  hNaI = new Histogram("NaI Detector", Channels1D, 1);
+  hNaICal = new Histogram("NaI Energy Calibrated", Channels1D, 1);
 
   // Build the scalers 
   sGates = new Scaler("Total Gates", 0);    // Name, index
@@ -71,7 +81,11 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 
   //std::cout << ADCsize << "  " << TDCsize << std::endl;
   //std::cout << dADC << "  " << dTDC << std::endl;
-  
+
+	// Calibration for the NaI detector
+	double slope = 5.436860068259382;
+	double intercept = -749.8174061433435;
+	
   // Thresholds
   int Threshold = 150;
   for (int i=0; i<ADCsize; i++) {
@@ -80,11 +94,13 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 		}
 	}
   //  std::cout << "Done thresholding" << std::endl;
-	int c20=0;
-	int c40=0;
-	int c60=0;
-	int c80=0;
-	int cMon=0;
+	int c20 = 0;
+	int c40 = 0;
+	int c60 = 0;
+	int c80 = 0;
+	int cMon = 0;
+	int cNaI = 0;
+	int cNaICal = 0;
 
   // Define the channels
   if(ADCsize > 0){
@@ -94,16 +110,22 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 		c60 = dADC[2];
 		c80 = dADC[3];
 	  cMon = dADC[4];
+		cNaI = dADC[5];
 		
   }
-  
-  // Increment 1D histograms
+
+	cNaICal = std::round(((slope * cNaI + intercept) / 10.0)
+											 + uniform_sample(generator)); // Compress by a factor of 2 
+	
+  // Increment 1D histogramsx
   hDet20 -> inc(c20);
   hDet40 -> inc(c40);
   hDet60 -> inc(c60);
   hDet80 -> inc(c80);
 	hMonitor -> inc(cMon);
-
+	hNaI -> inc(cNaI);
+	hNaICal -> inc(cNaICal);
+	
 }
 
 // Increment the scalers

@@ -622,11 +622,13 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Silicon slope = %f\n",pSiSlope);
   
   fRunEventCounter = 0;
+	fModule->eA->setIsRunning(true);
 }
 
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
+	fModule->eA->setIsRunning(false);
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
