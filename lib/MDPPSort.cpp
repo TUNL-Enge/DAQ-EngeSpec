@@ -351,7 +351,8 @@ void EngeSort::Initialize(){
 	hTDCNaI15 -> addGate("Timing Gate");
 
 	// Initialize the calibrator
-	this->calibrator.load_file("60Co_two_point_run362.csv");
+	this->calibrator_annulus_ps.load_file("60Co_two_point_run362.csv");
+	this->calibrator_hpge.load_file("hpge_run419_60Co_two_point.csv");
 	
 }
 
@@ -370,7 +371,8 @@ void EngeSort::sort(MDPPEvent& event_data){
 	vec_u32 qdc_adc = event_data.get_data("qdc1").adc;
 	vec_u32 qdc_tdc = event_data.get_data("qdc1").tdc;
 
-	IntVector cal_values = this->calibrator.calibrate(qdc_adc);
+	IntVector cal_values = this->calibrator_annulus_ps.calibrate(qdc_adc);
+	IntVector hpge_cal_values = this->calibrator_hpge.calibrate(scp_adc);
 	
   
   // // Increment 1D histograms
@@ -440,7 +442,7 @@ void EngeSort::sort(MDPPEvent& event_data){
 	hNaITDC -> inc(NaITDC);
 
 	hHPGe -> inc(scp_adc[0]); 
-	hHPGe_E -> inc(cal_values[0]);
+	hHPGe_E -> inc(hpge_cal_values[0]);
  	
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra

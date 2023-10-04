@@ -77,7 +77,8 @@ class EngeSort {
   void setIsRunning(bool isr){isRunning = isr;}
   bool getIsRunning(){return isRunning;}
 
-	Calibrator calibrator;
+	Calibrator calibrator_annulus_ps;
+	Calibrator calibrator_hpge;
 
   
   // Gate passing
