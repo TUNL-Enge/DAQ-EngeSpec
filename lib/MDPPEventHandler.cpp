@@ -30,7 +30,7 @@ It will be passed
 
 MDPPEvent::MDPPEvent() {
 	// hard coded for now
-	this->module_map = read_from_toml("/home/jam/midas/online/src/mdpp/mdpp-setup.toml");
+	this->module_map = read_from_toml("/home/jam/caleb-stuff/setup-files/ecr-beamline-mdpp-setup.toml");
 	// go ahead and set up the data vector and map
 	int i = 0;
  	for (auto m : this->module_map) {

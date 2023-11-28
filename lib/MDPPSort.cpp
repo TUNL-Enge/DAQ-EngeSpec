@@ -31,7 +31,7 @@ Global Variables
 
 // binning to use in the histograms
 int Channels1D = 65536;
-int Channels2D = 512;
+int Channels2D = 1000;
 
 
 // Scalers
@@ -291,8 +291,8 @@ void EngeSort::Initialize(){
 
 	//--------------------
 	// Scalers
-  sPulser = new Scaler("Pulser", 0);    // Name, index
-  sTriggers = new Scaler("Triggers", 1);    // Name, index
+	sPulser = new Scaler("Pulser", 0);    // Name, index
+	sTriggers = new Scaler("Triggers", 1);    // Name, index
   //--------------------
 
 	
@@ -334,25 +334,25 @@ void EngeSort::Initialize(){
 	hHPGevNaIsum -> addGate("Energy Gate");
 	hHPGevNaITDC -> addGate("Time Gate");
 	hTDCNaI0 -> addGate("Time Gate");
-  hTDCNaI1 -> addGate("Time Gate");
+	hTDCNaI1 -> addGate("Time Gate");
 	hTDCNaI2 -> addGate("Time Gate");
 	hTDCNaI3 -> addGate("Time Gate");
-  hTDCNaI4 -> addGate("Time Gate");
+	hTDCNaI4 -> addGate("Time Gate");
 	hTDCNaI5 -> addGate("Time Gate");
 	hTDCNaI6 -> addGate("Time Gate");
-  hTDCNaI7 -> addGate("Time Gate");
+	hTDCNaI7 -> addGate("Time Gate");
 	hTDCNaI8 -> addGate("Time Gate");
 	hTDCNaI9 -> addGate("Time Gate");
-  hTDCNaI10 -> addGate("Time Gate");
+	hTDCNaI10 -> addGate("Time Gate");
 	hTDCNaI11 -> addGate("Time Gate");
 	hTDCNaI12 -> addGate("Time Gate");
-  hTDCNaI13 -> addGate("Time Gate");
+	hTDCNaI13 -> addGate("Time Gate");
 	hTDCNaI14 -> addGate("Time Gate");
 	hTDCNaI15 -> addGate("Timing Gate");
 
 	// Initialize the calibrator
-	this->calibrator_annulus_ps.load_file("60Co_two_point_run362.csv");
-	this->calibrator_hpge.load_file("hpge_run419_60Co_two_point.csv");
+	this->calibrator_annulus_ps.load_file("nai_cal.csv");
+	this->calibrator_hpge.load_file("hpge_cal.csv");
 	
 }
 
@@ -378,6 +378,7 @@ void EngeSort::sort(MDPPEvent& event_data){
   // // Increment 1D histograms
 	hADCNaI0  -> inc(qdc_adc[0]);
 	hADCNaI1  -> inc(qdc_adc[1]);
+	hADCNaI2  -> inc(qdc_adc[2]);
 	hADCNaI3  -> inc(qdc_adc[3]);  
 	hADCNaI4  -> inc(qdc_adc[4]);
 	hADCNaI5  -> inc(qdc_adc[5]);
@@ -394,6 +395,7 @@ void EngeSort::sort(MDPPEvent& event_data){
 
 	hTDCNaI0  -> inc(qdc_tdc[0]);
 	hTDCNaI1  -> inc(qdc_tdc[1]);
+	hTDCNaI2  -> inc(qdc_tdc[2]);
 	hTDCNaI3  -> inc(qdc_tdc[3]);  
 	hTDCNaI4  -> inc(qdc_tdc[4]);
 	hTDCNaI5  -> inc(qdc_tdc[5]);
@@ -419,25 +421,27 @@ void EngeSort::sort(MDPPEvent& event_data){
 	hADCPS9 -> inc(qdc_adc[25]);
 
 	
-	int SumNaI = 0;
+	double SumNaI = 0;
 	int multi = 0;
 	bool first_hit = true;
 	int NaITDC;
 	// sum up the calibrated annulus
 	for(int i=0; i < 16; i++){
-		SumNaI += cal_values[i];
-		if (qdc_adc[i] > 0) {
-			multi += 1;
-			if (first_hit) {
-					NaITDC = qdc_tdc[i];
-					first_hit = false;
-				}
-		}
+	  SumNaI += (double) cal_values[i];
+	  if (qdc_adc[i] > 0) {
+	    multi += 1;
+	    if (first_hit) {
+	      // This spectra will be the timing difference between the
+	      // HPGe timing signal and first NaI segment that fired.
+	      NaITDC = (scp_tdc[2] - qdc_tdc[i]);
+	      first_hit = false;
+	    }
+	  }
 	}
 
 	
 	
-  hNaIsum -> inc(SumNaI);
+	hNaIsum -> inc(SumNaI);
 	hMulti -> inc(multi);
 	hNaITDC -> inc(NaITDC);
 
@@ -447,44 +451,44 @@ void EngeSort::sort(MDPPEvent& event_data){
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
-  double compressionE = 5000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
-	double compressionT = 1000.0/Channels2D; //(double)Channels1D/ (double)Channels2D;
-  int cSum = (int) std::floor(SumNaI / compressionE);
-  int cHPGe = (int) std::floor(scp_adc[0] / compressionE);
+  double compressionE = Channels2D/10000.0; //(double)Channels1D/ (double)Channels2D;
+  double compressionT = Channels2D/10000.0; //(double)Channels1D/ (double)Channels2D;
+  int cSum = (int) std::floor(SumNaI * compressionE);
+  int cHPGe = (int) std::floor((double) hpge_cal_values[0] * compressionE);
   int cTDC = (int) std::floor(NaITDC / compressionT);
 
 	
 
-	// hPulser -> inc(qdc_adc[16]);
+  // hPulser -> inc(qdc_adc[16]);
 	
   // // Increment 2D histograms
 
-	hHPGevNaIsum -> inc(cHPGe, cSum);
+  hHPGevNaIsum -> inc(cHPGe, cSum);
 	
   hHPGevNaITDC -> inc(cHPGe, cTDC);
   
   // // The gated spectrum
-	// //TG : Timing Gate
+  // //TG : Timing Gate
 	
   Gate &G1 = hHPGevNaIsum -> getGate(0);
-	Gate &G2 = hHPGevNaITDC -> getGate(0);
+  Gate &G2 = hHPGevNaITDC -> getGate(0);
 	
-	Gate &TG0 = hTDCNaI0 -> getGate(0);
-	Gate &TG1 = hTDCNaI1 -> getGate(0);
-	Gate &TG2 = hTDCNaI2 -> getGate(0);
-	Gate &TG3 = hTDCNaI3 -> getGate(0);
-	Gate &TG4 = hTDCNaI4 -> getGate(0);
-	Gate &TG5 = hTDCNaI5 -> getGate(0);
-	Gate &TG6 = hTDCNaI6 -> getGate(0);
-	Gate &TG7 = hTDCNaI7 -> getGate(0);
-	Gate &TG8 = hTDCNaI8 -> getGate(0);
-	Gate &TG9 = hTDCNaI9 -> getGate(0);
-	Gate &TG10 = hTDCNaI10 -> getGate(0);
-	Gate &TG11 = hTDCNaI11 -> getGate(0);
-	Gate &TG12 = hTDCNaI12 -> getGate(0);
-	Gate &TG13 = hTDCNaI13 -> getGate(0);
-	Gate &TG14 = hTDCNaI14 -> getGate(0);
-	Gate &TG15 = hTDCNaI15 -> getGate(0);
+  Gate &TG0 = hTDCNaI0 -> getGate(0);
+  Gate &TG1 = hTDCNaI1 -> getGate(0);
+  Gate &TG2 = hTDCNaI2 -> getGate(0);
+  Gate &TG3 = hTDCNaI3 -> getGate(0);
+  Gate &TG4 = hTDCNaI4 -> getGate(0);
+  Gate &TG5 = hTDCNaI5 -> getGate(0);
+  Gate &TG6 = hTDCNaI6 -> getGate(0);
+  Gate &TG7 = hTDCNaI7 -> getGate(0);
+  Gate &TG8 = hTDCNaI8 -> getGate(0);
+  Gate &TG9 = hTDCNaI9 -> getGate(0);
+  Gate &TG10 = hTDCNaI10 -> getGate(0);
+  Gate &TG11 = hTDCNaI11 -> getGate(0);
+  Gate &TG12 = hTDCNaI12 -> getGate(0);
+  Gate &TG13 = hTDCNaI13 -> getGate(0);
+  Gate &TG14 = hTDCNaI14 -> getGate(0);
+  Gate &TG15 = hTDCNaI15 -> getGate(0);
 
 
 	
@@ -493,84 +497,84 @@ void EngeSort::sort(MDPPEvent& event_data){
   }
 
 
-	if(G2.inGate(cHPGe, cTDC)){
+  if(G2.inGate(cHPGe, cTDC)){
     ghHPGeT->inc(scp_adc[0]);
   }
 
 
-	if(TG0.inGate(qdc_tdc[0])){
-		ghNaI_0TDC_0 -> inc(qdc_adc[0]);
-	}
+  if(TG0.inGate(qdc_tdc[0])){
+    ghNaI_0TDC_0 -> inc(qdc_adc[0]);
+  }
 	
-	if(TG1.inGate(qdc_tdc[1])){
-		ghNaI_1TDC_1 -> inc(qdc_adc[1]);
+  if(TG1.inGate(qdc_tdc[1])){
+    ghNaI_1TDC_1 -> inc(qdc_adc[1]);
 		
-	}
+  }
 
 
-	if(TG2.inGate(qdc_tdc[2])){
-		ghNaI_2TDC_2 -> inc(qdc_adc[2]);
+  if(TG2.inGate(qdc_tdc[2])){
+    ghNaI_2TDC_2 -> inc(qdc_adc[2]);
 		
-	}
+  }
 
 
-	if(TG3.inGate(qdc_tdc[3])){
-		ghNaI_3TDC_3 -> inc(qdc_adc[3]);
+  if(TG3.inGate(qdc_tdc[3])){
+    ghNaI_3TDC_3 -> inc(qdc_adc[3]);
 		
-	}
+  }
 
-	if(TG4.inGate(qdc_tdc[4])){
-		ghNaI_4TDC_4 -> inc(qdc_adc[4]);
+  if(TG4.inGate(qdc_tdc[4])){
+    ghNaI_4TDC_4 -> inc(qdc_adc[4]);
 		
-	}
+  }
 
-	if(TG5.inGate(qdc_tdc[5])){
-		ghNaI_5TDC_5 -> inc(qdc_adc[5]);
+  if(TG5.inGate(qdc_tdc[5])){
+    ghNaI_5TDC_5 -> inc(qdc_adc[5]);
 		
-	}
+  }
 
-	if(TG6.inGate(qdc_tdc[6])){
-		ghNaI_6TDC_6 -> inc(qdc_adc[6]);
+  if(TG6.inGate(qdc_tdc[6])){
+    ghNaI_6TDC_6 -> inc(qdc_adc[6]);
 		
-	}
+  }
 
-	if(TG7.inGate(qdc_tdc[7])){
-		ghNaI_7TDC_7 -> inc(qdc_adc[7]);
+  if(TG7.inGate(qdc_tdc[7])){
+    ghNaI_7TDC_7 -> inc(qdc_adc[7]);
 		
-	}
-	if(TG8.inGate(qdc_tdc[8])){
-		ghNaI_8TDC_8 -> inc(qdc_adc[8]);
+  }
+  if(TG8.inGate(qdc_tdc[8])){
+    ghNaI_8TDC_8 -> inc(qdc_adc[8]);
 		
-	}
-	if(TG9.inGate(qdc_tdc[9])){
-		ghNaI_9TDC_9 -> inc(qdc_adc[9]);
+  }
+  if(TG9.inGate(qdc_tdc[9])){
+    ghNaI_9TDC_9 -> inc(qdc_adc[9]);
 		
-	}
-	if(TG10.inGate(qdc_tdc[10])){
-		ghNaI_10TDC_10 -> inc(qdc_adc[10]);
+  }
+  if(TG10.inGate(qdc_tdc[10])){
+    ghNaI_10TDC_10 -> inc(qdc_adc[10]);
 		
-	}
-	if(TG11.inGate(qdc_tdc[11])){
-		ghNaI_11TDC_11 -> inc(qdc_adc[11]);
+  }
+  if(TG11.inGate(qdc_tdc[11])){
+    ghNaI_11TDC_11 -> inc(qdc_adc[11]);
 		
-	}
+  }
 
-	if(TG12.inGate(qdc_tdc[12])){
-		ghNaI_12TDC_12 -> inc(qdc_adc[12]);
+  if(TG12.inGate(qdc_tdc[12])){
+    ghNaI_12TDC_12 -> inc(qdc_adc[12]);
 		
-	}
-	if(TG13.inGate(qdc_tdc[13])){
-		ghNaI_13TDC_13 -> inc(qdc_adc[13]);
+  }
+  if(TG13.inGate(qdc_tdc[13])){
+    ghNaI_13TDC_13 -> inc(qdc_adc[13]);
 		
-	}
-	if(TG14.inGate(qdc_tdc[14])){
-		ghNaI_14TDC_14 -> inc(qdc_adc[14]);
+  }
+  if(TG14.inGate(qdc_tdc[14])){
+    ghNaI_14TDC_14 -> inc(qdc_adc[14]);
 		
-	}
-	if(TG15.inGate(qdc_tdc[15])){
-		ghNaI_15TDC_15 -> inc(qdc_adc[15]);
+  }
+  if(TG15.inGate(qdc_tdc[15])){
+    ghNaI_15TDC_15 -> inc(qdc_adc[15]);
 		
-	}
+  }
 }
 
 
