@@ -46,6 +46,9 @@ class SpectrumCanvas(FigureCanvas):
         self.n1 = 1
         self.n2 = 1
 
+        ## Fit a Gaussian (Eventually need to make this an option)
+        self.doFitGaus = True
+        
         self.isZoomed = False
         
         self.fig = Figure(figsize=(width, height), dpi=dpi)
@@ -1064,8 +1067,8 @@ class SpectrumCanvas(FigureCanvas):
             ## Draw background line
             xplot = list(range(min(bgx),max(bgx)))
             yplot = np.poly1d(bgfit)
-            #self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
-            #self.fig.canvas.draw()
+            self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
+            self.fig.canvas.draw()
 
             ## Find the peak position
             Chn = peakpoints[0]
@@ -1087,138 +1090,126 @@ class SpectrumCanvas(FigureCanvas):
             totalsum = sum(peakpoints[1])
             net = totalsum - bgsum
             unet = np.sqrt(net + ubgsum**2)
-            
-            #self.guess = [a1,centroid,sig1,m,b] ## Peak height as param
-            self.guess = [net,centroid,sig1,m,b] ## Net area as param
-            
-            #Gauss Fitting
-            #Change Chn and PckPnts[1] to arrays
-            gChn = np.array(Chn)
-            gCnt = np.array(peakpoints[1])
-
-            ## lmfit
-            glmod = Model(self.gaussian) + Model(self.line)
-            #pars = glmod.make_params(a=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
-            pars = glmod.make_params(A=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
-            result = glmod.fit(gCnt, pars, x=gChn)
-            
-            ## Best-fit values
-            #print(result.fit_report())
-            cent = result.best_values.get('c')
-            #cent = result.params.get('c').value
-            ucent = result.params.get('c').stderr
-            sd = np.abs(result.best_values.get('sig'))
-            usd = result.params.get('sig').stderr
-            fwhm = 2 * np.sqrt(2 * np.log(2)) * sd
-            #ufwhm = fwhm / np.sqrt(2 * net)
-            ufwhm = 2 * np.sqrt(2 * np.log(2)) * usd ## Might be wrong
-            netarea = result.best_values.get('A')
-            unetarea = result.params.get('A').stderr
-            print("Cent: ", cent) # Centroid
-            print("uCent: ", ucent) # Uncertainty in centroid
-            print("SD: ", sd) # standard deviation
-            print("uSD: ", usd) # Uncertainty in standard deviation
-            #print("FWHM: ", fwhm) # FWHM
-            #print("UFWHM: ", ufwhm) # Uncertainty in FWHM
-            print("NetArea (fit): ", netarea) # Net area of peak
-            print("uNetArea (fit)", unetarea) # Uncertainty in net area
-
-           
-            ## Plotting fits
-            #self.a.plot(gChn, result.init_fit, 'c--')
-            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
-            self.fig.canvas.draw()
-
-
-           
-
-          #  print(len(self.fig.axes))
-           # self.fig.axes[0].change_geometry(2, 1, 2)
-
-            
-          
-
-
-            
-            ## Plotting fit components
-            comps = result.eval_components()
-            #self.a.plot(gChn, comps['gaussian'], 'b--')
-           # self.a.plot(gChn, comps['line'], 'C3--')
-            mid1 = sum(bg1points[0])/len(bg1points[0])
-            mid2 = sum(bg2points[0])/len(bg2points[0])
-            m = result.best_values.get('m')
-            b = result.best_values.get('b')
-            
-            self.a.plot([mid1,mid2],[mid1*m+b,mid2*m+b],'C3--')
-            self.fig.canvas.draw()
-
-
-             ### ax2 = self.fig.add_subplot(self.gs[4,:])
-
-            #Clears z value plot is one is already present
-
-            try:
-                self.fig.delaxes(self.ax2)
-            except:
-                pass
-        
-            ax2 = self.fig.add_subplot(self.gs[1])
-            self.ax2 = ax2
-            height = result.best_values.get('A')
-            x_vals = np.arange(bgx[0],bgx[-1]+1,1)
-            self.x = x_vals
-            exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
-            obs_y =  [self.Spec.spec[i] for i in x_vals]
-
-            p_values = []
-            signs = []
-            for i in range(len(obs_y)):
-                D = obs_y[i]
-                B = exp_y[i]
-                
-                if D>B:
-                    p_value = 1-gam(D,B)
-                    if p_value < .5:
-                        signs.append(1)
-                    else:
-                        signs.append(0)
-                else:
-                    p_value = gam(D+1,B)
-
-                    if p_value < .5:
-                        signs.append(-1)
-                    else:
-                        signs.append(0)
-                
-                p_values.append(p_value)
-            p_values = np.array(p_values)
-            z_values = signs*(np.sqrt(2)*erfinv(1-2*p_values))
-
-            ax2.step(x_vals,z_values,where="mid")
-            ax2.set_xlim(self.Spec.xzoom)
-            ax2.set_ylim([-5,5])
-            ax2.axis('off')
-            ax2.plot([min(x_vals),max(x_vals)],[0,0],   linestyle="--", c="black")
-            ax2.plot([min(x_vals),max(x_vals)],[2,2],   linestyle="--", c="red")
-            ax2.plot([min(x_vals),max(x_vals)],[-2,-2], linestyle="--", c="red")
-            ax2.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
-
-            self.fig.canvas.draw()
 
             print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
             ## rounding
-            dprecis = self.getprecis(ucent)
-            nprecis = self.getprecis(cent)
+            dprecis = self.getprecis(ucentroid)
+            nprecis = self.getprecis(centroid)
             #print(centroid, ucentroid)
             #print(dprecis,nprecis)
-            print("Peak at ",self.round_to_n(cent,1+nprecis), "+/-",
-                  self.round_to_n(ucent,dprecis))
+            print("Peak at ",self.round_to_n(centroid,1+nprecis), "+/-",
+                  self.round_to_n(ucentroid,dprecis))
             ## rounding
             dprecis = self.getprecis(unet)
             nprecis = self.getprecis(net)
             #            print(net,unet)
             print("Net Area (tot - bkg) =",self.round_to_n(net,1+nprecis),"+/-",
                   self.round_to_n(unet,dprecis))
+
+            
+            #self.guess = [a1,centroid,sig1,m,b] ## Peak height as param
+            self.guess = [net,centroid,sig1,m,b] ## Net area as param
+
+            #Gauss Fitting
+            if False:
+                #Change Chn and PckPnts[1] to arrays
+                gChn = np.array(Chn)
+                gCnt = np.array(peakpoints[1])
+
+                ## lmfit
+                glmod = Model(self.gaussian) + Model(self.line)
+                #pars = glmod.make_params(a=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
+                pars = glmod.make_params(A=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
+                result = glmod.fit(gCnt, pars, x=gChn)
+            
+                ## Best-fit values
+                #print(result.fit_report())
+                cent = result.best_values.get('c')
+                #cent = result.params.get('c').value
+                ucent = result.params.get('c').stderr
+                sd = np.abs(result.best_values.get('sig'))
+                usd = result.params.get('sig').stderr
+                fwhm = 2 * np.sqrt(2 * np.log(2)) * sd
+                #ufwhm = fwhm / np.sqrt(2 * net)
+                ufwhm = 2 * np.sqrt(2 * np.log(2)) * usd ## Might be wrong
+                netarea = result.best_values.get('A')
+                unetarea = result.params.get('A').stderr
+                print("Cent: ", cent) # Centroid
+                print("uCent: ", ucent) # Uncertainty in centroid
+                print("SD: ", sd) # standard deviation
+                print("uSD: ", usd) # Uncertainty in standard deviation
+                #print("FWHM: ", fwhm) # FWHM
+                #print("UFWHM: ", ufwhm) # Uncertainty in FWHM
+                print("NetArea (fit): ", netarea) # Net area of peak
+                print("uNetArea (fit)", unetarea) # Uncertainty in net area
+
+           
+                ## Plotting fits
+                #self.a.plot(gChn, result.init_fit, 'c--')
+                self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
+                self.fig.canvas.draw()
+
+                ## Plotting fit components
+                comps = result.eval_components()
+                #self.a.plot(gChn, comps['gaussian'], 'b--')
+                # self.a.plot(gChn, comps['line'], 'C3--')
+                mid1 = sum(bg1points[0])/len(bg1points[0])
+                mid2 = sum(bg2points[0])/len(bg2points[0])
+                m = result.best_values.get('m')
+                b = result.best_values.get('b')
+            
+                self.a.plot([mid1,mid2],[mid1*m+b,mid2*m+b],'C3--')
+                self.fig.canvas.draw()
+
+                try:
+                    self.fig.delaxes(self.ax2)
+                except:
+                    pass
+        
+                ax2 = self.fig.add_subplot(self.gs[1])
+                self.ax2 = ax2
+                height = result.best_values.get('A')
+                x_vals = np.arange(bgx[0],bgx[-1]+1,1)
+                self.x = x_vals
+                exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
+                obs_y =  [self.Spec.spec[i] for i in x_vals]
+
+                p_values = []
+                signs = []
+                for i in range(len(obs_y)):
+                    D = obs_y[i]
+                    B = exp_y[i]
+                
+                    if D>B:
+                        p_value = 1-gam(D,B)
+                        if p_value < .5:
+                            signs.append(1)
+                        else:
+                            signs.append(0)
+                    else:
+                        p_value = gam(D+1,B)
+
+                        if p_value < .5:
+                            signs.append(-1)
+                        else:
+                            signs.append(0)
+                
+                    p_values.append(p_value)
+                    
+                p_values = np.array(p_values)
+                z_values = signs*(np.sqrt(2)*erfinv(1-2*p_values))
+
+                ax2.step(x_vals,z_values,where="mid")
+                ax2.set_xlim(self.Spec.xzoom)
+                ax2.set_ylim([-5,5])
+                ax2.axis('off')
+                ax2.plot([min(x_vals),max(x_vals)],[0,0],   linestyle="--", c="black")
+                ax2.plot([min(x_vals),max(x_vals)],[2,2],   linestyle="--", c="red")
+                ax2.plot([min(x_vals),max(x_vals)],[-2,-2], linestyle="--", c="red")
+                ax2.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
+
+                self.fig.canvas.draw()
+
             
             ## Writing (appending) centroids and FWHM to .txt file
             '''
