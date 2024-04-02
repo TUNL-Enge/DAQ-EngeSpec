@@ -36,7 +36,9 @@ int Channels2D = 1000;
 
 // Scalers
 Scaler *sPulser;
+Scaler *sBCI;
 Scaler *sTriggers;
+Scaler *sLN2;
 
 // 1D Spectra
 
@@ -100,12 +102,19 @@ Histogram *hHPGe_E;
 // HPGe Singles
 Histogram *hHPGe;
 
+// CeBr if you have it
+Histogram *hCeBr;
+Histogram *hTDCCeBr;
+
+
+
 // Pulser
 Histogram *hPulser;
 
 // 2D Spectra
 Histogram *hHPGevNaIsum;
 Histogram *hHPGevNaITDC;
+Histogram *hGevCeBr;
 
 
 // Gated Spectra
@@ -281,6 +290,11 @@ void EngeSort::Initialize(){
 
 	hHPGe = new Histogram("HPGe", Channels1D, 1);
 
+	hCeBr = new Histogram("CeBr", Channels1D, 1);
+	hTDCCeBr = new Histogram("TDC 15", Channels1D, 1);
+
+
+	
 	hHPGe_E = new Histogram("HPGe_Cal", Channels1D, 1);
 
 	
@@ -291,8 +305,11 @@ void EngeSort::Initialize(){
 
 	//--------------------
 	// Scalers
-	sPulser = new Scaler("Pulser", 0);    // Name, index
-	sTriggers = new Scaler("Triggers", 1);    // Name, index
+	sPulser = new Scaler("BCI", 0);    // Name, index
+	sBCI = new Scaler("Pulser", 1);    // Name, index
+	sTriggers = new Scaler("Trigger", 2);    // Name, index
+	sLN2 = new Scaler("LN2", 3);    // Name, index
+
   //--------------------
 
 	
@@ -302,6 +319,7 @@ void EngeSort::Initialize(){
 
 	hHPGevNaIsum = new Histogram("HPGe v NaI", Channels2D, 2);
 	hHPGevNaITDC = new Histogram("HPGe v TDC NaI", Channels2D, 2);
+	hGevCeBr = new Histogram("HPGe v CeBr", Channels2D, 2);
 
 	
 	//--------------------
@@ -420,6 +438,7 @@ void EngeSort::sort(MDPPEvent& event_data){
 	hADCPS8 -> inc(qdc_adc[24]);
 	hADCPS9 -> inc(qdc_adc[25]);
 
+	hTDCCeBr -> inc(scp_tdc[7]);
 	
 	double SumNaI = 0;
 	int multi = 0;
@@ -447,7 +466,9 @@ void EngeSort::sort(MDPPEvent& event_data){
 
 	hHPGe -> inc(scp_adc[0]); 
 	hHPGe_E -> inc(hpge_cal_values[0]);
- 	
+
+	hCeBr -> inc(scp_adc[7]);
+	
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
   // ------------------------------------------------------------
@@ -456,16 +477,18 @@ void EngeSort::sort(MDPPEvent& event_data){
   int cSum = (int) std::floor(SumNaI * compressionE);
   int cHPGe = (int) std::floor((double) hpge_cal_values[0] * compressionE);
   int cTDC = (int) std::floor(NaITDC / compressionT);
-
+  int cCeBr = (int) std::floor((double) scp_adc[7] * compressionE);
 	
 
-  // hPulser -> inc(qdc_adc[16]);
+  hPulser -> inc(scp_adc[2]);
 	
   // // Increment 2D histograms
 
   hHPGevNaIsum -> inc(cHPGe, cSum);
 	
   hHPGevNaITDC -> inc(cHPGe, cTDC);
+
+  hGevCeBr -> inc(cHPGe, cCeBr);
   
   // // The gated spectrum
   // //TG : Timing Gate
@@ -583,7 +606,9 @@ void EngeSort::sort(MDPPEvent& event_data){
 // defined we should assume that the user wants to increment it
 void EngeSort::incScalers(uint32_t *dSCAL){
 	sPulser -> inc(dSCAL);
+	sBCI -> inc(dSCAL);
 	sTriggers -> inc(dSCAL);
+	sLN2 -> inc(dSCAL);
 }
 
 // Connect the analyzer to midas
