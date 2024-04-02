@@ -196,20 +196,6 @@ class SpectrumCanvas(FigureCanvas):
         ymin = self.Spec.yzoom[0]
         ymax = self.Spec.yzoom[1]
 
-        #   if self.autobin:
-        ## Auto rebin.
-        ## The principle, here, is to plot a maximum of
-        ## nBinMax bins, so rebin the data to fit
-        #     byBin = round((xmax-xmin)/1000)
-        #     print("auto binning by: ",byBin)
-        #    x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-        #   y_rebin = np.zeros(len(x_rebin))
-        #  for i in range(len(x_rebin)):
-        # y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-        #     y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-        # else:
-        #    x_rebin = x
-        #   y_rebin = y
         x_rebin = x
         y_rebin = y
 
@@ -475,11 +461,7 @@ class SpectrumCanvas(FigureCanvas):
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
-        ##xmin  = self.a.get_xlim()[0]
-        ##xmax  = self.a.get_xlim()[1]
-        ##ymin    = self.a.get_ylim()[0]
-        ##ymax    = self.a.get_ylim()[1]
-
+        print("Updating.")
         ## Is MIDAS running? If so, run the collection thread
         if self.SpecColl.MIDASisRunning:
             self.SpecColl.midas_collection_thread.start()
@@ -497,10 +479,6 @@ class SpectrumCanvas(FigureCanvas):
             sp.spec2d[:] = sp.spec2d_temp
 
         if not self.is2D:
-            xmin = self.Spec.xzoom[0]
-            xmax = self.Spec.xzoom[1]
-            ymin = self.Spec.yzoom[0]
-            ymax = self.Spec.yzoom[1]
 
             x = np.array([x for x in range(0, self.Spec.NBins)], dtype=int)
             ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
@@ -508,45 +486,17 @@ class SpectrumCanvas(FigureCanvas):
             self.x = x
             self.y = y
             SpectrumCanvas.ReBin(self, self.n1)
-        #  if self.autobin:
-        ## Auto rebin.
-        ## The principle, here, is to plot a maximum of
-        ## nBinMax bins, so rebin the data to fit
-        #     nBinMax = 1000
-        #    byBin = round((xmax-xmin)/1000)
-        #   print("auto binning by: ",byBin)
-        #  x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-        # y_rebin = np.zeros(len(x_rebin))
-        # for i in range(len(x_rebin)):
-        # y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-        #   y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-        # else:
-
-        # x_rebin = x
-        # y_rebin = y
-
-        # self.a.clear()
-        # if not self.dots:
-        #     self.a.step(x_rebin,y_rebin,'k',where='mid')
-        # self.a.step(x,y,'k',where='mid')
-        #  else:
-        #    self.a.plot(x_rebin, y_rebin, 'k+')
-        #            self.a.step(x_rebin,y_rebin,'k',where='mid')
-        # self.a.set_xlim([xmin,xmax])
-        # self.a.set_ylim([ymin,ymax])
 
         else:
             H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
-            # print(ye)
             X, Y = np.meshgrid(xe, ye)
             self.H = H
             self.X = X.astype(int)
             self.Y = Y.astype(int)
 
             SpectrumCanvas.ReBin2D(self, self.n2)
-        # self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
         try:
             self.fig.delaxes(self.ax2)
         except:
@@ -1036,12 +986,6 @@ class SpectrumCanvas(FigureCanvas):
         return (A / (np.sqrt(2 * np.pi) * sig)) * np.exp(
             -((x - c) ** 2) / (2.0 * (sig) ** 2)
         )
-
-    # def gauss_plus_line(self,x,a1,x1,sig1,m,b):
-    #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b
-
-    # def double_gauss_plus_line(self,x,a1,x1,sig1,a2,x2,sig2,m,b):
-    #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b+a2*np.exp(-(x-x2)**2/(2.0*(sig2)**2))
 
     def netArea(self):
         if self.is2D:

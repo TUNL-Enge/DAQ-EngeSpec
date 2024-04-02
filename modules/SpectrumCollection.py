@@ -287,44 +287,36 @@ class MidasThread(QThread):
 class MidasCollectionThread(QThread):
     def __init__(self, specColl):
         super().__init__()
-
         self.specColl = specColl
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
-        ##print(len(self.names)," Spectra have been made:")
-        ##for name in self.names:
-        ##    print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.NGates = self.specColl.dm.getNGates()
 
     def run(self):
-        ##print("Collecting MIDAS data")
-        while True:  ##self.specColl.MIDASisRunning:
-            ##            print("isRunning!")
-            dat = np.transpose(self.specColl.dm.getData())
-            dat2d = self.specColl.dm.getData2D()
+        # probably the huge copy that occurs here
+        dat = np.transpose(self.specColl.dm.getData())
+        dat2d = self.specColl.dm.getData2D()
+        ## Update the scalers
+        sclrvals = self.specColl.dm.getScalers()
+        for i in range(len(self.specColl.sclr)):
+            self.specColl.sclr[i].N = sclrvals[i]
 
-            ## Update the scalers
-            sclrvals = self.specColl.dm.getScalers()
-            for i in range(len(self.specColl.sclr)):
-                self.specColl.sclr[i].N = sclrvals[i]
+        ## Go through the names and fill them for the appropriate data
+        counter1d = 0
+        counter2d = 0
+        for i in range(0, len(self.names)):
+            if not self.is2Ds[i]:
+                sObj = self.specColl.spec1d[counter1d]
+                sObj.spec_temp[:] = dat[:, counter1d]
+                counter1d = counter1d + 1
+            else:
+                sObj = self.specColl.spec2d[counter2d]
+                sObj.spec2d_temp[:] = dat2d[counter2d, :, :]
+                counter2d = counter2d + 1
 
-            ## Go through the names and fill them for the appropriate data
-            counter1d = 0
-            counter2d = 0
-            for i in range(0, len(self.names)):
-                if not self.is2Ds[i]:
-                    sObj = self.specColl.spec1d[counter1d]
-                    sObj.spec_temp[:] = dat[:, counter1d]
-                    counter1d = counter1d + 1
-                else:
-                    sObj = self.specColl.spec2d[counter2d]
-                    sObj.spec2d_temp[:] = dat2d[counter2d, :, :]
-                    counter2d = counter2d + 1
-
-            # time.sleep(1)
-            break  ## run only once for data collection when the update button is pressed
+        # run only once for data collection when the update button is pressed
 
 
 ## Run this if this file is run alone for debugging purposes
