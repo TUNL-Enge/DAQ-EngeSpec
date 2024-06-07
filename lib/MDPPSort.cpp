@@ -214,8 +214,7 @@ IntVector Calibrator::calibrate(vec_u32 &adc_values){
 		auto temp = (double)adc_values[i];
 		// check to make sure we have a adc value and that we have a calibration
 		if ((temp > 0) && (this->slope[i] > 0)){
-			result[i] = std::round((this->slope[i] * temp + this->intercept[i])
-														 + uniform_sample(generator));
+			result[i] = std::round((this->slope[i] * temp + this->intercept[i]) + uniform_sample(generator));
 		}
 	}
 	
@@ -438,7 +437,7 @@ void EngeSort::sort(MDPPEvent& event_data){
 	hADCPS8 -> inc(qdc_adc[24]);
 	hADCPS9 -> inc(qdc_adc[25]);
 
-	hTDCCeBr -> inc(scp_tdc[7]);
+	hTDCCeBr -> inc(scp_tdc[3]);
 	
 	double SumNaI = 0;
 	int multi = 0;
@@ -467,7 +466,7 @@ void EngeSort::sort(MDPPEvent& event_data){
 	hHPGe -> inc(scp_adc[0]); 
 	hHPGe_E -> inc(hpge_cal_values[0]);
 
-	hCeBr -> inc(scp_adc[7]);
+	hCeBr -> inc(scp_adc[3]);
 	
   // ------------------------------------------------------------
   // Compressed versions for 2D spectra
