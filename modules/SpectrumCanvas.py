@@ -60,7 +60,8 @@ class SpectrumCanvas(FigureCanvas):
         #self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
         
         ## Colormaps
-        basecolormap = cm.get_cmap('inferno',256)
+        ##basecolormap = cm.ColormapRegistry.get_cmap("inferno")
+        basecolormap = matplotlib.colormaps['inferno']
         newcolors = basecolormap(np.linspace(0,1,256))
         newcolors[:1,:] = np.array([0.99,0.99,0.99,1])
         self.cols = ListedColormap(newcolors)
