@@ -37,4 +37,4 @@ Makefile
 /spectra/testing
 /modules/SpectrumCanvas-V.py
 test
-*.csv
+
