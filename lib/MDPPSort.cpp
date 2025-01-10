@@ -47,8 +47,6 @@ Scaler *sLN2;
 /* 1D Spectra */
 ////////////////
 
-// 1D Spectra
-
 // Annulus Variables
 // multiplicity
 Histogram *hMulti;
@@ -84,11 +82,17 @@ Histogram *hPulser;
 ////////////////
 
 Histogram *h2dGevsNaIsumE;
-Histogram *h2dGevsNaIsumET;
 
 ///////////////////
 /* Gated Spectra */
 ///////////////////
+
+// HPGe spectra gated on 2D gates.
+// Implicit is that these will also have the effects of the NaI ADC & TDC gates.
+Histogram *hGeNaITE2d[4];
+
+// These are the same, but they will also include the scintillator veto.
+Histogram *hGeNaITE2d_SV[4];
 
 // random number generator for calibration values.
 std::random_device rand_dev;
@@ -203,20 +207,20 @@ void EngeSort::Initialize()
 					   Channels1D, 1);
 	}
 
-	// Plastic Scintillator
+	// Sum and multiplicity
+	hNaIsumE = new Histogram("NaI Sum Energy", Channels1D, 1);
+	hMulti = new Histogram("NaI Multiplicity", Channels1D, 1);
+
+	// Plastic Scintillator ADC
 	for (int i = 0; i < 9; i++) {
 		hSciADC[i] = new Histogram(name_with_index("Sci ADC ", i),
 					   Channels1D, 1);
 	}
-
+	// TDC
 	for (int i = 0; i < 9; i++) {
 		hSciTDC[i] = new Histogram(name_with_index("Sci TDC ", i),
 					   Channels1D, 1);
 	}
-
-	hNaIsumE = new Histogram("NaI Sum Energy", Channels1D, 1);
-
-	hMulti = new Histogram("NaI Multiplicity", Channels1D, 1);
 
 	hGe = new Histogram("HPGe Singles", Channels1D, 1);
 	hGeE = new Histogram("HPGe Singles Energy", Channels1D, 1);
@@ -232,34 +236,8 @@ void EngeSort::Initialize()
 	// 2D Histograms
 	//--------------------
 
-	//hHPGevNaIsum = new Histogram("HPGe v NaI", Channels2D, 2);
-	//hHPGevNaITDC = new Histogram("HPGe v TDC NaI", Channels2D, 2);
-	//hGevCeBr = new Histogram("HPGe v CeBr", Channels2D, 2);
-
-	//--------------------
-	// Gated Histograms
-	//--------------------
-
-	// ghHPGeE = new Histogram("Gated E", Channels1D, 1);
-	// ghHPGeT = new Histogram("Gated T", Channels1D, 1);
-
-	// //Gated Timing Histogram
-	// ghNaI_0TDC_0 = new Histogram("gated NaI_0 vs TDC 0", Channels1D,1);
-	// ghNaI_1TDC_1 = new Histogram("gated NaI 1 vs TDC 1", Channels1D,1);
-	// ghNaI_2TDC_2 = new Histogram("gated NaI 2 vs TDC 2", Channels1D,1);
-	// ghNaI_3TDC_3 = new Histogram("gated NaI 3 vs TDC 3", Channels1D,1);
-	// ghNaI_4TDC_4 = new Histogram("gated NaI 4 vs TDC 4", Channels1D,1);
-	// ghNaI_5TDC_5 = new Histogram("gated NaI 5 vs TDC 5", Channels1D,1);
-	// ghNaI_6TDC_6 = new Histogram("gated NaI 6 vs TDC 6", Channels1D,1);
-	// ghNaI_7TDC_7 = new Histogram("gated NaI 7 vs TDC 7", Channels1D,1);
-	// ghNaI_8TDC_8 = new Histogram("gated NaI 8 vs TDC 8", Channels1D,1);
-	// ghNaI_9TDC_9 = new Histogram("gated NaI 9 vs TDC 9", Channels1D,1);
-	// ghNaI_10TDC_10 = new Histogram("gated NaI 10 vs TDC 10", Channels1D,1);
-	// ghNaI_11TDC_11 = new Histogram("gated NaI 11 vs TDC 11", Channels1D,1);
-	// ghNaI_12TDC_12 = new Histogram("gated NaI 12 vs TDC 12", Channels1D,1);
-	// ghNaI_13TDC_13 = new Histogram("gated NaI 13 vs TDC 13", Channels1D,1);
-	// ghNaI_14TDC_14 = new Histogram("gated NaI 14 vs TDC 14", Channels1D,1);
-	// ghNaI_15TDC_15 = new Histogram("gated NaI 15 vs TDC 15", Channels1D,1);
+	h2dGevsNaIsumE = new Histogram("HPGe v NaI", Channels2D, 2);
+	h2dGevsNaIsumET = new Histogram("HPGe v NaI", Channels2D, 2);
 
 	//------
 	// Gates
@@ -276,7 +254,27 @@ void EngeSort::Initialize()
 		hSciTDC[i]->addGate(name_with_index("Sci TDC Gate", i));
 	}
 
-	// Initialize the calibrator
+	// 2D gates
+	h2dGevsNaIsumE->addGate("2D_1");
+	h2dGevsNaIsumE->addGate("2D_2");
+	h2dGevsNaIsumE->addGate("2D_3");
+	h2dGevsNaIsumE->addGate("2D_4");
+
+	//--------------------
+	// Gated Histograms
+	//--------------------
+
+	for (int i = 0; i < 4; i++) {
+		hGeNaITE2d[1] = new Histogram(name_with_index("Ge T E 2D_", i),
+					      Channels1D, 1);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		hGeNaITE2d_SV[1] = new Histogram(
+			name_with_index("Ge T E SV 2D_", i), Channels1D, 1);
+	}
+
+	// Initialize the energy calibrator
 	this->calibrator_annulus_ps.load_file("nai_cal.csv");
 	this->calibrator_hpge.load_file("hpge_cal.csv");
 }
@@ -312,7 +310,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	}
 
 	// HPGe data
-	hGe -> inc(scp_adc[0]);
+	hGe->inc(scp_adc[0]);
 	hGeE->inc(hpge_cal_values[0]);
 
 	// So now sum the NaI segments
@@ -323,146 +321,51 @@ void EngeSort::sort(MDPPEvent &event_data)
 	int NaITDC;
 	// sum up the calibrated annulus
 	for (int i = 0; i < 16; i++) {
-		int hit = qdc_adc[i];
 		Gate &GNaIADC = hNaIADC[i]->getGate(0);
 		Gate &GNaITDC = hNaITDC[i]->getGate(0);
-		if (GNaIADC.inGate(hit) && GNaITDC.inGate(hit)) {
+		if (GNaIADC.inGate(qdc_adc[i]) && GNaITDC.inGate(qdc_tdc[i])) {
 			SumNaIE += (double)cal_values[i];
 			multi += 1;
 		}
 	}
 
-	hNaIsumE -> inc(SumNaIE);
-	hMulti -> inc(multi * 100);
-	 	//hNaITDC -> inc(NaITDC);
-
-	 	//hHPGe -> inc(scp_adc[0]);
-	 	//hHPGe_E -> inc(hpge_cal_values[0]);
-
-	 	//hCeBr -> inc(scp_adc[3]);
+	hNaIsumE->inc(SumNaIE);
+	hMulti->inc(multi * 100);
 
 	// // ------------------------------------------------------------
 	// // Compressed versions for 2D spectra
 	// // ------------------------------------------------------------
-	//double compressionE = Channels2D/10000.0; //(double)Channels1D/ (double)Channels2D;
-	//double compressionT = Channels2D/10000.0; //(double)Channels1D/ (double)Channels2D;
-	//int cSum = (int) std::floor(SumNaI * compressionE);
-	//int cHPGe = (int) std::floor((double) hpge_cal_values[0] * compressionE);
-	//int cTDC = (int) std::floor(NaITDC / compressionT);
-	// int cCeBr = (int) std::floor((double) scp_adc[7] * compressionE);
-
-	// hPulser -> inc(scp_adc[2]);
+	double compressionE =
+		Channels2D / 10000.0; //(double)Channels1D/ (double)Channels2D;
+	double compressionT =
+		Channels2D / 10000.0; //(double)Channels1D/ (double)Channels2D;
+	int cNaISumE = (int)std::floor(SumNaIE * compressionE);
+	int cGeE = (int)std::floor((double)hpge_cal_values[0] * compressionE);
 
 	// // // Increment 2D histograms
 
-	//hHPGevNaIsum -> inc(cHPGe, cSum);
+	h2dGevsNaIsumE->inc(cGeE, cNaISumE);
 
-	//hHPGevNaITDC -> inc(cHPGe, cTDC);
-
-	// hGevCeBr -> inc(cHPGe, cCeBr);
-
-	// // // The gated spectrum
-	// // //TG : Timing Gate
-
-	// Gate &G1 = hHPGevNaIsum -> getGate(0);
-	// Gate &G2 = hHPGevNaITDC -> getGate(0);
-
-	// Gate &TG0 = hTDCNaI0 -> getGate(0);
-	// Gate &TG1 = hTDCNaI1 -> getGate(0);
-	// Gate &TG2 = hTDCNaI2 -> getGate(0);
-	// Gate &TG3 = hTDCNaI3 -> getGate(0);
-	// Gate &TG4 = hTDCNaI4 -> getGate(0);
-	// Gate &TG5 = hTDCNaI5 -> getGate(0);
-	// Gate &TG6 = hTDCNaI6 -> getGate(0);
-	// Gate &TG7 = hTDCNaI7 -> getGate(0);
-	// Gate &TG8 = hTDCNaI8 -> getGate(0);
-	// Gate &TG9 = hTDCNaI9 -> getGate(0);
-	// Gate &TG10 = hTDCNaI10 -> getGate(0);
-	// Gate &TG11 = hTDCNaI11 -> getGate(0);
-	// Gate &TG12 = hTDCNaI12 -> getGate(0);
-	// Gate &TG13 = hTDCNaI13 -> getGate(0);
-	// Gate &TG14 = hTDCNaI14 -> getGate(0);
-	// Gate &TG15 = hTDCNaI15 -> getGate(0);
-
-	// if(G1.inGate(cHPGe, cSum)){
-	//   ghHPGeE->inc(scp_adc[0]);
-	// }
-
-	// if(G2.inGate(cHPGe, cTDC)){
-	//   ghHPGeT->inc(scp_adc[0]);
-	// }
-
-	// if(TG0.inGate(qdc_tdc[0])){
-	//   ghNaI_0TDC_0 -> inc(qdc_adc[0]);
-	// }
-
-	// if(TG1.inGate(qdc_tdc[1])){
-	//   ghNaI_1TDC_1 -> inc(qdc_adc[1]);
-
-	// }
-
-	// if(TG2.inGate(qdc_tdc[2])){
-	//   ghNaI_2TDC_2 -> inc(qdc_adc[2]);
-
-	// }
-
-	// if(TG3.inGate(qdc_tdc[3])){
-	//   ghNaI_3TDC_3 -> inc(qdc_adc[3]);
-
-	// }
-
-	// if(TG4.inGate(qdc_tdc[4])){
-	//   ghNaI_4TDC_4 -> inc(qdc_adc[4]);
-
-	// }
-
-	// if(TG5.inGate(qdc_tdc[5])){
-	//   ghNaI_5TDC_5 -> inc(qdc_adc[5]);
-
-	// }
-
-	// if(TG6.inGate(qdc_tdc[6])){
-	//   ghNaI_6TDC_6 -> inc(qdc_adc[6]);
-
-	// }
-
-	// if(TG7.inGate(qdc_tdc[7])){
-	//   ghNaI_7TDC_7 -> inc(qdc_adc[7]);
-
-	// }
-	// if(TG8.inGate(qdc_tdc[8])){
-	//   ghNaI_8TDC_8 -> inc(qdc_adc[8]);
-
-	// }
-	// if(TG9.inGate(qdc_tdc[9])){
-	//   ghNaI_9TDC_9 -> inc(qdc_adc[9]);
-
-	// }
-	// if(TG10.inGate(qdc_tdc[10])){
-	//   ghNaI_10TDC_10 -> inc(qdc_adc[10]);
-
-	// }
-	// if(TG11.inGate(qdc_tdc[11])){
-	//   ghNaI_11TDC_11 -> inc(qdc_adc[11]);
-
-	// }
-
-	// if(TG12.inGate(qdc_tdc[12])){
-	//   ghNaI_12TDC_12 -> inc(qdc_adc[12]);
-
-	// }
-	// if(TG13.inGate(qdc_tdc[13])){
-	//   ghNaI_13TDC_13 -> inc(qdc_adc[13]);
-
-	// }
-	// if(TG14.inGate(qdc_tdc[14])){
-	//   ghNaI_14TDC_14 -> inc(qdc_adc[14]);
-
-	// }
-	// if(TG15.inGate(qdc_tdc[15])){
-	//   ghNaI_15TDC_15 -> inc(qdc_adc[15]);
-
-	// }
+	// Check if the veto fired.
+	bool scint_veto = false;
+	for (int i = 0; i < 9; i++) {
+		Gate &gSciADC = hSciADC[i]->getGate(0);
+		Gate &gSciTDC = hSciTDC[i]->getGate(0);
+		scint_veto = scint_veto || (gSciADC.inGate(qdc_adc[i + 17]) &&
+					    gSciTDC.inGate(qdc_tdc[i + 17]))
+	}
+	// Now increment the HPGe gated histograms.
+	for (int i = 0; i < 4; i++) {
+		Gate &g2d = h2dGevsNaIsumE->getGate(i);
+		// Do we pass the ith 2D gate?
+		if (g2d.inGate(cGeE, cNaISumE)) {
+			hGeNaITE2d[i]->inc(hpge_cal_values[0]);
+			// Does the scintillator veto this event?
+			if (!scint_veto) {
+				hGeNaITE2d_SV[i]->inc(hpge_cal_values[0]);
+			}
+		}
+	}
 }
 
 // Increment the scalers
