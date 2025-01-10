@@ -237,7 +237,6 @@ void EngeSort::Initialize()
 	//--------------------
 
 	h2dGevsNaIsumE = new Histogram("HPGe v NaI", Channels2D, 2);
-	h2dGevsNaIsumET = new Histogram("HPGe v NaI", Channels2D, 2);
 
 	//------
 	// Gates
@@ -352,7 +351,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 		Gate &gSciADC = hSciADC[i]->getGate(0);
 		Gate &gSciTDC = hSciTDC[i]->getGate(0);
 		scint_veto = scint_veto || (gSciADC.inGate(qdc_adc[i + 17]) &&
-					    gSciTDC.inGate(qdc_tdc[i + 17]))
+					    gSciTDC.inGate(qdc_tdc[i + 17]));
 	}
 	// Now increment the HPGe gated histograms.
 	for (int i = 0; i < 4; i++) {
