@@ -1,3 +1,4 @@
+#include <boost/python/numpy/ndarray.hpp>
 #include <iostream>
 #include <vector>
 #include <random>
@@ -35,6 +36,7 @@ This is where histograms need to be defined.
 
 // binning to use in the histograms
 int Channels1D = 65536;
+int ChannelsTDC = 10000;
 int Channels2D = 1000;
 
 // Scalers
@@ -204,12 +206,12 @@ void EngeSort::Initialize()
 
 	for (int i = 0; i < 16; i++) {
 		hNaITDC[i] = new Histogram(name_with_index("NaI TDC ", i),
-					   Channels1D, 1);
+					   ChannelsTDC, 1);
 	}
 
 	// Sum and multiplicity
 	hNaIsumE = new Histogram("NaI Sum Energy", Channels1D, 1);
-	hMulti = new Histogram("NaI Multiplicity", Channels1D, 1);
+	hMulti = new Histogram("NaI Multiplicity", 20, 1);
 
 	// Plastic Scintillator ADC
 	for (int i = 0; i < 9; i++) {
@@ -329,7 +331,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	}
 
 	hNaIsumE->inc(SumNaIE);
-	hMulti->inc(multi * 100);
+	hMulti->inc(multi);
 
 	// // ------------------------------------------------------------
 	// // Compressed versions for 2D spectra
@@ -465,6 +467,17 @@ IntVector EngeSort::getNGates()
 	return ngates;
 }
 
+// Return the number of channels in each Histogram
+IntVector EngeSort::getNChannels()
+{
+	IntVector nchannels;
+	for (auto h : Histograms) {
+		nchannels.push_back(h->getnChannels());
+	}
+
+	return nchannels;
+}
+
 // Return a vector of scalers
 IntVector EngeSort::getScalers()
 {
@@ -489,16 +502,21 @@ np::ndarray EngeSort::getData()
 
 	// Loop through all histograms and pack the 1D histograms into a numpy matrix
 	int i = 0;
+	std::cout << "Starting 1D" << std::endl;
 	for (auto h : Histograms) {
 		if (h->getnDims() == 1) {
-			//h.Print(1000,2000);
 			shape = p::make_tuple(h->getnChannels());
-			converted[i] = np::from_data(h->getData1D().data(),
-						     dtype, shape, stride, own);
+			np::ndarray temp = np::from_data(h->getData1D().data(),
+							 dtype, shape, stride,
+							 own);
+			for (int j = 0; j < h->getnChannels(); j++) {
+				converted[i][j] = temp[j];
+			}
+
 			i++;
 		}
 	}
-
+	std::cout << "Ending 1D" << std::endl;
 	return converted;
 }
 
@@ -718,6 +736,7 @@ BOOST_PYTHON_MODULE(EngeSort)
 		.def("getData2D", &EngeSort::getData2D) // 2D histograms
 		.def("getis2Ds", &EngeSort::getis2Ds) // bool vector
 		.def("getNGates", &EngeSort::getNGates) // int vector
+		.def("getNChannels", &EngeSort::getNChannels) // int vector
 		.def("getSpectrumNames",
 		     &EngeSort::getSpectrumNames) // string vector
 		.def("getIsRunning", &EngeSort::getIsRunning) // bool value
@@ -729,7 +748,5 @@ BOOST_PYTHON_MODULE(EngeSort)
 		     &EngeSort::getGateNames) // string vector of gate names
 		.def("ClearData", &EngeSort::ClearData) // void
 		.def("putGate", &EngeSort::putGate) // void
-		.def("data", range(&EngeSort::begin, &EngeSort::end))
-		//    .def("Histogram1D", &Histogram1D::Histogram1D)
-		;
+		.def("data", range(&EngeSort::begin, &EngeSort::end));
 }

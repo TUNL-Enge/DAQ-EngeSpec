@@ -195,16 +195,10 @@ class MidasThread(QThread):
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
         self.sclrnames = self.specColl.dm.getScalerNames()
-        ##self.sclr = [0] * len(self.sclrnames)   ## fill the scalers with 0
-        ## print(len(self.sclrnames)," scalers have been made:")
-        ## for name in self.sclrnames:
-        ##     print(" - ",name)
-        ## print(len(self.names)," Spectra have been made:")
-        ## for name in self.names:
-        ##     print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.NGates = self.specColl.dm.getNGates()
+        self.NBins = self.specColl.dm.getNChannels()
 
         ## First delete the old spectra
         self.specColl.spec1d = []
@@ -218,7 +212,7 @@ class MidasThread(QThread):
         counter2d = 0
         for i in range(len(self.names)):
             if not self.is2Ds[i]:
-                sObj = SpectrumObject(counter1d)
+                sObj = SpectrumObject(counter1d, self.NBins[i])
                 sObj.Name = self.names[i]
                 sObj.NGates = self.NGates[i]
                 ## Fill the gate names
@@ -236,7 +230,7 @@ class MidasThread(QThread):
                 self.specColl.spec1d.append(sObj)
                 counter1d = counter1d + 1
             else:
-                sObj = SpectrumObject2D(counter2d)
+                sObj = SpectrumObject2D(counter2d, self.NBins[i])
                 sObj.Name = self.names[i]
                 sObj.NGates = self.NGates[i]
                 ## Fill the gate names
@@ -309,11 +303,13 @@ class MidasCollectionThread(QThread):
         for i in range(0, len(self.names)):
             if not self.is2Ds[i]:
                 sObj = self.specColl.spec1d[counter1d]
-                sObj.spec_temp[:] = dat[:, counter1d]
+                sObj.spec_temp[:] = dat[: sObj.NBins, counter1d]
                 counter1d = counter1d + 1
             else:
                 sObj = self.specColl.spec2d[counter2d]
-                sObj.spec2d_temp[:] = dat2d[counter2d, :, :]
+                sObj.spec2d_temp[:] = dat2d[
+                    counter2d, : sObj.NBins, : sObj.NBins
+                ]
                 counter2d = counter2d + 1
 
         # run only once for data collection when the update button is pressed

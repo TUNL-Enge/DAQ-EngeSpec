@@ -12,14 +12,14 @@ if os.path.exists("EngeSort.so"):
 
 
 class SpectrumObject:
-    def __init__(self, num):
+    def __init__(self, num, NBins=2**16):
         self.num = num
         self.isSpectrum = True
         self.isVisible = True
         self.is2D = False
         self.isLog = False
 
-        self.NBins = 2**16  # you changed this from 2**13
+        self.NBins = NBins
 
         self.spec = np.zeros(self.NBins)
         self.spec_temp = np.zeros(
@@ -86,14 +86,14 @@ class SpectrumObject:
 
 
 class SpectrumObject2D:
-    def __init__(self, num):
+    def __init__(self, num, NBins=1000):
         self.num = num
         self.isSpectrum = True
         self.isVisible = True
         self.is2D = True
         self.isLog = False
 
-        self.NBins = 1000
+        self.NBins = NBins
 
         # self.xedges = None
         # self.yedges = None
@@ -105,7 +105,7 @@ class SpectrumObject2D:
         )  ## The temporary spectrum in memory
         self.Name = "2D Test Spectrum"
 
-        self.makeFakeData()
+        # self.makeFakeData()
 
         self.xzoom = [1, self.NBins]
         self.yzoom = [1, self.NBins]

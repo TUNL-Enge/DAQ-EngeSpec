@@ -69,6 +69,7 @@ class EngeSort {
 
 	BoolVector getis2Ds();
 	IntVector getNGates();
+	IntVector getNChannels();
 	StringVector getGateNames(std::string hname);
 	StringVector getSpectrumNames();
 	StringVector getScalerNames();
