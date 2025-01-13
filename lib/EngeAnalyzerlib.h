@@ -59,8 +59,8 @@ class Histogram{
   //void setNGates(int ng){nGates = ng;}
   std::string getName(){return Name;}
   int getnChannels(){return nChannels;}
-  std::vector<int> getData1D(){return Bins1D;}
-  std::vector<std::vector<int>> getData2D(){return Bins2D;}
+  std::vector<int>& getData1D(){return Bins1D;}
+  std::vector<std::vector<int>>& getData2D(){return Bins2D;}
   int getNGates(){return GateCollection.size();}
   void addGate(std::string gname);
   Gate& getGate(int i){return GateCollection[i];}

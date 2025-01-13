@@ -37,7 +37,7 @@ This is where histograms need to be defined.
 // binning to use in the histograms
 int Channels1D = 65536;
 int ChannelsTDC = 10000;
-int Channels2D = 1000;
+int Channels2D = 500;
 
 // Scalers
 Scaler *sPulser;
@@ -82,7 +82,7 @@ Histogram *hPulser;
 ////////////////
 /* 2D Spectra */
 ////////////////
-
+Histogram *h2dGevsNaIsumE_no_gates;
 Histogram *h2dGevsNaIsumE;
 
 ///////////////////
@@ -238,6 +238,7 @@ void EngeSort::Initialize()
 	// 2D Histograms
 	//--------------------
 
+	h2dGevsNaIsumE_no_gates = new Histogram("HPGe v NaI No Gates", 250, 2);
 	h2dGevsNaIsumE = new Histogram("HPGe v NaI", Channels2D, 2);
 
 	//------
@@ -317,6 +318,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	// So now sum the NaI segments
 
 	double SumNaIE = 0.0;
+	double SumNaIE_no_gates = 0.0;
 	int multi = 0;
 	bool first_hit = true;
 	int NaITDC;
@@ -324,6 +326,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	for (int i = 0; i < 16; i++) {
 		Gate &GNaIADC = hNaIADC[i]->getGate(0);
 		Gate &GNaITDC = hNaITDC[i]->getGate(0);
+		SumNaIE_no_gates += (double)cal_values[i];
 		if (GNaIADC.inGate(qdc_adc[i]) && GNaITDC.inGate(qdc_tdc[i])) {
 			SumNaIE += (double)cal_values[i];
 			multi += 1;
@@ -337,14 +340,15 @@ void EngeSort::sort(MDPPEvent &event_data)
 	// // Compressed versions for 2D spectra
 	// // ------------------------------------------------------------
 	double compressionE =
-		Channels2D / 10000.0; //(double)Channels1D/ (double)Channels2D;
+		Channels2D / 5000.0; //(double)Channels1D/ (double)Channels2D;
 	double compressionT =
-		Channels2D / 10000.0; //(double)Channels1D/ (double)Channels2D;
+		Channels2D / 5000.0; //(double)Channels1D/ (double)Channels2D;
 	int cNaISumE = (int)std::floor(SumNaIE * compressionE);
+	int cNaISumE_no_gates = (int)std::floor(SumNaIE_no_gates * 0.1);
 	int cGeE = (int)std::floor((double)hpge_cal_values[0] * compressionE);
 
 	// // // Increment 2D histograms
-
+	h2dGevsNaIsumE_no_gates->inc(cGeE, cNaISumE_no_gates);
 	h2dGevsNaIsumE->inc(cGeE, cNaISumE);
 
 	// Check if the veto fired.
@@ -502,13 +506,9 @@ np::ndarray EngeSort::getData()
 
 	// Loop through all histograms and pack the 1D histograms into a numpy matrix
 	int i = 0;
-	std::cout << "Starting 1D" << std::endl;
-	for (auto h : Histograms) {
+	for (auto const &h : Histograms) {
 		if (h->getnDims() == 1) {
-			shape = p::make_tuple(h->getnChannels());
-			np::ndarray temp = np::from_data(h->getData1D().data(),
-							 dtype, shape, stride,
-							 own);
+			IntVector &temp = h->getData1D();
 			for (int j = 0; j < h->getnChannels(); j++) {
 				converted[i][j] = temp[j];
 			}
@@ -516,7 +516,6 @@ np::ndarray EngeSort::getData()
 			i++;
 		}
 	}
-	std::cout << "Ending 1D" << std::endl;
 	return converted;
 }
 
@@ -537,13 +536,13 @@ np::ndarray EngeSort::getData2D()
 
 	//  for(u_int t = 0; t<n_t; t++){
 	int t = 0;
-	for (auto h : Histograms) {
+	for (auto const &h : Histograms) {
 		if (h->getnDims() == 2) {
+			std::vector<IntVector> &temp = h->getData2D();
 			for (int i = 0; i < h->getnChannels(); i++) {
-				shape = p::make_tuple(h->getnChannels());
-				converted[t][i] = np::from_data(
-					h->getData2D()[i].data(), dtype, shape,
-					stride, own);
+				for (int j = 0; j < h->getnChannels(); j++) {
+					converted[t][i][j] = temp[i][j];
+				}
 			}
 			t++;
 		}
