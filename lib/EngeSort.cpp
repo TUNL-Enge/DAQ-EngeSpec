@@ -358,6 +358,7 @@ int EngeSort::runMidasAnalyzer(boost::python::list file_list){
     std::cout << " " << file;
     filename += file + " ";
   }
+  filename += " --no-profiler";
 
   std::cout << std::endl;
   std::cout << filename << std::endl;
