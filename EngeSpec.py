@@ -4,6 +4,7 @@ from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication
 import sys
 import random
+import time
 
 ## All code is in the modules folder
 sys.path.append('./modules')
