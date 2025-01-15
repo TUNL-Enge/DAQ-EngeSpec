@@ -19,6 +19,7 @@ runs
 
 ## Folders we don't need
 modules/backup
+notes
 
 ## Random other files
 conversioncommand
@@ -28,6 +29,7 @@ test.dat
 Will.dat
 qlong_engespec.txt
 *_backup*
+EngeSpec\ for\ Mac\ Users.pdf
 
 ## CMake stuff
 CMakeFiles
