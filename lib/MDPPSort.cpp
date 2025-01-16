@@ -99,7 +99,7 @@ Histogram *hGeNaITE2d_SV[4];
 // random number generator for calibration values.
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
-std::uniform_int_distribution<int> uniform_sample(-1, 1);
+std::uniform_real_distribution<double> uniform_sample(-0.1, 0.1);
 
 std::string name_with_index(std::string name, int index)
 {
@@ -225,7 +225,7 @@ void EngeSort::Initialize()
 	}
 
 	hGe = new Histogram("HPGe Singles", Channels1D, 1);
-	hGeE = new Histogram("HPGe Singles Energy", Channels1D, 1);
+	hGeE = new Histogram("HPGe Singles Energy", 10000, 1);
 
 	hPulser = new Histogram("Pulser", Channels1D, 1);
 
