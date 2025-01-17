@@ -240,7 +240,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
          if self.SpecCanvas.twoD == False:
              self.SpecCanvas.ReBin(self.n)
          else:
-             self.SpecCanvas.ReBin2D(self.n)
+             self.SpecCanvas.PlotData2D()
     ## --------------------------------------------------
     ## Function to write to the command editor
     def append_text(self, text, col=None):

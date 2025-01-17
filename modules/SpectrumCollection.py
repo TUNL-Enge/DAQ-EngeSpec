@@ -297,22 +297,22 @@ class MidasCollectionThread(QThread):
         print("Collecting MIDAS data")
         while True: ##self.specColl.MIDASisRunning:
 ##            print("isRunning!")
-            print("MidasCollectionThread start 1D fetch: ",time.time())
+            ##print("MidasCollectionThread start 1D fetch: ",time.time())
             dat = np.transpose(self.specColl.dm.getData())
-            print("MidasCollectionThread end 1D fetch: ",time.time())
-            print("MidasCollectionThread start 2D fetch: ",time.time())
+            ##print("MidasCollectionThread end 1D fetch: ",time.time())
+            ##print("MidasCollectionThread start 2D fetch: ",time.time())
             dat2d = self.specColl.dm.getData2D()
-            print("MidasCollectionThread end 2D fetch: ",time.time())
+            ##print("MidasCollectionThread end 2D fetch: ",time.time())
 
             ## Update the scalers
-            print("MidasCollectionThread start scaler fetch: ",time.time())
+            ##print("MidasCollectionThread start scaler fetch: ",time.time())
             sclrvals = self.specColl.dm.getScalers()
             for i in range(len(self.specColl.sclr)):
                 self.specColl.sclr[i].N = sclrvals[i]
-            print("MidasCollectionThread end scaler fetch: ",time.time())
+            ##print("MidasCollectionThread end scaler fetch: ",time.time())
 
             ## Go through the names and fill them for the appropriate data
-            print("MidasCollectionThread start namefill: ",time.time())
+            ##print("MidasCollectionThread start namefill: ",time.time())
             counter1d=0
             counter2d=0
             for i in range(0,len(self.names)):
@@ -324,7 +324,7 @@ class MidasCollectionThread(QThread):
                     sObj = self.specColl.spec2d[counter2d]
                     sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
                     counter2d = counter2d+1
-            print("MidasCollectionThread end namefill: ",time.time())
+            ##print("MidasCollectionThread end namefill: ",time.time())
                 
             #time.sleep(1)
             break  ## run only once for data collection when the update button is pressed
