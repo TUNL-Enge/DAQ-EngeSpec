@@ -47,3 +47,51 @@
      cd /path/to/desired/installation/folder
      git clone https://github.com/TUNL-Enge/DAQ-EngeSpec.git EngeSpec
    #+end_src
+** Configure and Build the EngeSpec Library
+   - Navigate to the `lib` directory:
+     #+begin_src bash
+       cd /path/to/desired/installation/folder/EngeSpec/lib
+     #+end_src
+   - Edit the =CMakeLists.txt= file to ensure compatibility with macOS:
+     - Locate and modify the sections where =target_link_libraries=
+       references =-lrt=. Replace them with conditional logic to
+       exclude =-lrt= for macOS.
+     - Example
+       #+begin_src 
+         if(NOT APPLE)
+             target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer librootana.a -lz ${ROOT_LIBRARIES} libmidas.a -lrt )
+         else()
+             target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
+         endif()
+       #+end_src
+     - Repeat for other targets: =v1730Sort, MDPPSort, RBSSort= etc.
+     - Save all files
+   - Build the library
+     #+begin_src sh
+       cmake .
+       make clean
+       make
+     #+end_src
+   - If successful, the build process will generate the necessary =.dylib= files.
+   - Link the sort routine
+     #+begin_src sh
+       cd /path/to/desired/installation/folder/EngeSpec/
+       ln -s lib/libEngeSpec.dylib EngeSpec.so
+     #+end_src
+** Additional notes
+   - If a configuration file (e.g., TOML) is required, ensure it is placed in the appropriate directory as per the EngeSpec documentation.
+   - Dependencies:\\
+     If additional dependencies or errors arise (e.g., missing Python modules), install them as needed using pip.
+   - Updates:\\
+     To switch to a specific branch (e.g., `LENA-qdc`), use the following commands:
+     #+begin_src sh
+       git fetch origin
+       git checkout -b LENA-qdc origin/LENA-qdc
+       cmake .
+       make clean
+       make
+     #+end_src
+
+  By following these steps, EngeSpec should be successfully installed
+  and configured on your macOS system. If issues persist, refer to the
+  logs or consult with the developer.
