@@ -294,7 +294,7 @@ class MidasCollectionThread(QThread):
         self.NGates = self.specColl.dm.getNGates()
 
     def run(self):
-        ##print("Collecting MIDAS data")
+        print("Collecting MIDAS data")
         while True: ##self.specColl.MIDASisRunning:
 ##            print("isRunning!")
             print("MidasCollectionThread start 1D fetch: ",time.time())
@@ -324,7 +324,7 @@ class MidasCollectionThread(QThread):
                     sObj = self.specColl.spec2d[counter2d]
                     sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
                     counter2d = counter2d+1
-            print("MidasCollectionThread start namefill: ",time.time())
+            print("MidasCollectionThread end namefill: ",time.time())
                 
             #time.sleep(1)
             break  ## run only once for data collection when the update button is pressed

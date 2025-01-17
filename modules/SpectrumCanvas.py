@@ -505,6 +505,7 @@ class SpectrumCanvas(FigureCanvas):
             print("No bins currently displayed")
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
+        print("SpectrumCanvas UpdatePlotstart:", time.time())
         ##xmin  = self.a.get_xlim()[0]
         ##xmax  = self.a.get_xlim()[1]
         ##ymin    = self.a.get_ylim()[0]
@@ -512,20 +513,28 @@ class SpectrumCanvas(FigureCanvas):
 
         ## Is MIDAS running? If so, run the collection thread
         if self.SpecColl.MIDASisRunning:
+            print("SpectrumCanvas collectionthread start:", time.time())
             self.SpecColl.midas_collection_thread.start()
+            print("SpectrumCanvas collectionthread start:", time.time())
             time.sleep(0.5)
+            print("SpectrumCanvas collectionthread after sleep:", time.time())
+
             
         if self.SpecColl.MIDASLastAgg:
             self.SpecColl.midas_collection_thread.start()
             self.SpecColl.MIDASLastAgg = False
             time.sleep(0.5)
-            
+
+        print("SpectrumCanvas DataCollected:", time.time())
+        
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
             sp.spec[:] = sp.spec_temp
         for sp in self.SpecColl.spec2d:
             sp.spec2d[:] = sp.spec2d_temp
 
+        print("SpectrumCanvas CopiedData:", time.time())
+            
         if not self.is2D:
             xmin = self.Spec.xzoom[0]
             xmax = self.Spec.xzoom[1]
@@ -581,8 +590,11 @@ class SpectrumCanvas(FigureCanvas):
             self.fig.delaxes(self.ax2)
         except:
             pass
+        print("SpectrumCanvas SpectraBuilding:",time.time())
         self.updateSlider()
+        print("SpectrumCanvas SliderUpdated:",time.time())
         self.fig.canvas.draw()
+        print("SpectrumCanvas CanvasDrawn:",time.time())
     
 
     def GetMax(self):
