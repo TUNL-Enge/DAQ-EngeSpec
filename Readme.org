@@ -4,3 +4,46 @@
   - Installation
     - Linux
     - Mac
+* How to install on a mac
+  These are the updated instructions to install and configure EngeSpec
+  on macOS, including steps for building dependencies and making
+  necessary adjustments to configuration files.
+** Prerequisites
+   Ensure the following are installed on your system:
+   - Homebrew: Install Homebrew from https://brew.sh/
+     #+begin_src sh
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"=
+     #+end_src
+   - Python 3: Verify Python 3 is installed:
+     #+begin_src sh
+       python3 --version
+     #+end_src
+     If not, install it:
+     #+begin_src sh
+       brew install python3
+     #+end_src
+   - Required Python Libraries:\\
+     Install the following libraries using pip:
+     #+begin_src sh
+       python3 -m pip install matplotlib scipy PySide6
+     #+end_src
+   - CMake: Install CMake if it is not already available:
+     #+begin_src sh
+       brew install cmake
+     #+end_src
+   - Git: Verify Git is installed:
+     #+begin_src sh
+       git --version
+     #+end_src
+     If not, install it:
+     #+begin_src sh
+       brew install git
+     #+end_src
+** Clone the EngeSpec Repository
+   Choose a directory where you want to install EngeSpec and clone the
+   repository. Replace =/path/to/desired/installation/folder= with
+   your chosen path:
+   #+begin_src sh
+     cd /path/to/desired/installation/folder
+     git clone https://github.com/TUNL-Enge/DAQ-EngeSpec.git EngeSpec
+   #+end_src
