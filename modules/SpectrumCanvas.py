@@ -423,6 +423,7 @@ class SpectrumCanvas(FigureCanvas):
 
         
     def ReBin2D(self,binNum):
+        print("ReBin2D: This shouldn't have been called!")
         try:
             n = binNum
             
@@ -519,7 +520,7 @@ class SpectrumCanvas(FigureCanvas):
             self.SpecColl.midas_collection_thread.start()
             self.SpecColl.MIDASLastAgg = False
             time.sleep(0.5)
-            
+
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
             sp.spec[:] = sp.spec_temp
@@ -533,7 +534,7 @@ class SpectrumCanvas(FigureCanvas):
             ymax = self.Spec.yzoom[1]
 
             x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
-            ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
+            ## The displayed spectrum is only updated when we hit the UpdatePlot button
             y = self.Spec.spec
             self.x = x
             self.y = y
@@ -566,16 +567,22 @@ class SpectrumCanvas(FigureCanvas):
            # self.a.set_ylim([ymin,ymax])
            
         else:
+            print("2D")
             H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
-        #print(ye)
+            #print(ye)
+            print("SpectrumCanvas beforemeshgrid:",time.time())
             X, Y = np.meshgrid(xe,ye)
+            print("SpectrumCanvas aftermeshgrid:",time.time())
             self.H = H
             self.X = X.astype(int)
             self.Y = Y.astype(int)
 
-            SpectrumCanvas.ReBin2D(self,self.n2)
+            print("SpectrumCanvas beforeRebin:",time.time())
+            ##SpectrumCanvas.ReBin2D(self,self.n2)
+            self.PlotData2D()
+            print("SpectrumCanvas afterRebin:",time.time())
            #self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
         try:
             self.fig.delaxes(self.ax2)
