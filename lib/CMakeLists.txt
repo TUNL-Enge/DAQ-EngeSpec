@@ -3,7 +3,14 @@ cmake_minimum_required( VERSION 3.2 )
 set (CMAKE_CXX_STANDARD 17)
  
 project( BoostPythonMakeData )
- 
+
+# Default to release build
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
+  if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+  endif()
+endif()
+
 # Find necessary packages
 #find_package( PythonInterp 3 REQUIRED )
 find_package( PythonLibs 3 REQUIRED )
