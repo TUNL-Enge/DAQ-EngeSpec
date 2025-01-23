@@ -64,6 +64,7 @@ add_library( MDPPSort SHARED MDPPSort.cpp)
 # Build our Sort Routine
 add_library( RBSSort SHARED RBSSort.cpp)
 
+set_target_properties(EngeAnalyzer MDppevt tomlread EngeSort v1730Sort MDPPSort RBSSort PROPERTIES SUFFIX ".so")
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt ) 
