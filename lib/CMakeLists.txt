@@ -51,9 +51,13 @@ add_library( MDPPSort SHARED MDPPSort.cpp)
 set_target_properties(MDPPSort tomlread MDPPevt EngeAnalyzer PROPERTIES SUFFIX ".so")
 
 if(APPLE)
-target_link_libraries( MDPPSort MDPPevt tomlread ${Boost_LIBRARIES} EngeAnalyzer
+target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
+target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 else()
+target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )    
 endif()
