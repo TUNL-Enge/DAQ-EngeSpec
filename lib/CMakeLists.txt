@@ -48,7 +48,7 @@ add_library( tomlread SHARED mdpp_module_config.cpp )
 # Build our Sort Routine
 add_library( MDPPSort SHARED MDPPSort.cpp)
 
-set_target_properties(MDPPSort PROPERTIES SUFFIX ".so")
+set_target_properties(MDPPSort tomlread MDPPevt EngeAnalyzer PROPERTIES SUFFIX ".so")
 
 if(APPLE)
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
