@@ -7,6 +7,12 @@
 
 #include "EngeAnalyzerlib.h"
 
+// Initialize the global variables.
+std::vector<Histogram*> Histograms;
+std::vector<Scaler*> Scalers;
+int nHist1D = 0;
+int nHist2D = 0;
+
 //----------------------------------------------------------------------
 // HELLO AND GOODBYE MESSAGES
 std::string Messages::sayhello(std::string mesg){

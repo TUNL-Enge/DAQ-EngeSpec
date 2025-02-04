@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 
+#include "EngeAnalyzerlib.h"
 #include "MDPPEventHandler.h"
 #include "MDPPSort.h"
 #include "TV792Data.hxx"
@@ -298,6 +299,15 @@ void EngeSort::sort(MDPPEvent &event_data)
 	IntVector cal_values = this->calibrator_annulus_ps.calibrate(qdc_adc);
 	IntVector hpge_cal_values = this->calibrator_hpge.calibrate(scp_adc);
 
+	// pulser count
+	int cpulser = scp_adc[4];
+	bool pulser_event = false;
+	if (cpulser > 0) {
+		hPulser->inc(
+			scp_adc[0]); // The pulser histogram are the counts from the HPGe.
+		pulser_event = true;
+	}
+
 	// Increment 1D histograms
 	// NaI
 	for (int i = 0; i < 16; i++) {
@@ -312,8 +322,10 @@ void EngeSort::sort(MDPPEvent &event_data)
 	}
 
 	// HPGe data
-	hGe->inc(scp_adc[0]);
-	hGeE->inc(hpge_cal_values[0]);
+	if (!pulser_event) {
+		hGe->inc(scp_adc[0]);
+		hGeE->inc(hpge_cal_values[0]);
+	}
 
 	// So now sum the NaI segments
 

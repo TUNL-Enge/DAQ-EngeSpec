@@ -1,5 +1,6 @@
-//#ifndef EngeAnalyzer_H
-//#define EngeAnalyzer_H
+#ifndef MDPP_SORT_H
+#define MDPP_SORT_H
+
 #include "EngeAnalyzerlib.h"
 #include "MDPPEventHandler.h"
 
@@ -175,3 +176,5 @@ class MidasAnalyzerRun : public TARunObject {
 	MidasAnalyzerModule *fModule;
 	MDPPEvent mdpp_event;
 };
+
+#endif

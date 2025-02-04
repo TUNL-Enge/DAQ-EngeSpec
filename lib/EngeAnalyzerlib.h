@@ -1,5 +1,5 @@
-//#ifndef EngeAnalyzerlib_H
-//#define EngeAnalyzerlib_H
+#ifndef EngeAnalyzerlib_H
+#define EngeAnalyzerlib_H
 typedef std::vector<std::string> StringVector;
 
 //----------------------------------------------------------------------
@@ -78,10 +78,6 @@ class Histogram{
   std::vector<Gate> GateCollection;
 
 };
-std::vector<Histogram*> Histograms;
-int nHist1D = 0;
-int nHist2D = 0;
-
 
 //----------------------------------------------------------------------
 // SCALERS
@@ -110,7 +106,13 @@ class Scaler{
 
 };
 
-std::vector<Scaler*> Scalers;
+// Global variables that are needed by the sort routine.
+
+extern std::vector<Histogram*> Histograms;
+extern std::vector<Scaler*> Scalers;
+extern int nHist1D;
+extern int nHist2D;
 
 
-//#endif
+
+#endif

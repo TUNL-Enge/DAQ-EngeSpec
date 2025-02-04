@@ -12,9 +12,7 @@ if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
 endif()
 
 # Find necessary packages
-#find_package( PythonInterp 3 REQUIRED )
 find_package( PythonLibs 3 REQUIRED )
-#set(PYTHON_LIBRARIES /opt/anaconda3/lib/libpython3.7m.so)
 include_directories( ${PYTHON_INCLUDE_DIRS} )
 MESSAGE(STATUS "Pythonlibs: " ${PYTHON_INCLUDE_DIRS})
 
@@ -25,7 +23,6 @@ MESSAGE(STATUS "Boost: " ${Boost_INCLUDE_DIR})
 find_package( ROOT COMPONENTS Gui XMLParser XMLIO RHTTP )
 include_directories( ${ROOT_INCLUDE_DIRS} )
 MESSAGE(STATUS "ROOT: " ${ROOT_INCLUDE_DIRS})
-#set(NO_ROOT "1")
 
 set(MIDASSYS "$ENV{MIDASSYS}")
 include_directories( ${MIDASSYS}/include )
@@ -38,11 +35,8 @@ link_directories( ${ROOTANASYS}/lib )
 MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 
 ##find_package(Boost REQUIRED COMPONENTS numpy)
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl, -Wno-undef") # complain about missing symbols
 
 LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
-
-#include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 
 # Define the general Enge analyzer library
 add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
@@ -51,29 +45,15 @@ add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 add_library( MDPPevt SHARED MDPPEventHandler.cpp )
 add_library( tomlread SHARED mdpp_module_config.cpp )
 
-
-# Build our Sort Routine
-add_library( EngeSort SHARED EngeSort.cpp)
-
-# Build our Sort Routine
-add_library( v1730Sort SHARED v1730Sort.cpp)
-
 # Build our Sort Routine
 add_library( MDPPSort SHARED MDPPSort.cpp)
 
-# Build our Sort Routine
-add_library( RBSSort SHARED RBSSort.cpp)
+set_target_properties(MDPPSort PROPERTIES SUFFIX ".so")
 
-set_target_properties(EngeAnalyzer MDPPevt tomlread EngeSort v1730Sort MDPPSort RBSSort PROPERTIES SUFFIX ".so")
-
-target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt ) 
-
-target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
-
+if(APPLE)
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
- 
-target_link_libraries( RBSSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
+else()
+target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )    
+endif()
