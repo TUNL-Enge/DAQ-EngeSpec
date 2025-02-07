@@ -1,5 +1,5 @@
-//#ifndef EngeAnalyzerlib_H
-//#define EngeAnalyzerlib_H
+#ifndef EngeAnalyzerlib_H
+#define EngeAnalyzerlib_H
 typedef std::vector<std::string> StringVector;
 
 //----------------------------------------------------------------------
@@ -78,9 +78,6 @@ class Histogram{
   std::vector<Gate> GateCollection;
 
 };
-std::vector<Histogram*> Histograms;
-int nHist1D = 0;
-int nHist2D = 0;
 
 
 //----------------------------------------------------------------------
@@ -110,7 +107,10 @@ class Scaler{
 
 };
 
-std::vector<Scaler*> Scalers;
 
+extern std::vector<Scaler*> Scalers;
+extern std::vector<Histogram*> Histograms;
+extern int nHist1D;
+extern int nHist2D;
 
-//#endif
+#endif

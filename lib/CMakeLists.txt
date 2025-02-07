@@ -2,6 +2,11 @@ cmake_minimum_required( VERSION 3.2 )
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_FLAGS "-O3")
+
+## Only add -lrt if it's not Mac
+if(NOT APPLE)
+link_libraries(rt)
+endif()
  
 project( BoostPythonMakeData )
  
@@ -57,16 +62,16 @@ add_library( RBSSort SHARED RBSSort.cpp)
 
 
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a -lrt ) 
+  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a ) 
 
 target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
 
 target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
 
 target_link_libraries( SiliconSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
 
 target_link_libraries( RBSSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a -lrt )
+  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
