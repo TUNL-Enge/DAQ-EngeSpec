@@ -34,10 +34,8 @@ include_directories( ${ROOTANASYS}/include )
 link_directories( ${ROOTANASYS}/lib )
 MESSAGE(STATUS "ROOTANA: " ${ROOTANASYS}/include)
 
-##find_package(Boost REQUIRED COMPONENTS numpy)
-
 LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
-
+## Still unable to statically link these on Linux.
 # Define the general Enge analyzer library
 add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 
@@ -48,16 +46,15 @@ add_library( tomlread SHARED mdpp_module_config.cpp )
 # Build our Sort Routine
 add_library( MDPPSort SHARED MDPPSort.cpp)
 
+# Ensure .so extension, which is needed by python when it imports the module.
 set_target_properties(MDPPSort tomlread MDPPevt EngeAnalyzer PROPERTIES SUFFIX ".so")
 
-if(APPLE)
-target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
-target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
-else()
-target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
-target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )    
+# rt is needed by midas on linux, not sure if it is actually required to build the library
+if(NOT APPLE)
+  link_libraries(rt)
 endif()
+# The extra target is just so CMake does not screw up the dependencies.
+target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
+target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )

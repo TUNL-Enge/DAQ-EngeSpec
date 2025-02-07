@@ -80,6 +80,9 @@ Histogram *hTDCCeBr;
 // Pulser
 Histogram *hPulser;
 
+// TAC
+Histogram *hBeam;
+
 ////////////////
 /* 2D Spectra */
 ////////////////
@@ -230,6 +233,8 @@ void EngeSort::Initialize()
 
 	hPulser = new Histogram("Pulser", Channels1D, 1);
 
+	hBeam = new Histogram("Beam Pulse", ChannelsTDC, 1);
+	
 	// Scalers
 	sPulser = new Scaler("BCI", 0); // Name, index
 	sBCI = new Scaler("Pulser", 1); // Name, index
@@ -327,6 +332,8 @@ void EngeSort::sort(MDPPEvent &event_data)
 		hGeE->inc(hpge_cal_values[0]);
 	}
 
+	hBeam -> inc(scp_tdc[6]);
+	
 	// So now sum the NaI segments
 
 	double SumNaIE = 0.0;
