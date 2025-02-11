@@ -164,9 +164,7 @@ bool Gate::inBound(double testx, double testy){
 
 int Gate::pnpoly(double testx, double testy)
 {
-  int nvert = Points.size();
-  //std::cout << "(x,y) = (" << testx << "," << testy << ")" << std::endl;
-  
+  int nvert = Points.size();  
   int i, j, c = 0;
   for (i = 0, j = nvert-1; i < nvert; j = i++) {
     if ( ((Points[i][1]>testy) != (Points[j][1]>testy)) &&
@@ -174,7 +172,7 @@ int Gate::pnpoly(double testx, double testy)
 	  (Points[j][1]-Points[i][1]) + Points[i][0]) )
        c = !c;
   }
-  //std::cout << "c=" << c << std::endl;
+
   return c;
 }
 

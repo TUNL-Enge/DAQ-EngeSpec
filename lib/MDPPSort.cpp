@@ -244,7 +244,7 @@ void EngeSort::Initialize()
 	// 2D Histograms
 	//--------------------
 
-	h2dGevsNaIsumE_no_gates = new Histogram("HPGe v NaI No Gates", 250, 2);
+	h2dGevsNaIsumE_no_gates = new Histogram("HPGe v NaI No Gates", Channels2D, 2);
 	h2dGevsNaIsumE = new Histogram("HPGe v NaI", Channels2D, 2);
 
 	//------
@@ -278,7 +278,7 @@ void EngeSort::Initialize()
 	}
 
 	for (int i = 0; i < 4; i++) {
-		hGeNaITE2d_SV[1] = new Histogram(
+		hGeNaITE2d_SV[i] = new Histogram(
 			name_with_index("Ge T E SV 2D_", i), Channels1D, 1);
 	}
 

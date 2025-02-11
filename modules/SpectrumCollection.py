@@ -1,8 +1,7 @@
 ## All of the stuff for opening spectra
-from PyQt5.QtCore import Qt, QThread, QTimer
+from PyQt5.QtCore import QThread
 from PySide6.QtWidgets import QApplication, QFileDialog, QStatusBar
 import numpy as np
-import pandas as pd
 
 # import matplotlib.pyplot as plt
 import time
@@ -222,8 +221,8 @@ class MidasThread(QThread):
                         gObj = GateObject()
                         gObj.name = gnames[j]
                         sObj.gates.append(gObj)
-
                 sObj.spec = np.zeros(sObj.NBins)
+
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec[0] = 1
                 sObj.spec_temp[:] = sObj.spec

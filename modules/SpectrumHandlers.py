@@ -28,11 +28,7 @@ class SpectrumObject:
         self.Name = "Test Spectrum"
 
         self.xzoom = [0, self.NBins]
-        self.yzoom = [0, 1]
-
-        ## Load the data library
-        ##if os.path.exists('EngeSort.so'):
-        ##    self.dm = EngeSort.EngeSort()
+        self.yzoom = [0, 100]
 
         self.gates = []
         self.NGates = 0
@@ -70,9 +66,6 @@ class SpectrumObject:
             with open(filename[0], "w") as ofile:
                 writer = csv.writer(ofile, delimiter="\t")
                 writer.writerows(zip(range(len(self.spec)), self.spec))
-                # for bin in range(len(self.spec)):
-                # ofile.write([bin,self.spec[bin]])
-            # ofile.close()
 
     ## Initial sine-wave histogram
     def initialize(self):
@@ -97,8 +90,8 @@ class SpectrumObject2D:
 
         # self.xedges = None
         # self.yedges = None
-        self.xedges = np.array([x for x in range(0, self.NBins)])
-        self.yedges = np.array([y for y in range(0, self.NBins)])
+        self.xedges = np.arange(self.NBins)
+        self.yedges = np.arange(self.NBins)
         self.spec2d = np.zeros(shape=(self.NBins, self.NBins))
         self.spec2d_temp = np.zeros(
             shape=(self.NBins, self.NBins)
@@ -113,7 +106,7 @@ class SpectrumObject2D:
 
         self.gates = []
         self.NGates = 0
-        self.GateIndex = -1  ## -1 for no gates selected
+        self.GateIndex = -1
 
     def makeFakeData(self):
         n = 1000000

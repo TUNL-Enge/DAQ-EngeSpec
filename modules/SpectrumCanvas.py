@@ -170,7 +170,7 @@ class SpectrumCanvas(FigureCanvas):
         self.SpecColl.SavePickleData()
 
     def PlotData(self, drawGate=-1, reBin=[]):
-        x = np.array([x for x in range(0, self.Spec.NBins)], dtype=int)
+        x = np.arange(self.Spec.NBins, dtype=int)
         y = self.Spec.spec
 
         self.x = x
@@ -189,8 +189,7 @@ class SpectrumCanvas(FigureCanvas):
             self.colorbar_axes = None
             self.a.set_axes_locator(self.original_loc)
 
-        ##self.a.set_axes_locator(self.original_loc)
-
+        # TODO: Make this aware of the data...
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
         ymin = self.Spec.yzoom[0]
@@ -224,7 +223,6 @@ class SpectrumCanvas(FigureCanvas):
 
         if drawGate == -1:
             for i in range(self.Spec.NGates):
-                # print(i)
                 if len(self.Spec.gates[i].x) > 0:
                     self.drawGates(i)
         else:
@@ -260,8 +258,6 @@ class SpectrumCanvas(FigureCanvas):
                         new_y.append(sum(y_vals) / len(y_vals))
 
             SpectrumCanvas.PlotData(self, reBin=[[new_x], [new_y]])
-
-            ##print("Re-binned by "+str(binNum))
             self.n1 = n
 
         except:
@@ -276,11 +272,8 @@ class SpectrumCanvas(FigureCanvas):
         H = self.Spec2D.spec2d.T
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
-        # print(ye)
-        X, Y = np.meshgrid(xe, ye)
-        # print(X)
-        # print(Y)
 
+        X, Y = np.meshgrid(xe, ye)
         self.X = X.astype(int)
         self.Y = Y.astype(int)
         self.H = H
@@ -367,14 +360,8 @@ class SpectrumCanvas(FigureCanvas):
         self.a.set_xlim([xmin, xmax])
         self.a.set_ylim([ymin, ymax])
 
-        # self.lincb.remove()
-        # self.lincb = False
-        # self.a.set_axes_locator(self.original_loc)
         if drawGate == -1:
-            ##for g in self.Spec2D.gates:
-            ##print("NGates = ",self.Spec2D.NGates)
             for i in range(self.Spec2D.NGates):
-                ##print(i)
                 if len(self.Spec2D.gates[i].x) > 0:
                     self.drawGates2D(i)
         else:
@@ -450,10 +437,6 @@ class SpectrumCanvas(FigureCanvas):
                 new_H.append(new_h)
 
             new_H = np.array(new_H)
-            #  for i in range(len(new_H)):
-            #     print(new_H[i])
-
-            ##print("Re-binned by "+str(n))
             self.n2 = n
             SpectrumCanvas.PlotData2D(self, reBin=[new_H, new_x, new_y])
         except:
@@ -478,16 +461,7 @@ class SpectrumCanvas(FigureCanvas):
         for sp in self.SpecColl.spec2d:
             sp.spec2d[:] = sp.spec2d_temp
 
-        if not self.is2D:
-
-            x = np.array([x for x in range(0, self.Spec.NBins)], dtype=int)
-            ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
-            y = self.Spec.spec
-            self.x = x
-            self.y = y
-            SpectrumCanvas.ReBin(self, self.n1)
-
-        else:
+        if self.is2D:
             H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
@@ -497,6 +471,15 @@ class SpectrumCanvas(FigureCanvas):
             self.Y = Y.astype(int)
 
             SpectrumCanvas.ReBin2D(self, self.n2)
+
+        else:
+            x = np.arange(self.Spec.NBins, dtype=int)
+            ## The displayed selfpectrum is only updated when we hit the UpdatePlot button
+            y = self.Spec.spec
+            self.x = x
+            self.y = y
+            SpectrumCanvas.ReBin(self, self.n1)
+
         try:
             self.fig.delaxes(self.ax2)
         except:
@@ -871,21 +854,18 @@ class SpectrumCanvas(FigureCanvas):
 
     def getGate(self):
         if self.is2D:
-            ##tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
             self.getNClicks(-1)
-            # x = [i[0] for i in tup]
             x = self.cxdata
             x.append(x[0])
-            # y = [i[1] for i in tup]
             y = self.cydata
             y.append(y[0])
             self.a.plot(x, y, "r-")
             self.fig.canvas.draw()
-            ##self.Spec2D.NGates = self.Spec2D.NGates+1
+            self.Spec2D.GateIndex += 1
             ig = self.Spec2D.GateIndex
             self.Spec2D.gates[ig].setGate(x, y)
 
-            ## Send the gate over to c++
+            # Send the gate over to c++
             self.SpecColl.dm.putGate(
                 self.Spec2D.Name,
                 self.Spec2D.gates[ig].name,
@@ -893,17 +873,16 @@ class SpectrumCanvas(FigureCanvas):
                 self.Spec2D.gates[ig].y,
             )
         else:
-            ##tup = self.fig.ginput(n=2)
             self.getNClicks(2)
+
             x = self.cxdata
-            ##x = [i[0] for i in tup]
             y = self.cydata
-            ##y = [i[1] for i in tup]   ## we don't need this but it helps reuse the algorithms
+
             self.a.vlines(x=x, ymin=0.1, ymax=self.a.get_ylim()[1], color="red")
             self.fig.canvas.draw()
-
-            self.Spec.NGates = self.Spec.NGates + 1
+            self.Spec.GateIndex += 1
             ig = self.Spec.GateIndex
+
             self.Spec.gates[ig].setGate(x, y)
             ## Send the gate over to c++
             self.SpecColl.dm.putGate(
