@@ -1,3 +1,121 @@
+// ******************************************************************************
+// GENERIC SORT ROUTINE FOR LENA GAMMA-GAMMA SPECTROMETER
+// ******************************************************************************
+//
+// Authors: Caleb Marshall & Christian Iliadis
+//
+// Date:
+//
+// ******************************************************************************
+//
+// Summary of setup procedure:
+//
+//  (1) set discriminator thresholds on both HPGe and NaI segments; record noise 
+//      level
+//  (2) check NaI TDC spectra [60Co or 22Na]; there should be no structure in the 
+//      central peak, and no oscillatory pattern on either the left or right side
+//  (3) energy calibrate the NaI segments [using: 22Na (511 keV and 1275 keV); or 
+//      22Na (511 keV) and 60Co (2505 keV sum peak); or 14N(p,g) (763 keV and 
+//      2373 keV)
+//  (4) enter energy calibrations in external files; 
+//  (5) set gates in the 2D spectrum and analyze gated HPGe spectra
+//
+// ******************************************************************************
+//
+// Comments:
+//
+// This sort routine is set up for a Ge detector plus a 16 segment NaI annulus
+// plus several segments of plastic scintillator (veto). All events are analyzed 
+// that give rise to a Ge signal. Stored events are: Ge and individual NaI segment 
+// energies, time differences between NaI segment STOP and Ge (common) START. 
+// Remember, NaI segment single spectra are not collected.
+//
+// Make sure that NaI discriminator thresholds are not set too high; you can see 
+// this, if it is the case, immediately in the raw NaI [channel] spectra; some of 
+// them do not show the 511 keV line because the  threshold is set above this 
+// energy; so, the procedure for setting the CFD thresholds is: high enough to cut 
+// out noise, but low enough to observe the 511 keV line.
+//
+// The energies of the same event in all NaI segments need to be added together 
+// in order to produce a NaI sum energy signal. That is done by energy calibrating 
+// each NaI segment first, then the signals from individual segments are added to 
+// display: 
+//   (i)  a 1D NaI sum energy spectrum 
+//   (ii) a 2D Ge vs. NaI sum energy spectrum. The Ge part of the 2D spectrum is 
+//        also in energy units; both the Ge and the NaI sum part are compressed.
+//
+// Note 1: the energy in a NaI segment is only summed if the event is located both 
+//         in NaI ADC gate and in the Ge-NaI TDC coincidence gate. 
+// Note 2: after performing a NaI energy calibration, inspect the 1D NaI sum 
+//         spectrum to see if its shape makes any sense; if one sees any double 
+//         peaks or similar, the energy calibrations on some segments may be off.
+//
+// For example: if we have for a raw (Ge or NaI) spectrum 3 keV/ch, then (raw) 
+// channel 4000 corresponds to an energy of about 12000 keV (neglecting the offset). 
+// The latter scale can be compressed, e.g., by a factor of 10, for the 1D NaI sum 
+// energy spectrum (so that out of 4096 energy channels only energy channels 0 to 
+// 1200 have a meaning), and, e.g., by a factor of 20 for the 2D Ge vs NaI spectrum 
+// (both parts in energy units). This 2D spectrum has typically dimensions of 
+// 512 x 512, so that energy channel 512 corresponds to an energy of 512x20=10240 
+// keV. For a given energy calibration it is important to choose compression factors 
+// and energy spectrum dimensions so that the energy calibrated spectra are 
+// compressed, otherwise energy channels with zero counts are produced. Note, that 
+// the energy calibration of the Ge in the sort routine only applies to the 2D 
+// spectrum Ge part; the Ge singles spectrum and all Ge gated spectra are in 
+// channels and have to be energy calibrated separately.  
+//
+// Gates are set on (i) the individual NaI segment ADC spectra (these should be 
+// "wide" gates, the lower limit set right above noise and the upper limit set close 
+// to the end of the spectrum; only events located in these gates are summed to 
+// produce a NaI sum energy signal); (ii) the individual TDC spectra (these should 
+// be centered on the true coincidence peak); (iii) the 2D Ge (energy) vs. NaI sum 
+// (energy) spectrum; 4 gates can be set on the energy regions of interest; 
+// typically, in order to cut out room background events, one may set a gate 
+// E(Ge)+E(NaI)>4 MeV or so.
+//
+// Gated Ge spectra (all in channels, not energy) are displayed for (i) events that 
+// are located in any TDC true coincidence peak gate (an OR condition is used for 
+// the TDC's, i.e., if the event is located in (gate of TDC segment#1) OR (gate of 
+// TDC segment#2) OR etc.); (ii) events that are located in any TDC true coincidence 
+// peak (as before under (i)) AND events that are located in a specific gate in the 
+// 2D Ge vs. NaI spectrum. 
+//
+// The sort routine includes several veto plastic scintillators. Gates can be set 
+// on each scintillator energy spectra (usually set on the muon peak) and on the 
+// true coincidence peak in the Ge-Sci timing spectrum. The vetoed Ge spectra that
+// are gated on the Ge-NaI TDC's AND on the Ge-NaI 2D spectrum are not incremented 
+// if there is a signal in either the Ge-Sci TAC gate or the Sci energy gate.
+//
+// When incrementing the gated spectra:
+// specify explicitly all conditions, otherwise confusion may arise; do not
+// assume any implicit conditions; in other words, e.g., the sum NaI energy is just 
+// a variable; its value has no explicit information about logic it was obtained 
+// from.  
+//
+//
+// ToDo: 
+// (a) gate on multiplicity not included in gated 1D HPGe spectra
+// (b) singles Ge spectrum that is vetoed by scintillators.
+// (c) singles Ge spectrum that is vetoed by Ge-NaI TAC. This is most useful 
+//     for background suppression if the transition of interest is a ground state 
+//     transition (i.e., multiplicity of 1). The scintillator veto (see above) will 
+//     suppress muon events, but the NaI veto will also suppress background due to 
+//     (i)  beam or cosmic-ray induced background cascades (i.e., one BG photon hits 
+//          the Ge, the other one the NaI), and 
+//     (ii) beam or cosmic-ray induced single BG photons that scatter from the Ge 
+//          into the NaI. For such gamma-ray events, the scintillators have only 
+//          small efficiencies.
+// (d) singles Ge spectrum that is vetoed both by the NaI AND by the scintillators.
+// (e) beam pulsing; beam pulse on/off information can be found in histogram 
+//     hBeamPulse; setting a gate around peak in higher channels corresponds to 
+//     tagging events according to when beam was on or off; NOTE: "Ge BeamPulseOff" 
+//     is not really the spectrum with no beam, but it is the spectrum for all events
+//     that are outside the "beam on gate".
+//
+// ******************************************************************************
+// GENERAL INFORMATION
+// ******************************************************************************
+
 #include <boost/python/numpy/ndarray.hpp>
 #include <iostream>
 #include <vector>
@@ -29,16 +147,17 @@ std::string EngeSort::saysomething(std::string str)
 	return messages.saysomething(str);
 }
 
-/* -------------
-Global Variables
+// ******************************************************************************
+// DEFINE HISTOGRAMS
+// ******************************************************************************
 
-This is where histograms need to be defined.
-----------------*/
-
-// binning to use in the histograms
+// Binning to use in the histograms
 int Channels1D = 65536;
 int ChannelsTDC = 10000;
 int Channels2D = 500;
+
+// Compression factor for 2D histograms
+double compressE = 0.1; 
 
 // Scalers
 Scaler *sPulser;
@@ -46,65 +165,63 @@ Scaler *sBCI;
 Scaler *sTriggers;
 Scaler *sLN2;
 
-////////////////
-/* 1D Spectra */
-////////////////
+// -----------------------
+// 1D HISTOGRAMS: UNGATED
+// -----------------------
+// 1D spectra have names h....; 2D spectra have names h2...
 
-// Annulus Variables
-// multiplicity
+// HPGe singles (channels)
+Histogram *hGe;
+
+// HPGe singles (energy)
+Histogram *hGeE;
+
+// Pulser (HPGe preamp input)
+Histogram *hPulser;
+
+// Annulus multiplicity
 Histogram *hMulti;
 
-// Annulus ADC Histograms (i.e. no calibration)
+// Annulus ADCs (in channel units)
 Histogram *hNaIADC[16];
-// And TDC
+
+// Annulus TDCs (in channel units)
 Histogram *hNaITDC[16];
 
-// This will be the energy calibrated sum.
+// Energy sum in all segments (in energy units)
 Histogram *hNaIsumE;
 
-// Plastic Scintillators ADC and TDC
+// Plastic scintillator ADCs and TDCs (channels)
 Histogram *hSciADC[9];
 Histogram *hSciTDC[9];
 
-// HPGe Histograms
+// -----------------------
+// 1D HISTOGRAMS: GATED
+// -----------------------
 
-// HPGe Singles
-Histogram *hGe;
-// Energy Calibrated
-Histogram *hGeE;
-
-// CeBr if you have it
-Histogram *hCeBr;
-Histogram *hTDCCeBr;
-
-// Pulser
-Histogram *hPulser;
-
-// TAC
-Histogram *hBeam;
-
-////////////////
-/* 2D Spectra */
-////////////////
-Histogram *h2dGevsNaIsumE_no_gates;
-Histogram *h2dGevsNaIsumE;
-
-///////////////////
-/* Gated Spectra */
-///////////////////
-
-// HPGe spectra gated on 2D gates.
-// Implicit is that these will also have the effects of the NaI ADC & TDC gates.
+// HPGe gated on: NaI ADCs, NaI TDCs, 2D Ge v NaI
 Histogram *hGeNaITE2d[4];
 
-// These are the same, but they will also include the scintillator veto.
+// HPGe gated on: NaI ADCs, NaI TDCs, 2D Ge v NaI; included scintillator veto
 Histogram *hGeNaITE2d_SV[4];
 
-// random number generator for calibration values.
+// -----------------------
+// 2D HISTOGRAMS: GATED
+// -----------------------
+
+// Ge v NaIsumE (energies); gated on TDCs
+Histogram *h2dGevsNaIsumE;
+
+// ******************************************************************************
+// OTHER: UTILITIES, ENERGY CALIBRATION
+// ******************************************************************************
+
+// Random number generator for energy calibration [to avoid artifacts]
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
 std::uniform_real_distribution<double> uniform_sample(-0.1, 0.1);
 
+// Utility to add integers to strings [used later]
 std::string name_with_index(std::string name, int index)
 {
 	return name + std::to_string(index);
@@ -114,11 +231,11 @@ std::string name_with_index(std::string name, int index)
 void Calibrator::load_file(std::string filename)
 {
 	// store the fit calibration parameters
-	this->slope.resize(32);
-	std::fill(this->slope.begin(), this->slope.end(), 0);
+	this -> slope.resize(32);
+	std::fill(this -> slope.begin(), this -> slope.end(), 0);
 
-	this->intercept.resize(32);
-	std::fill(this->intercept.begin(), this->intercept.end(), 0);
+	this -> intercept.resize(32);
+	std::fill(this -> intercept.begin(), this -> intercept.end(), 0);
 
 	// read in the calibration
 	std::ifstream file(filename);
@@ -155,11 +272,11 @@ void Calibrator::load_file(std::string filename)
 				break;
 
 			case 2:
-				this->slope[channel] = std::stod(temp_string);
+				this -> slope[channel] = std::stod(temp_string);
 				break;
 
 			case 3:
-				this->intercept[channel] =
+				this -> intercept[channel] =
 					std::stod(temp_string);
 				break;
 
@@ -179,218 +296,136 @@ IntVector Calibrator::calibrate(vec_u32 &adc_values)
 		// do the calibration
 		auto temp = (double)adc_values[i];
 		// check to make sure we have a adc value and that we have a calibration
-		if ((temp > 0) && (this->slope[i] > 0)) {
+		if ((temp > 0) && (this -> slope[i] > 0)) {
 			result[i] = std::round(
-				(this->slope[i] * temp + this->intercept[i]) +
+				(this -> slope[i] * temp + this -> intercept[i]) +
 				uniform_sample(generator));
 		}
 	}
-
 	return result;
 }
 
 // Counters
 int totalCounter = 0;
 
+// ******************************************************************************
+// INITIALIZATIONS [SCALERS, HISTOGRAMS, GATES]
+// ******************************************************************************
+
 void EngeSort::Initialize()
 {
 	std::string hname;
 
-	// Now we initialize all of the histograms defined above.
+    //------------------------------
+	// Scalers
+    //------------------------------
+    
+	sPulser = new Scaler("BCI", 0); // Name, index
+	sBCI = new Scaler("Pulser", 1); // Name, index
+	sTriggers = new Scaler("Trigger", 2); // Name, index
+	sLN2 = new Scaler("LN2", 3); // Name, index
 
-	//--------------------
-	// 1D Histograms
+	//------------------------------
+	// 1D Histograms: ungated
+	//------------------------------
 
-	// Raw values first
-	// NaI
+    // HPGe singles (channels)  
+	hGe = new Histogram("HPGe Singles", Channels1D, 1);
+
+    // HPGe singles (energy)
+    // does this mean 10 MeV max ??
+	hGeE = new Histogram("HPGe Singles E", 10000, 1);
+
+    // Pulser (HPGe preamp input)
+	hPulser = new Histogram("Pulser", Channels1D, 1);
+
+	// NaI ADCs (channels)
 	for (int i = 0; i < 16; i++) {
 		hNaIADC[i] = new Histogram(name_with_index("NaI ADC ", i),
 					   Channels1D, 1);
 	}
 
+	// NaI TDCs (channels)
 	for (int i = 0; i < 16; i++) {
 		hNaITDC[i] = new Histogram(name_with_index("NaI TDC ", i),
 					   ChannelsTDC, 1);
 	}
 
-	// Sum and multiplicity
-	hNaIsumE = new Histogram("NaI Sum Energy", Channels1D, 1);
-	hMulti = new Histogram("NaI Multiplicity", 20, 1);
+	// NaI energy sum (energies)
+	hNaIsumE = new Histogram("NaI Sum E", Channels1D, 1);
 
-	// Plastic Scintillator ADC
+	// NaI multiplicity
+	hMulti = new Histogram("NaI Multi", 20, 1);
+
+	// Plastic scintillator ADCs
 	for (int i = 0; i < 9; i++) {
 		hSciADC[i] = new Histogram(name_with_index("Sci ADC ", i),
 					   Channels1D, 1);
 	}
-	// TDC
+
+	// Plastic scintillator TDCs
 	for (int i = 0; i < 9; i++) {
 		hSciTDC[i] = new Histogram(name_with_index("Sci TDC ", i),
 					   Channels1D, 1);
 	}
 
-	hGe = new Histogram("HPGe Singles", Channels1D, 1);
-	hGeE = new Histogram("HPGe Singles Energy", 10000, 1);
+	//------------------------------
+	// 2D Histograms: gated
+	//------------------------------
 
-	hPulser = new Histogram("Pulser", Channels1D, 1);
-
-	hBeam = new Histogram("Beam Pulse", ChannelsTDC, 1);
-	
-	// Scalers
-	sPulser = new Scaler("BCI", 0); // Name, index
-	sBCI = new Scaler("Pulser", 1); // Name, index
-	sTriggers = new Scaler("Trigger", 2); // Name, index
-	sLN2 = new Scaler("LN2", 3); // Name, index
-	//--------------------
-	// 2D Histograms
-	//--------------------
-
-	h2dGevsNaIsumE_no_gates = new Histogram("HPGe v NaI No Gates", Channels2D, 2);
+    // Ge v NaIsumE (energies)
 	h2dGevsNaIsumE = new Histogram("HPGe v NaI", Channels2D, 2);
 
-	//------
-	// Gates
-	//------
+	//------------------------------
+	// Define gates
+	//------------------------------
 
-	// NaI
+	// on 1D histograms of NaI ADCs and TDCs
 	for (int i = 0; i < 16; i++) {
 		hNaIADC[i]->addGate(name_with_index("NaI ADC Gate ", i));
 		hNaITDC[i]->addGate(name_with_index("NaI TDC Gate ", i));
 	}
-	// Plastic Scintillator
+
+	// on 1D histograms of plastic scintillator ADCs and TDCs
 	for (int i = 0; i < 9; i++) {
 		hSciADC[i]->addGate(name_with_index("Sci ADC Gate", i));
 		hSciTDC[i]->addGate(name_with_index("Sci TDC Gate", i));
 	}
 
-	// 2D gates
+	// on 2D histograms of HPGe v NaI (energies)
 	h2dGevsNaIsumE->addGate("2D_1");
 	h2dGevsNaIsumE->addGate("2D_2");
 	h2dGevsNaIsumE->addGate("2D_3");
 	h2dGevsNaIsumE->addGate("2D_4");
 
-	//--------------------
-	// Gated Histograms
-	//--------------------
+	//------------------------------
+	// 1D Histograms: gated
+	//------------------------------
 
+    // HPGe gated on: NaI ADCs, NaI TDCs, 2D Ge v NaI
 	for (int i = 0; i < 4; i++) {
-		hGeNaITE2d[1] = new Histogram(name_with_index("Ge T E 2D_", i),
+		hGeNaITE2d[i] = new Histogram(name_with_index("Ge T E 2D_", i),
 					      Channels1D, 1);
 	}
 
+    // HPGe gated on: NaI ADCs, NaI TDCs, 2D Ge v NaI; included scintillator veto
 	for (int i = 0; i < 4; i++) {
 		hGeNaITE2d_SV[i] = new Histogram(
 			name_with_index("Ge T E SV 2D_", i), Channels1D, 1);
 	}
 
-	// Initialize the energy calibrator
-	this->calibrator_annulus_ps.load_file("nai_cal.csv");
-	this->calibrator_hpge.load_file("hpge_cal.csv");
+    //----------------------------------
+	// Initialize the energy calibrators
+    //----------------------------------
+
+    // read from external files for HPGe and NaI segments
+	this -> calibrator_annulus_ps.load_file("nai_cal.csv");
+	this -> calibrator_hpge.load_file("hpge_cal.csv");
 }
 
-//======================================================================
-// This is the equivalent to the "sort" function in jam
-// Arguments are the raw events
-void EngeSort::sort(MDPPEvent &event_data)
-{
-	totalCounter++;
-
-	// get the data to make it easier for later
-	vec_u32 scp_adc = event_data.get_data("scp1").adc;
-	vec_u32 scp_tdc = event_data.get_data("scp1").tdc;
-
-	vec_u32 qdc_adc = event_data.get_data("qdc1").adc;
-	vec_u32 qdc_tdc = event_data.get_data("qdc1").tdc;
-
-	IntVector cal_values = this->calibrator_annulus_ps.calibrate(qdc_adc);
-	IntVector hpge_cal_values = this->calibrator_hpge.calibrate(scp_adc);
-
-	// pulser count
-	int cpulser = scp_adc[4];
-	bool pulser_event = false;
-	if (cpulser > 0) {
-		hPulser->inc(
-			scp_adc[0]); // The pulser histogram are the counts from the HPGe.
-		pulser_event = true;
-	}
-
-	// Increment 1D histograms
-	// NaI
-	for (int i = 0; i < 16; i++) {
-		hNaIADC[i]->inc(qdc_adc[i]);
-		hNaITDC[i]->inc(qdc_tdc[i]);
-	}
-
-	// Plastic Scintillator
-	for (int i = 0; i < 9; i++) {
-		hSciADC[i]->inc(qdc_adc[i + 17]);
-		hSciTDC[i]->inc(qdc_adc[i + 17]);
-	}
-
-	// HPGe data
-	if (!pulser_event) {
-		hGe->inc(scp_adc[0]);
-		hGeE->inc(hpge_cal_values[0]);
-	}
-
-	hBeam -> inc(scp_tdc[6]);
-	
-	// So now sum the NaI segments
-
-	double SumNaIE = 0.0;
-	double SumNaIE_no_gates = 0.0;
-	int multi = 0;
-	bool first_hit = true;
-	int NaITDC;
-	// sum up the calibrated annulus
-	for (int i = 0; i < 16; i++) {
-		Gate &GNaIADC = hNaIADC[i]->getGate(0);
-		Gate &GNaITDC = hNaITDC[i]->getGate(0);
-		SumNaIE_no_gates += (double)cal_values[i];
-		if (GNaIADC.inGate(qdc_adc[i]) && GNaITDC.inGate(qdc_tdc[i])) {
-			SumNaIE += (double)cal_values[i];
-			multi += 1;
-		}
-	}
-
-	hNaIsumE->inc(SumNaIE);
-	hMulti->inc(multi);
-
-	// // ------------------------------------------------------------
-	// // Compressed versions for 2D spectra
-	// // ------------------------------------------------------------
-	double compressionE =
-		Channels2D / 5000.0; //(double)Channels1D/ (double)Channels2D;
-	double compressionT =
-		Channels2D / 5000.0; //(double)Channels1D/ (double)Channels2D;
-	int cNaISumE = (int)std::floor(SumNaIE * compressionE);
-	int cNaISumE_no_gates = (int)std::floor(SumNaIE_no_gates * 0.1);
-	int cGeE = (int)std::floor((double)hpge_cal_values[0] * compressionE);
-
-	// // // Increment 2D histograms
-	h2dGevsNaIsumE_no_gates->inc(cGeE, cNaISumE_no_gates);
-	h2dGevsNaIsumE->inc(cGeE, cNaISumE);
-
-	// Check if the veto fired.
-	bool scint_veto = false;
-	for (int i = 0; i < 9; i++) {
-		Gate &gSciADC = hSciADC[i]->getGate(0);
-		Gate &gSciTDC = hSciTDC[i]->getGate(0);
-		scint_veto = scint_veto || (gSciADC.inGate(qdc_adc[i + 17]) &&
-					    gSciTDC.inGate(qdc_tdc[i + 17]));
-	}
-	// Now increment the HPGe gated histograms.
-	for (int i = 0; i < 4; i++) {
-		Gate &g2d = h2dGevsNaIsumE->getGate(i);
-		// Do we pass the ith 2D gate?
-		if (g2d.inGate(cGeE, cNaISumE)) {
-			hGeNaITE2d[i]->inc(hpge_cal_values[0]);
-			// Does the scintillator veto this event?
-			if (!scint_veto) {
-				hGeNaITE2d_SV[i]->inc(hpge_cal_values[0]);
-			}
-		}
-	}
-}
+// ******************************************************************************
+// DATA SORT [PROCESS EACH EVENT]
+// ******************************************************************************
 
 // Increment the scalers
 // TODO: make this automatic. If the scaler is
@@ -403,7 +438,155 @@ void EngeSort::incScalers(uint32_t *dSCAL)
 	sLN2->inc(dSCAL);
 }
 
-// Connect the analyzer to midas
+void EngeSort::sort(MDPPEvent &event_data)
+{
+	totalCounter++;
+
+    //-----------------------------	
+    // Assign data variables
+	//-----------------------------
+
+	vec_u32 scp_adc = event_data.get_data("scp1").adc;
+	vec_u32 scp_tdc = event_data.get_data("scp1").tdc;
+
+	vec_u32 qdc_adc = event_data.get_data("qdc1").adc;
+	vec_u32 qdc_tdc = event_data.get_data("qdc1").tdc;
+
+	IntVector hpge_cal = this -> calibrator_hpge.calibrate(scp_adc);
+	IntVector nai_cal = this -> calibrator_annulus_ps.calibrate(qdc_adc);
+
+    //----------------------------------
+	// Define pulser events
+    //----------------------------------	
+
+    // the pulser histogram contains the counts from the HPGe
+	int cpulser = scp_adc[4];
+	bool pulser_event = false;
+	if (cpulser > 0) {
+		hPulser -> inc(
+			scp_adc[0]); 
+		pulser_event = true;
+	}
+
+    //----------------------------------
+	// Increment 1D histograms: ungated
+    //----------------------------------	
+
+	// HPGe
+	if (!pulser_event) {
+		hGe -> inc(scp_adc[0]);
+		hGeE -> inc(hpge_cal[0]);
+	}
+
+	// NaI
+	for (int i = 0; i < 16; i++) {
+		hNaIADC[i] -> inc(qdc_adc[i]);
+		hNaITDC[i] -> inc(qdc_tdc[i]);
+	}
+
+	// Plastic Scintillator
+	for (int i = 0; i < 9; i++) {
+		hSciADC[i] -> inc(qdc_adc[i + 17]);
+		hSciTDC[i] -> inc(qdc_tdc[i + 17]);
+	}
+
+    //-----------------------------	
+	// Sum energies of NaI segments
+    //-----------------------------	
+
+	double SumNaIE = 0.0;
+	int multi = 0;
+	bool first_hit = true;
+	int NaITDC;
+    
+	// Sum NaI energies
+	for (int i = 0; i < 16; i++) {
+		Gate &GNaIADC = hNaIADC[i] -> getGate(0);
+		Gate &GNaITDC = hNaITDC[i] -> getGate(0);
+        // gates on: NaI TDCs and ADCs 
+		if (GNaIADC.inGate(qdc_adc[i]) && GNaITDC.inGate(qdc_tdc[i])) {
+            // are we summing the energy 
+			SumNaIE += (double)nai_cal[i];
+			multi += 1;
+		}
+	}
+
+    //------------------------------------	
+	// Determine if scintillators fired
+    //------------------------------------
+
+	bool sci_fire = false;
+	for (int i = 0; i < 9; i++) {
+		Gate &gSciADC = hSciADC[i] -> getGate(0);
+		Gate &gSciTDC = hSciTDC[i] -> getGate(0);
+        // scintillator fired if there are a signal in the energy OR
+        // timing spectrum
+		sci_fire = sci_fire || (gSciADC.inGate(qdc_adc[i + 17]) ||
+					    gSciTDC.inGate(qdc_tdc[i + 17]));
+	}
+
+    //------------------------------------	
+	// Determine if annulus fired
+    //------------------------------------
+
+	bool nai_fire = false;
+	for (int i = 0; i < 16; i++) {
+		Gate &gNaIADC = hNaIADC[i] -> getGate(0);
+		Gate &gNaITDC = hNaITDC[i] -> getGate(0);
+        // annulus fired if there are a signal in the energy AND
+        // timing spectrum of any segment
+		nai_fire = nai_fire || (gNaIADC.inGate(qdc_adc[i]) &&
+					    gNaITDC.inGate(qdc_tdc[i]));
+	}
+
+    //------------------------------------	
+	// Increment 1D histograms: gated
+    //------------------------------------
+
+    // Increment NaI energy sum and multiplicity histograms; 
+    // they are gated on NaI ADCs and TDCs
+    if (nai_fire) {
+	    hNaIsumE -> inc(SumNaIE);
+	    hMulti -> inc(multi);
+    }
+
+    //-----------------------------------------------------	
+	// Compress variables for 2D histograms in energy units
+    //-----------------------------------------------------
+
+    // compressed variables (energies)
+	int cGeE = (int)std::floor((double)hpge_cal[0] * compressE);
+	int cNaISumE = (int)std::floor(SumNaIE * compressE);
+
+    //------------------------------------------	
+	// Increment compressed 2D histogram: gated
+    //------------------------------------------
+
+    if (nai_fire) {
+	    h2dGevsNaIsumE -> inc(cGeE, cNaISumE);
+    }
+
+    //------------------------------------	
+	// Increment 1D HPGe histograms: gated
+    //------------------------------------
+
+	for (int i = 0; i < 4; i++) {
+		Gate &g2d = h2dGevsNaIsumE -> getGate(i);
+		// Do we pass the ith 2D gate AND did NaI fire?
+		if (nai_fire && g2d.inGate(cGeE, cNaISumE)) {
+			hGeNaITE2d[i] -> inc(hpge_cal[0]);
+			// Does the scintillator veto this event?
+			if (!sci_fire) {
+				hGeNaITE2d_SV[i] -> inc(hpge_cal[0]);
+			}
+		}
+	}
+}
+
+// ******************************************************************************
+// CONNECT TO AND RUN MIDAS
+// ******************************************************************************
+
 int EngeSort::connectMidasAnalyzer()
 {
 	TARegister tar(&mAMod);
@@ -444,7 +627,6 @@ int EngeSort::runMidasAnalyzer(boost::python::list file_list)
 	Py_BEGIN_ALLOW_THREADS manalyzer_main(ac, av);
 	//    manalyzer_main(0,0);
 	Py_END_ALLOW_THREADS
-
 		return 0;
 }
 
@@ -455,7 +637,6 @@ StringVector EngeSort::getSpectrumNames()
 	for (auto h : Histograms) {
 		s.push_back(h->getName());
 	}
-
 	return s;
 }
 // Return a vector of spectrum names
@@ -465,18 +646,16 @@ StringVector EngeSort::getScalerNames()
 	for (auto Sclr : Scalers) {
 		s.push_back(Sclr->getName());
 	}
-
 	return s;
 }
 // Return a bool vector of whether the spectra are 2D
 BoolVector EngeSort::getis2Ds()
 {
-	BoolVector is2d;
+	BoolVector is2D;
 	for (auto h : Histograms) {
 		bool b = (h->getnDims() == 2) ? true : false;
 		is2D.push_back(b);
 	}
-
 	return is2D;
 }
 // Return a bool vector of whether the spectra have gates
@@ -486,7 +665,6 @@ IntVector EngeSort::getNGates()
 	for (auto h : Histograms) {
 		ngates.push_back(h->getNGates());
 	}
-
 	return ngates;
 }
 
@@ -497,7 +675,6 @@ IntVector EngeSort::getNChannels()
 	for (auto h : Histograms) {
 		nchannels.push_back(h->getnChannels());
 	}
-
 	return nchannels;
 }
 
@@ -508,7 +685,6 @@ IntVector EngeSort::getScalers()
 	for (auto sc : Scalers) {
 		sclr.push_back(sc->getValue());
 	}
-
 	return sclr;
 }
 
@@ -638,11 +814,10 @@ void EngeSort::ClearData()
 	totalCounter = 0;
 }
 
-//----------------------------------------------------------------------
+//------------------------------------
+// manalyzer module
+//------------------------------------
 
-/* 
-   manalyzer module
-*/
 void MidasAnalyzerModule::Init(const std::vector<std::string> &args)
 {
 	printf("Initializing Midas Analyzer Module\n");
@@ -652,6 +827,7 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args)
 
 	fTotalEventCounter = 0;
 }
+
 void MidasAnalyzerModule::Finish()
 {
 	printf("Finish!\n");
@@ -660,6 +836,7 @@ void MidasAnalyzerModule::Finish()
 		  << std::endl;
 	eA->setIsRunning(false);
 }
+
 TARunObject *MidasAnalyzerModule::NewRunObject(TARunInfo *runinfo)
 {
 	printf("NewRunObject, run %d, file %s\n", runinfo->fRunNo,
@@ -667,6 +844,7 @@ TARunObject *MidasAnalyzerModule::NewRunObject(TARunInfo *runinfo)
 	eA->setIsRunning(true);
 	return new MidasAnalyzerRun(runinfo, this);
 }
+
 TAFlowEvent *MidasAnalyzerRun::Analyze(TARunInfo *runinfo, TMEvent *event,
 				       TAFlags *flags, TAFlowEvent *flow)
 {
@@ -704,9 +882,10 @@ TAFlowEvent *MidasAnalyzerRun::Analyze(TARunInfo *runinfo, TMEvent *event,
 	return flow;
 }
 
-/* 
-   manalyzer run
-*/
+//------------------------------------
+//   manalyzer run
+//------------------------------------
+
 void MidasAnalyzerRun::BeginRun(TARunInfo *runinfo)
 {
 	printf("Begin run %d\n", runinfo->fRunNo);
