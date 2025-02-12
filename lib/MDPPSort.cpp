@@ -4,7 +4,7 @@
 //
 // Authors: Caleb Marshall & Christian Iliadis
 //
-// Date:
+// Date: Feb. 2025
 //
 // ******************************************************************************
 //
@@ -30,9 +30,9 @@
 // energies, time differences between NaI segment STOP and Ge (common) START.
 // Remember, NaI segment single spectra are not collected.
 //
-// Make sure that NaI discriminator thresholds are not set too high; you can see
-// this, if it is the case, immediately in the raw NaI [channel] spectra; some of
-// them do not show the 511 keV line because the  threshold is set above this
+// Make sure that NaI discriminator thresholds are not set too high; you will see
+// immediately if this is the case in the raw NaI [channel] spectra; if some of
+// them do not show the 511 keV line because the threshold was set above this
 // energy; so, the procedure for setting the CFD thresholds is: high enough to cut
 // out noise, but low enough to observe the 511 keV line.
 //
@@ -40,29 +40,23 @@
 // in order to produce a NaI sum energy signal. That is done by energy calibrating
 // each NaI segment first, then the signals from individual segments are added to
 // display:
-//   (i)  a 1D NaI sum energy spectrum
-//   (ii) a 2D Ge vs. NaI sum energy spectrum. The Ge part of the 2D spectrum is
-//        also in energy units; both the Ge and the NaI sum part are compressed.
+//   (i)  a 1D NaI sum energy spectrum [which is compressed by some factor]
+//   (ii) a 2D Ge vs. NaI sum energy spectrum [both axes are compressed]. The Ge
+//        part of the 2D spectrum is also in energy units; both the Ge and the NaI
 //
 // Note 1: the energy in a NaI segment is only summed if the event is located both
 //         in NaI ADC gate and in the Ge-NaI TDC coincidence gate.
 // Note 2: after performing a NaI energy calibration, inspect the 1D NaI sum
-//         spectrum to see if its shape makes any sense; if one sees any double
+//         spectrum to see if its shape makes sense; if one sees any double
 //         peaks or similar, the energy calibrations on some segments may be off.
 //
-// For example: if we have for a raw (Ge or NaI) spectrum 3 keV/ch, then (raw)
-// channel 4000 corresponds to an energy of about 12000 keV (neglecting the offset).
-// The latter scale can be compressed, e.g., by a factor of 10, for the 1D NaI sum
-// energy spectrum (so that out of 4096 energy channels only energy channels 0 to
-// 1200 have a meaning), and, e.g., by a factor of 20 for the 2D Ge vs NaI spectrum
-// (both parts in energy units). This 2D spectrum has typically dimensions of
-// 512 x 512, so that energy channel 512 corresponds to an energy of 512x20=10240
-// keV. For a given energy calibration it is important to choose compression factors
+// For a given energy calibration it is important to choose compression factors
 // and energy spectrum dimensions so that the energy calibrated spectra are
 // compressed, otherwise energy channels with zero counts are produced. Note, that
-// the energy calibration of the Ge in the sort routine only applies to the 2D
-// spectrum Ge part; the Ge singles spectrum and all Ge gated spectra are in
-// channels and have to be energy calibrated separately.
+// the energy calibration of the Ge in the sort routine applies to a special 1D
+// Ge spectrum and Ge axis in the the 2D spectrum; the Ge singles spectrum and all
+// Ge gated spectra are in channels and have to be energy calibrated outside
+// EngeSpec.
 //
 // Gates are set on (i) the individual NaI segment ADC spectra (these should be
 // "wide" gates, the lower limit set right above noise and the upper limit set close
@@ -71,9 +65,9 @@
 // be centered on the true coincidence peak); (iii) the 2D Ge (energy) vs. NaI sum
 // (energy) spectrum; 4 gates can be set on the energy regions of interest;
 // typically, in order to cut out room background events, one may set a gate
-// E(Ge)+E(NaI)>4 MeV or so.
+// E(Ge)+E(NaI)>4 MeV, or so.
 //
-// Gated Ge spectra (all in channels, not energy) are displayed for (i) events that
+// Gated Ge spectra (all in channels, not energy) are displayed for: (i) events that
 // are located in any TDC true coincidence peak gate (an OR condition is used for
 // the TDC's, i.e., if the event is located in (gate of TDC segment#1) OR (gate of
 // TDC segment#2) OR etc.); (ii) events that are located in any TDC true coincidence
@@ -84,7 +78,18 @@
 // on each scintillator energy spectra (usually set on the muon peak) and on the
 // true coincidence peak in the Ge-Sci timing spectrum. The vetoed Ge spectra that
 // are gated on the Ge-NaI TDC's AND on the Ge-NaI 2D spectrum are not incremented
-// if there is a signal in either the Ge-Sci TAC gate or the Sci energy gate.
+// if there is a signal in the Ge-Sci TAC gate or the Sci energy gate.
+//
+// Also included are singles HPGe histograms that are vetoed on either scintillators
+// or annulus. The latter is most useful for background suppression if the transition
+// of interest is a ground state transition (i.e., multiplicity of 1). The scintillator
+// veto (see above) will suppress muon events, but the NaI veto will also suppress
+// background due to:
+//     (i)  beam or cosmic-ray induced background cascades (i.e., one BG photon hits
+//          the Ge, the other one the NaI), and
+//     (ii) beam or cosmic-ray induced single BG photons that scatter from the Ge
+//          into the NaI. For such gamma-ray events, the scintillators have only
+//          small efficiencies.
 //
 // When incrementing the gated spectra:
 // specify explicitly all conditions, otherwise confusion may arise; do not
@@ -95,18 +100,8 @@
 //
 // ToDo:
 // (a) gate on multiplicity not included in gated 1D HPGe spectra
-// (b) singles Ge spectrum that is vetoed by scintillators.
-// (c) singles Ge spectrum that is vetoed by Ge-NaI TAC. This is most useful
-//     for background suppression if the transition of interest is a ground state
-//     transition (i.e., multiplicity of 1). The scintillator veto (see above) will
-//     suppress muon events, but the NaI veto will also suppress background due to
-//     (i)  beam or cosmic-ray induced background cascades (i.e., one BG photon hits
-//          the Ge, the other one the NaI), and
-//     (ii) beam or cosmic-ray induced single BG photons that scatter from the Ge
-//          into the NaI. For such gamma-ray events, the scintillators have only
-//          small efficiencies.
-// (d) singles Ge spectrum that is vetoed both by the NaI AND by the scintillators.
-// (e) beam pulsing; beam pulse on/off information can be found in histogram
+// (b) singles Ge spectrum that is vetoed both by the NaI AND by the scintillators.
+// (c) beam pulsing; beam pulse on/off information can be found in histogram
 //     hBeamPulse; setting a gate around peak in higher channels corresponds to
 //     tagging events according to when beam was on or off; NOTE: "Ge BeamPulseOff"
 //     is not really the spectrum with no beam, but it is the spectrum for all events
@@ -155,8 +150,9 @@ std::string EngeSort::saysomething(std::string str)
 int Channels1D = 65536;
 int ChannelsTDC = 10000;
 int Channels2D = 500;
+double Energies1D = 10000;
 
-// Compression factor for 2D histograms
+// Compression factor for 1D and 2D histograms
 double compressE = 0.1;
 
 // Scalers
@@ -172,6 +168,12 @@ Scaler *sLN2;
 
 // HPGe singles (channels)
 Histogram *hGe;
+
+// HPGe singles (vetoed by scintillators)
+Histogram *hGe_SV;
+
+// HPGe singles (vetoed by annulus)
+Histogram *hGe_NaIV;
 
 // HPGe singles (energy)
 Histogram *hGeE;
@@ -332,9 +334,14 @@ void EngeSort::Initialize()
 	// HPGe singles (channels)
 	hGe = new Histogram("HPGe Singles", Channels1D, 1);
 
+	// HPGe singles (channels) vetoed by scintillators
+	hGe_SV = new Histogram("HPGe Singles Scint veto", Channels1D, 1);
+
+	// HPGe singles (channels) vetoed by annulus
+	hGe_NaIV = new Histogram("HPGe Singles NaI veto", Channels1D, 1);
+
 	// HPGe singles (energy)
-	// does this mean 10 MeV max ??
-	hGeE = new Histogram("HPGe Singles E", 10000, 1);
+	hGeE = new Histogram("HPGe Singles E", Energies1D, 1);
 
 	// Pulser (HPGe preamp input)
 	hPulser = new Histogram("Pulser", Channels1D, 1);
@@ -393,10 +400,9 @@ void EngeSort::Initialize()
 	}
 
 	// on 2D histograms of HPGe v NaI (energies)
-	h2dGevsNaIsumE->addGate("2D_1");
-	h2dGevsNaIsumE->addGate("2D_2");
-	h2dGevsNaIsumE->addGate("2D_3");
-	h2dGevsNaIsumE->addGate("2D_4");
+	for (int i = 0; i < 4; i++) {
+		h2dGevsNaIsumE->addGate(name_with_index("2D ", i));
+	}
 
 	//------------------------------
 	// 1D Histograms: gated
@@ -538,6 +544,18 @@ void EngeSort::sort(MDPPEvent &event_data)
 					gNaITDC.inGate(qdc_tdc[i]));
 	}
 
+	//----------------------------------------------------------------
+	// Increment 1D HPGe histograms vetoed by scintillators or annulus
+	//----------------------------------------------------------------
+
+	if (!pulser_event && !sci_fire) {
+		hGe_SV->inc(scp_adc[0]);
+	}
+
+	if (!pulser_event && !nai_fire) {
+		hGe_NaIV->inc(scp_adc[0]);
+	}
+
 	//------------------------------------
 	// Increment 1D histograms: gated
 	//------------------------------------
@@ -555,14 +573,14 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	// compressed variables (energies)
 	int cGeE = (int)std::floor((double)hpge_cal[0] * compressE);
-	int cNaISumE = (int)std::floor(SumNaIE * compressE);
+	int cSumNaIE = (int)std::floor(SumNaIE * compressE);
 
 	//------------------------------------------
 	// Increment compressed 2D histogram: gated
 	//------------------------------------------
 
 	if (nai_fire) {
-		h2dGevsNaIsumE->inc(cGeE, cNaISumE);
+		h2dGevsNaIsumE->inc(cGeE, cSumNaIE);
 	}
 
 	//------------------------------------
@@ -572,7 +590,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	for (int i = 0; i < 4; i++) {
 		Gate &g2d = h2dGevsNaIsumE->getGate(i);
 		// Do we pass the ith 2D gate AND did NaI fire?
-		if (nai_fire && g2d.inGate(cGeE, cNaISumE)) {
+		if (nai_fire && g2d.inGate(cGeE, cSumNaIE)) {
 			hGeNaITE2d[i]->inc(hpge_cal[0]);
 			// Does the scintillator veto this event?
 			if (!sci_fire) {

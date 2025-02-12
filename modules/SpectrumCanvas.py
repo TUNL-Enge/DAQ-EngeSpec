@@ -336,25 +336,17 @@ class SpectrumCanvas(FigureCanvas):
 
         self.a.format_coord = format_coord
         self.a.clear()
-        ##self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
 
         self.image = self.a.pcolormesh(
             X, Y, H, norm=norm, cmap=self.cols, shading="auto"
         )
-        # self.image = self.a.pcolormesh(H, norm = norm, cmap=self.cols)
+        
         if self.lincb:
             self.lincb.update_normal(self.image)
         else:
-            ##self.sm = cm.ScalarMappable(norm=norm,cmap= self.cols)
             divider = make_axes_locatable(self.a)
             cax = divider.append_axes("right", size="3%", pad="5%")
-            blah = divider.append_axes(
-                "right", size="5%", pad="5%", add_to_figure=False
-            )
-            ##cax = make_axes_locatable(self.a).new_horizontal(size="3%", pad="1%")
             self.lincb = self.fig.colorbar(self.image, cax=cax)
-            ##self.lincb = matplotlib.pyplot.colorbar(image)#,cax=cax)
-        ##self.lincb = self.fig.colorbar(self.image,cax=self.colorbar_axes)
         self.a, self.colorbar_axes = self.fig.get_axes()
 
         self.a.set_xlim([xmin, xmax])
