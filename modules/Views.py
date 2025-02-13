@@ -243,6 +243,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.SpecCanvas.ReBin2D(self.n)
 
+    def setting_target(self):
+        text, ok = QtWidgets.QInputDialog.getText(
+            self,
+            "Set Target",
+            f"Current Target: {get_target_id()}\n\nEnter Your Target:",
+        )
+        if ok:
+            if text:
+                set_target_id(text)
+            else:
+                set_target_id("Unknown")
+
     ## --------------------------------------------------
     ## Function to write to the command editor
     def append_text(self, text, col=None):
@@ -326,10 +338,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dotsAction.triggered.connect(self.setting_dots)
         self.settings_menu.addAction(dotsAction)
 
-        # calibration settings
-        # cal_action = QtGui.QAction('&Calibrate', self.settings_menu)
-
-        # self.settings_menu.addAction(cal_action)
+        # set target
+        targetAction = QtGui.QAction("&Set Current Target", self.settings_menu)
+        targetAction.triggered.connect(self.setting_target)
+        self.settings_menu.addAction(targetAction)
 
         ## -----
         ## Help Menu
@@ -788,3 +800,35 @@ class MyReceiver(QtCore.QObject):
             self.mysignal.emit(text)
             if text == "Exiting":
                 break
+
+
+class TargetDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Target Setup")
+
+        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+
+        self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        layout = QtWidgets.QVBoxLayout()
+        message = QtWidgets.QLineEdit(get_target_id())
+        layout.addWidget(message)
+        layout.addWidget(self.buttonBox)
+        self.setLayout(layout)
+
+
+def set_target_id(target_id):
+    s = f'set "/Targets/Target ID" "{target_id}"'
+    os.system("odbedit -c '" + s + "'")
+
+
+def get_target_id():
+    l = os.popen('odbedit -d "/Targets/Target ID" -c " ls " ').readlines()[0]
+    l = l.split()
+    if l[0] == "Target" and l[1] == "ID":
+        return " ".join(l[2:])
+    return None
