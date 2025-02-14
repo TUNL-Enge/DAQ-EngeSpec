@@ -474,7 +474,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # self.MIDASisRunning = False
 
     def setgate(self):
-        self.SpecCanvas.getGate()
+        # tell the gate function which gate you are on.
+        item = self.treeWidget.selectedItems()
+        if len(item) != 1:
+            print("Cannot set gate when multiple spectra are selected.")
+            return None
+        if item[0].parent() is None:
+            print("Must select gated spectrum!")
+            return None
+        self.SpecCanvas.getGate(item[0].index)
 
     def PopulateTree(self):
         ## Now get the list of spectra and add them to the selection

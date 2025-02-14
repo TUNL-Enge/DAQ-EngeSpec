@@ -65,7 +65,7 @@ class SpectrumCanvas(FigureCanvas):
         # self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
 
         ## Colormaps
-        basecolormap = cm.get_cmap("inferno", 256)
+        basecolormap = cm.get_cmap("viridis", 256)
         newcolors = basecolormap(np.linspace(0, 1, 256))
         newcolors[:1, :] = np.array([0.99, 0.99, 0.99, 1])
         self.cols = ListedColormap(newcolors)
@@ -340,7 +340,7 @@ class SpectrumCanvas(FigureCanvas):
         self.image = self.a.pcolormesh(
             X, Y, H, norm=norm, cmap=self.cols, shading="auto"
         )
-        
+
         if self.lincb:
             self.lincb.update_normal(self.image)
         else:
@@ -503,6 +503,7 @@ class SpectrumCanvas(FigureCanvas):
             self.fig.canvas.draw()
         else:
             zmax = 0
+
             self.Spec2D.zmax = zmax
             self.PlotData2D()
 
@@ -844,7 +845,7 @@ class SpectrumCanvas(FigureCanvas):
         self.SpecColl.ZeroAll()
         self.UpdatePlot()
 
-    def getGate(self):
+    def getGate(self, index):
         if self.is2D:
             self.getNClicks(-1)
             x = self.cxdata
@@ -853,16 +854,14 @@ class SpectrumCanvas(FigureCanvas):
             y.append(y[0])
             self.a.plot(x, y, "r-")
             self.fig.canvas.draw()
-            self.Spec2D.GateIndex += 1
-            ig = self.Spec2D.GateIndex
-            self.Spec2D.gates[ig].setGate(x, y)
+            self.Spec2D.gates[index].setGate(x, y)
 
             # Send the gate over to c++
             self.SpecColl.dm.putGate(
                 self.Spec2D.Name,
-                self.Spec2D.gates[ig].name,
-                self.Spec2D.gates[ig].x,
-                self.Spec2D.gates[ig].y,
+                self.Spec2D.gates[index].name,
+                self.Spec2D.gates[index].x,
+                self.Spec2D.gates[index].y,
             )
         else:
             self.getNClicks(2)
@@ -872,16 +871,14 @@ class SpectrumCanvas(FigureCanvas):
 
             self.a.vlines(x=x, ymin=0.1, ymax=self.a.get_ylim()[1], color="red")
             self.fig.canvas.draw()
-            self.Spec.GateIndex += 1
-            ig = self.Spec.GateIndex
 
-            self.Spec.gates[ig].setGate(x, y)
+            self.Spec.gates[index].setGate(x, y)
             ## Send the gate over to c++
             self.SpecColl.dm.putGate(
                 self.Spec.Name,
-                self.Spec.gates[ig].name,
-                self.Spec.gates[ig].x,
-                self.Spec.gates[ig].y,
+                self.Spec.gates[index].name,
+                self.Spec.gates[index].x,
+                self.Spec.gates[index].y,
             )
 
     def drawGates2D(self, i):
