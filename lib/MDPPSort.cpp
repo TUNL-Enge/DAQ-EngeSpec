@@ -67,7 +67,7 @@
 // typically, in order to cut out room background events, one may set a gate
 // E(Ge)+E(NaI)>4 MeV, or so.
 //
-// Gated Ge spectra (all in channels, not energy) are displayed for: (i) events that
+// Gated Ge spectra (all in energy) are displayed for: (i) events that
 // are located in any TDC true coincidence peak gate (an OR condition is used for
 // the TDC's, i.e., if the event is located in (gate of TDC segment#1) OR (gate of
 // TDC segment#2) OR etc.); (ii) events that are located in any TDC true coincidence
@@ -150,6 +150,7 @@ std::string EngeSort::saysomething(std::string str)
 int Channels1D = 65536;
 int ChannelsTDC = 10000;
 int Channels2D = 500;
+int ChannelsMulti = 20;
 double Energies1D = 10000;
 
 // Compression factor for 1D and 2D histograms
@@ -212,16 +213,17 @@ Histogram *hGeNaITE2d_SV[4];
 // -----------------------
 
 // Ge v NaIsumE (energies); gated on TDCs
-Histogram *h2dGevsNaIsumE;
+Histogram *h2dGevsNaIsumE[4];
 
 // ******************************************************************************
 // OTHER: UTILITIES, ENERGY CALIBRATION
 // ******************************************************************************
 
-// Random number generator for energy calibration [to avoid artifacts]
+// Random number generator setup for Gaussian distribution
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
-std::uniform_real_distribution<double> uniform_sample(-0.1, 0.1);
+// Mean = 0.0, Standard deviation = 1.0 (energu units)
+std::normal_distribution<double> gaussian_sample(0.0, 1.0);
 
 // Utility to add integers to strings [used later]
 std::string name_with_index(std::string name, int index)
@@ -290,18 +292,17 @@ void Calibrator::load_file(std::string filename)
 	}
 }
 
+// Modify the calibrate function to use the Gaussian distribution
 IntVector Calibrator::calibrate(vec_u32 &adc_values)
 {
 	IntVector result(adc_values.size(), 0);
 
 	for (int i = 0; i < adc_values.size(); i++) {
-		// do the calibration
-		auto temp = (double)adc_values[i];
-		// check to make sure we have a adc value and that we have a calibration
+		auto temp = static_cast<double>(adc_values[i]);
 		if ((temp > 0) && (this->slope[i] > 0)) {
 			result[i] = std::round(
 				(this->slope[i] * temp + this->intercept[i]) +
-				uniform_sample(generator));
+				gaussian_sample(generator));
 		}
 	}
 	return result;
@@ -362,7 +363,7 @@ void EngeSort::Initialize()
 	hNaIsumE = new Histogram("NaI Sum E", Channels1D, 1);
 
 	// NaI multiplicity
-	hMulti = new Histogram("NaI Multi", 20, 1);
+	hMulti = new Histogram("NaI Multi", ChannelsMulti, 1);
 
 	// Plastic scintillator ADCs
 	for (int i = 0; i < 9; i++) {
@@ -375,13 +376,6 @@ void EngeSort::Initialize()
 		hSciTDC[i] = new Histogram(name_with_index("Sci TDC ", i),
 					   Channels1D, 1);
 	}
-
-	//------------------------------
-	// 2D Histograms: gated
-	//------------------------------
-
-	// Ge v NaIsumE (energies)
-	h2dGevsNaIsumE = new Histogram("HPGe v NaI", Channels2D, 2);
 
 	//------------------------------
 	// Define gates
@@ -399,9 +393,19 @@ void EngeSort::Initialize()
 		hSciTDC[i]->addGate(name_with_index("Sci TDC Gate", i));
 	}
 
+	// annulus multiplicity gate
+	hMulti->addGate("NaI Multiplicity");
+
+
+	// Ge v NaIsumE (energies)
+	for (int i = 0; i < 4; i++) {
+		h2dGevsNaIsumE[i] = new Histogram(
+			name_with_index("NaI v HPGe ", i), Channels2D, 2);
+	}
+
 	// on 2D histograms of HPGe v NaI (energies)
 	for (int i = 0; i < 4; i++) {
-		h2dGevsNaIsumE->addGate(name_with_index("2D ", i));
+		h2dGevsNaIsumE[i]->addGate(name_with_index("2D_", i));
 	}
 
 	//------------------------------
@@ -419,6 +423,11 @@ void EngeSort::Initialize()
 		hGeNaITE2d_SV[i] = new Histogram(
 			name_with_index("Ge T E SV 2D_", i), Channels1D, 1);
 	}
+
+	//------------------------------
+	// 2D Histograms: gated
+	//------------------------------
+
 
 	//----------------------------------
 	// Initialize the energy calibrators
@@ -501,17 +510,16 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	double SumNaIE = 0.0;
 	int multi = 0;
-	bool first_hit = true;
-	int NaITDC;
 
 	// Sum NaI energies
 	for (int i = 0; i < 16; i++) {
-		Gate &GNaIADC = hNaIADC[i]->getGate(0);
-		Gate &GNaITDC = hNaITDC[i]->getGate(0);
+		Gate &gNaIADC = hNaIADC[i]->getGate(0);
+		Gate &gNaITDC = hNaITDC[i]->getGate(0);
 		// gates on: NaI TDCs and ADCs
-		if (GNaIADC.inGate(qdc_adc[i]) && GNaITDC.inGate(qdc_tdc[i])) {
+		if (gNaIADC.inGate(qdc_adc[i]) && gNaITDC.inGate(qdc_tdc[i])) {
 			// are we summing the energy
 			SumNaIE += (double)nai_cal[i];
+			// multi += 5;
 			multi += 1;
 		}
 	}
@@ -580,7 +588,9 @@ void EngeSort::sort(MDPPEvent &event_data)
 	//------------------------------------------
 
 	if (nai_fire) {
-		h2dGevsNaIsumE->inc(cGeE, cSumNaIE);
+		for (int i = 0; i < 4; i++) {
+			h2dGevsNaIsumE[i]->inc(cGeE, cSumNaIE);
+		}
 	}
 
 	//------------------------------------
@@ -588,9 +598,11 @@ void EngeSort::sort(MDPPEvent &event_data)
 	//------------------------------------
 
 	for (int i = 0; i < 4; i++) {
-		Gate &g2d = h2dGevsNaIsumE->getGate(i);
-		// Do we pass the ith 2D gate AND did NaI fire?
-		if (nai_fire && g2d.inGate(cGeE, cSumNaIE)) {
+		Gate &g2d = h2dGevsNaIsumE[i]->getGate(0);
+		Gate &gMulti = hMulti->getGate(0);
+		// Do we pass the ith 2D gate AND did NaI fire AND NaI multiplicity?
+		if (nai_fire && g2d.inGate(cGeE, cSumNaIE) &&
+		    gMulti.inGate(multi)) {
 			hGeNaITE2d[i]->inc(hpge_cal[0]);
 			// Does the scintillator veto this event?
 			if (!sci_fire) {

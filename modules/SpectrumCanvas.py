@@ -854,15 +854,12 @@ class SpectrumCanvas(FigureCanvas):
             y.append(y[0])
             self.a.plot(x, y, "r-")
             self.fig.canvas.draw()
-            self.Spec2D.gates[index].setGate(x, y)
+            self.Spec2D.gates[index].setGate(
+                self.SpecColl.dm, self.Spec2D.Name, x, y
+            )
 
             # Send the gate over to c++
-            self.SpecColl.dm.putGate(
-                self.Spec2D.Name,
-                self.Spec2D.gates[index].name,
-                self.Spec2D.gates[index].x,
-                self.Spec2D.gates[index].y,
-            )
+
         else:
             self.getNClicks(2)
 
@@ -872,13 +869,8 @@ class SpectrumCanvas(FigureCanvas):
             self.a.vlines(x=x, ymin=0.1, ymax=self.a.get_ylim()[1], color="red")
             self.fig.canvas.draw()
 
-            self.Spec.gates[index].setGate(x, y)
-            ## Send the gate over to c++
-            self.SpecColl.dm.putGate(
-                self.Spec.Name,
-                self.Spec.gates[index].name,
-                self.Spec.gates[index].x,
-                self.Spec.gates[index].y,
+            self.Spec.gates[index].setGate(
+                self.SpecColl.dm, self.Spec.Name, x, y
             )
 
     def drawGates2D(self, i):

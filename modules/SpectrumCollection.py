@@ -86,6 +86,9 @@ class SpectrumCollection:
                     self.spec2d.append(data2[j])
                 else:
                     self.spec1d.append(data2[j])
+                if data2[j].gates:
+                    for g in data2[j].gates:
+                        g.load_gate(self.dm)
 
     ## Save events to a "pickle" file
     def SavePickleData(self):

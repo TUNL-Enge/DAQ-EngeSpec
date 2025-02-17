@@ -138,12 +138,19 @@ class ScalerObject:
 class GateObject:
     def __init__(self):
         self.name = "Test Gate"
+        self.spec_name = None
         self.x = []
         self.y = []
 
-    def setGate(self, x, y):
+    def setGate(self, cpp_module, spec_name, x, y):
         self.x = x
         self.y = y
+        self.spec_name = spec_name
+        cpp_module.putGate(spec_name, self.name, self.x, self.y)
+
+    def load_gate(self, cpp_module):
+        if self.spec_name is not None:
+            cpp_module.putGate(self.spec_name, self.name, self.x, self.y)
 
 
 if __name__ == "__main__":
