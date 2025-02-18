@@ -486,7 +486,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	// it will be added to time differences latter on to ensure
 	// all timing histograms are positive.
 	int ref_time = scp_tdc[0];
-	
+
 	// Now see if the hpge timing optimized channel fired
 	int cGe_t = scp_tdc[2];
 
@@ -559,8 +559,10 @@ void EngeSort::sort(MDPPEvent &event_data)
 		Gate &gSciTDC = hSciTDC[i]->getGate(0);
 		// scintillator fired if there are a signal in the energy OR
 		// timing spectrum
-		sci_fire = sci_fire || (gSciADC.inGate(qdc_adc[i + 17]) ||
-					gSciTDC.inGate(shift_tdc(qdc_tdc[i +17], cGe_t, ref_time)));
+		sci_fire = sci_fire ||
+			   (gSciADC.inGate(qdc_adc[i + 17]) ||
+			    gSciTDC.inGate(shift_tdc(qdc_tdc[i + 17], cGe_t,
+						     ref_time)));
 	}
 
 	//----------------------------------------------------------------
