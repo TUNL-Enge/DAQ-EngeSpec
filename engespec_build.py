@@ -29,6 +29,13 @@ def main(clean):
     # Step 5: Build the libraries
     print("Building sort routine")
 
+    current_path = os.getcwd()
+    temp = current_path.split("EngeSpec")
+    if len(temp) == 1:
+        print("Error: Could not find EngeSpec root directory")
+        exit(1)
+    os.chdir(temp[0] + "EngeSpec")
+
     lib_directory = os.path.abspath("lib")
 
     run_command("cmake .", lib_directory)
@@ -54,7 +61,7 @@ def main(clean):
         os.symlink(source_file, dest_file)
         print(f"Created symbolic link {dest_file} -> {source_file}")
     except OSError as e:
-        print(f"Error creating symbolic link: {e}")
+        print(f"Error: creating symbolic link: {e}")
         exit(1)
 
     print("Build done!")
