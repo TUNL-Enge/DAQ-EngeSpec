@@ -17,7 +17,7 @@
 //       22Na (511 keV) and 60Co (2505 keV sum peak); or 14N(p,g) (763 keV and
 //       2373 keV)
 //  (5)  enter energy calibrations in external files
-//  (6)  set gates in ADC and TDC spectra, both for annulus and scintillators 
+//  (6)  set gates in ADC and TDC spectra, both for annulus and scintillators
 //  (7)  zero all histograms and sort data
 //  (8)  set gate on multiplicity spectrum
 //  (9)  set gates in the 2D spectra
@@ -45,7 +45,7 @@
 // display:
 //   (i)  a 1D NaI sum energy spectrum [which is compressed by some factor]
 //   (ii) 2D Ge vs. NaI sum energy spectra [both axes are compressed]; for both
-//        the Ge and the NaI, the axes are in energy units 
+//        the Ge and the NaI, the axes are in energy units
 //
 // Note 1: the energy in a NaI segment is only summed if the event is located both
 //         in NaI ADC gate and in the Ge-NaI TDC coincidence gate.
@@ -55,16 +55,16 @@
 //
 // For a given energy calibration it is important to choose compression factors
 // and energy spectrum dimensions so that the energy calibrated spectra are
-// compressed, otherwise energy channels with zero counts are produced. 
+// compressed, otherwise energy channels with zero counts are produced.
 //
 // Gates are set on (i) the individual NaI segment ADC spectra (these should be
 // "wide" gates, the lower limit set right above noise and the upper limit set close
 // to the end of the spectrum; only events located in these gates are summed to
 // produce a NaI sum energy signal); (ii) the individual TDC spectra (these should
-// be centered on the true coincidence peak); (iii) the multiplicity spectrum 
-// (typically, you would set a gate to include all multiplicities); (iv) the 2D Ge 
-// (energy) vs. NaI sum (energy) spectrum; 4 gates can be set on the energy regions 
-// of interest; typically, in order to cut out room background events, one may set a 
+// be centered on the true coincidence peak); (iii) the multiplicity spectrum
+// (typically, you would set a gate to include all multiplicities); (iv) the 2D Ge
+// (energy) vs. NaI sum (energy) spectrum; 4 gates can be set on the energy regions
+// of interest; typically, in order to cut out room background events, one may set a
 // gate E(Ge)+E(NaI)>4 MeV, or so.
 //
 // Gated Ge spectra (all in energy) are displayed for specific gating conditions.
@@ -147,14 +147,19 @@ std::string EngeSort::saysomething(std::string str)
 // ******************************************************************************
 
 // Binning to use in the histograms
+
 // ADC channels:
 int Channels1D = 65536;
-// TDC channels; xx ns per channel:
+
+// TDC channels; 781 ps per channel for common settings:
 int ChannelsTDC = 10000;
+
 // compressed channels in 2D histograms (energies):
 int Channels2D = 1000;
+
 // channels in multiplicity spectrum (stretched by factor 5):
 int ChannelsMulti = 100;
+
 // channels in energy spectra:
 double Energies1D = 20000;
 
@@ -341,9 +346,9 @@ void EngeSort::Initialize()
 	//------------------------------
 
 	sBCI = new Scaler("BCI", 0); // Name, index
-	sPulser = new Scaler("Pulser", 1); 
-	sTriggers = new Scaler("Trigger", 2); 
-	sLN2 = new Scaler("LN2", 3); 
+	sPulser = new Scaler("Pulser", 1);
+	sTriggers = new Scaler("Trigger", 2);
+	sLN2 = new Scaler("LN2", 3);
 
 	//------------------------------
 	// 1D Histograms: ungated/vetoed
@@ -426,14 +431,14 @@ void EngeSort::Initialize()
 
 	// on 1D histograms of NaI ADCs and TDCs
 	for (int i = 0; i < 16; i++) {
-		hNaIADC[i] -> addGate(name_with_index("NaI ADC Gate ", i));
-		hNaITDC[i] -> addGate(name_with_index("NaI TDC Gate ", i));
+		hNaIADC[i]->addGate(name_with_index("NaI ADC Gate ", i));
+		hNaITDC[i]->addGate(name_with_index("NaI TDC Gate ", i));
 	}
 
 	// on 1D histograms of plastic scintillator ADCs and TDCs
 	for (int i = 0; i < 9; i++) {
-		hSciADC[i] -> addGate(name_with_index("Sci ADC Gate", i));
-		hSciTDC[i] -> addGate(name_with_index("Sci TDC Gate", i));
+		hSciADC[i]->addGate(name_with_index("Sci ADC Gate", i));
+		hSciTDC[i]->addGate(name_with_index("Sci TDC Gate", i));
 	}
 
 	// annulus multiplicity gate
@@ -441,7 +446,7 @@ void EngeSort::Initialize()
 
 	// on 2D histograms of HPGe v NaI (energies)
 	for (int i = 0; i < 4; i++) {
-		h2dGevsNaIsumE[i] -> addGate(name_with_index("2D_", i));
+		h2dGevsNaIsumE[i]->addGate(name_with_index("2D_", i));
 	}
 
 	//----------------------------------
@@ -449,8 +454,8 @@ void EngeSort::Initialize()
 	//----------------------------------
 
 	// read from external files for HPGe and NaI segments
-	this -> calibrator_annulus_ps.load_file("nai_cal.csv");
-	this -> calibrator_hpge.load_file("hpge_cal.csv");
+	this->calibrator_annulus_ps.load_file("nai_cal.csv");
+	this->calibrator_hpge.load_file("hpge_cal.csv");
 }
 
 // ******************************************************************************
@@ -460,10 +465,10 @@ void EngeSort::Initialize()
 // Increment scalers
 void EngeSort::incScalers(uint32_t *dSCAL)
 {
-	sPulser -> inc(dSCAL);
-	sBCI -> inc(dSCAL);
-	sTriggers -> inc(dSCAL);
-	sLN2 -> inc(dSCAL);
+	sPulser->inc(dSCAL);
+	sBCI->inc(dSCAL);
+	sTriggers->inc(dSCAL);
+	sLN2->inc(dSCAL);
 }
 
 void EngeSort::sort(MDPPEvent &event_data)
@@ -500,7 +505,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	bool pulser_event = false;
 	if (cpulser > 0) {
-		hPulser -> inc(scp_adc[0]);
+		hPulser->inc(scp_adc[0]);
 		pulser_event = true;
 	}
 
@@ -510,25 +515,25 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	// HPGe
 	if (!pulser_event) {
-		hGe -> inc(scp_adc[0]);
-		hGeE -> inc(hpge_cal[0]);
+		hGe->inc(scp_adc[0]);
+		hGeE->inc(hpge_cal[0]);
 	}
 
 	// NaI
 	for (int i = 0; i < 16; i++) {
-		hNaIADC[i] -> inc(qdc_adc[i]);
-		hNaITDC[i] -> inc(shift_tdc(qdc_tdc[i], cGe_t, ref_time));
+		hNaIADC[i]->inc(qdc_adc[i]);
+		hNaITDC[i]->inc(shift_tdc(qdc_tdc[i], cGe_t, ref_time));
 	}
 
 	// Plastic Scintillator
 	for (int i = 0; i < 9; i++) {
-		hSciADC[i] -> inc(qdc_adc[i + 17]);
-		hSciTDC[i] -> inc(shift_tdc(qdc_tdc[i + 17], cGe_t, ref_time));
+		hSciADC[i]->inc(qdc_adc[i + 17]);
+		hSciTDC[i]->inc(shift_tdc(qdc_tdc[i + 17], cGe_t, ref_time));
 	}
 
 	//----------------------------------------------------------
-	// Sum energies of NaI segments; determine multiplicity and 
-    // if annulus fired
+	// Sum energies of NaI segments; determine multiplicity and
+	// if annulus fired
 	//----------------------------------------------------------
 
 	double SumNaIE = 0.0;
@@ -537,12 +542,12 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	// Determine if NaI fired; sum NaI energies
 	for (int i = 0; i < 16; i++) {
-		Gate &gNaIADC = hNaIADC[i] -> getGate(0);
-		Gate &gNaITDC = hNaITDC[i] -> getGate(0);
+		Gate &gNaIADC = hNaIADC[i]->getGate(0);
+		Gate &gNaITDC = hNaITDC[i]->getGate(0);
 
 		// Check if both ADC and TDC signals are in gate
-		if (gNaIADC.inGate(qdc_adc[i]) && 
-            gNaITDC.inGate(shift_tdc(qdc_tdc[i], cGe_t, ref_time))) {
+		if (gNaIADC.inGate(qdc_adc[i]) &&
+		    gNaITDC.inGate(shift_tdc(qdc_tdc[i], cGe_t, ref_time))) {
 			// Sum the energy and count multiplicity
 			SumNaIE += static_cast<double>(nai_cal[i]);
 			multi += 5;
@@ -558,8 +563,8 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	bool sci_fire = false;
 	for (int i = 0; i < 9; i++) {
-		Gate &gSciADC = hSciADC[i] -> getGate(0);
-		Gate &gSciTDC = hSciTDC[i] -> getGate(0);
+		Gate &gSciADC = hSciADC[i]->getGate(0);
+		Gate &gSciTDC = hSciTDC[i]->getGate(0);
 		// scintillator fired if there are a signal in the energy OR
 		// timing spectrum
 		sci_fire = sci_fire ||
@@ -573,11 +578,11 @@ void EngeSort::sort(MDPPEvent &event_data)
 	//----------------------------------------------------------------
 
 	if (!pulser_event && !sci_fire) {
-		hGe_SV -> inc(scp_adc[0]);
+		hGe_SV->inc(scp_adc[0]);
 	}
 
 	if (!pulser_event && !nai_fire) {
-		hGe_NaIV -> inc(scp_adc[0]);
+		hGe_NaIV->inc(scp_adc[0]);
 	}
 
 	//------------------------------------
@@ -587,13 +592,13 @@ void EngeSort::sort(MDPPEvent &event_data)
 	// Increment NaI energy sum and multiplicity histograms;
 	// they are gated on NaI ADCs and TDCs
 	if (nai_fire) {
-		hNaIsumE -> inc(SumNaIE);
-		hMulti -> inc(multi);
+		hNaIsumE->inc(SumNaIE);
+		hMulti->inc(multi);
 	}
 
 	//-----------------------------------------------------
 	// Compress variables for 2D histograms in energy units and
-    // increment compressed 2D histogram (gated)   
+	// increment compressed 2D histogram (gated)
 	//-----------------------------------------------------
 
 	// compressed variables (energies)
@@ -602,7 +607,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	if (nai_fire) {
 		for (int i = 0; i < 4; i++) {
-			h2dGevsNaIsumE[i] -> inc(cGeE, cSumNaIE);
+			h2dGevsNaIsumE[i]->inc(cGeE, cSumNaIE);
 		}
 	}
 
@@ -611,8 +616,8 @@ void EngeSort::sort(MDPPEvent &event_data)
 	//---------------------------------------------
 
 	for (int i = 0; i < 4; i++) {
-		Gate &g2d = h2dGevsNaIsumE[i] -> getGate(0);
-		Gate &gMulti = hMulti -> getGate(0);
+		Gate &g2d = h2dGevsNaIsumE[i]->getGate(0);
+		Gate &gMulti = hMulti->getGate(0);
 		// Check if:
 		//   - No scintillator veto (!sci_fire)
 		//   - NaI fired (nai_fire)
@@ -620,8 +625,9 @@ void EngeSort::sort(MDPPEvent &event_data)
 		//   - The event passes the NaI multiplicity gate (gMulti.inGate(multi))
 		if (!sci_fire && nai_fire && g2d.inGate(cGeE, cSumNaIE) &&
 		    gMulti.inGate(multi)) {
-			hGeTE2dSV[i] -> inc(hpge_cal[0]); // Increment HPGe histogram
-			hNaITE2dSV[i] -> inc(SumNaIE); // Increment NaI histogram
+			hGeTE2dSV[i]->inc(
+				hpge_cal[0]); // Increment HPGe histogram
+			hNaITE2dSV[i]->inc(SumNaIE); // Increment NaI histogram
 		}
 	}
 }
@@ -650,6 +656,7 @@ int EngeSort::runMidasAnalyzer(boost::python::list file_list)
 		std::cout << " " << file;
 		filename += file + " ";
 	}
+	filename += " --no-profiler";
 
 	std::cout << std::endl;
 	std::cout << filename << std::endl;
@@ -823,8 +830,6 @@ void EngeSort::putGate(std::string name, std::string gname, p::list x,
 				Gate &G1 = h->getGate(ig);
 				if (G1.getName() == gname) {
 					G1.Clear();
-					//G1.Print();
-
 					p::ssize_t len = p::len(x);
 					// Make a vector for the gate
 					for (int i = 0; i < len; i++) {
@@ -837,7 +842,6 @@ void EngeSort::putGate(std::string name, std::string gname, p::list x,
 								y[i]));
 						G1.addVertex(tmp);
 					}
-					//G1.Print();
 				}
 			}
 		}
@@ -873,15 +877,13 @@ void MidasAnalyzerModule::Init(const std::vector<std::string> &args)
 void MidasAnalyzerModule::Finish()
 {
 	printf("Finish!\n");
-	printf("Counted %d events\n", fTotalEventCounter);
-	std::cout << "number of spectra: " << eA->getSpectrumNames().size()
-		  << std::endl;
 	eA->setIsRunning(false);
 }
 
 TARunObject *MidasAnalyzerModule::NewRunObject(TARunInfo *runinfo)
 {
-	printf("NewRunObject, run %d, file %s\n", runinfo->fRunNo,
+	printf("\n\n-------------------------------------------------\n");
+	printf("Loading run file, run %d, file %s\n", runinfo->fRunNo,
 	       runinfo->fFileName.c_str());
 	eA->setIsRunning(true);
 	return new MidasAnalyzerRun(runinfo, this);

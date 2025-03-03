@@ -374,13 +374,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         gateAction = QtGui.QAction(
             QtGui.QIcon(iconDir + "MakeGate.ico"), "Set Gate", self
         )
+
+        zeroAction = QtGui.QAction(
+            QtGui.QIcon(iconDir + "ZeroIcon.ico"), "Zero all", self
+        )
+        zeroAction.setToolTip("Zero all spectra")
+        zeroAction.triggered.connect(self.zeroall)
+
         gateAction.triggered.connect(self.setgate)
 
         self.runControlsToolbar = self.addToolBar("Exit")
         self.runControlsToolbar.addAction(exitAction)
+        self.runControlsToolbar.addSeparator()
         self.runControlsToolbar.addAction(startAction)
         self.runControlsToolbar.addAction(stopAction)
+        self.runControlsToolbar.addSeparator()
         self.runControlsToolbar.addAction(gateAction)
+        self.runControlsToolbar.addAction(zeroAction)
 
         # self.rebinSlider.setFixedWidth(20)
         right_spacer = QtWidgets.QWidget()
@@ -455,6 +465,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def sort(self):
         self.SpecColl.sort()
+
+    def zeroall(self):
+        self.SpecCanvas.ZeroAll()
 
     def startmidas(self):
 

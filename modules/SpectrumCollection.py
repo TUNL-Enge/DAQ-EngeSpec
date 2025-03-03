@@ -188,7 +188,7 @@ class MidasThread(QThread):
 
         self.specColl = specColl
 
-        print(self.specColl.offlinefiles)
+        # print(self.specColl.offlinefiles)
 
         print(self.specColl.dm.sayhello())
         ## Initialize the DataMaker
