@@ -1,1 +1,1 @@
-convert FENRISLogo.svg -define icon:auto-resize FENRIS.ico
+magick ReloadIcon.svg -transparent white -define icon:auto-resize ReloadIcon.ico

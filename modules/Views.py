@@ -341,11 +341,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         gateAction = QtGui.QAction(QtGui.QIcon(iconDir + 'MakeGate.ico'), 'Set Gate', self)
         gateAction.triggered.connect(self.setgate)
 
+        zeroAction = QtGui.QAction(QtGui.QIcon(iconDir + 'ZeroIcon.ico'), 'Zero all', self)
+        zeroAction.setToolTip("Zero all spectra")
+        zeroAction.triggered.connect(self.zeroall)
+        
         self.runControlsToolbar = self.addToolBar('Exit')
         self.runControlsToolbar.addAction(exitAction)
         self.runControlsToolbar.addAction(startAction)
         self.runControlsToolbar.addAction(stopAction)
         self.runControlsToolbar.addAction(gateAction)
+        ## Add a Splitter
+        self.runControlsToolbar.addSeparator()
+        self.runControlsToolbar.addAction(zeroAction)
 
         #self.rebinSlider.setFixedWidth(20)
         right_spacer = QtWidgets.QWidget()
@@ -444,6 +451,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def setgate(self):
         self.SpecCanvas.getGate()
 
+    def zeroall(self):
+        self.SpecCanvas.ZeroAll()
+        
     def PopulateTree(self):
         ## Now get the list of spectra and add them to the selection
         ## tree
@@ -627,10 +637,10 @@ class MyCustomToolbar(NavigationToolbar):
         self._actions['zoomout'] = self.a
 
         ## Zero all spectra
-        self.a = self.addAction(QtGui.QIcon(iconDir + "ZeroIcon.ico"),
-                                "Zero all", plotCanvas.ZeroAll)
-        self.a.setToolTip("Zero all spectra")
-        self._actions['zeroall'] = self.a
+        ##self.a = self.addAction(QtGui.QIcon(iconDir + "ZeroIcon.ico"),
+        ##                        "Zero all", plotCanvas.ZeroAll)
+        ##self.a.setToolTip("Zero all spectra")
+        ##self._actions['zeroall'] = self.a
 
 
         

@@ -52,6 +52,9 @@ add_library( EngeSort SHARED EngeSort.cpp)
 add_library( v1730Sort SHARED v1730Sort.cpp)
 
 # Build our Sort Routine
+add_library( MDPPSort_CI SHARED MDPPSort_CI.cpp)
+
+# Build our Sort Routine
 add_library( MDPPSort SHARED MDPPSort.cpp)
 
 # Build our Sort Routine
