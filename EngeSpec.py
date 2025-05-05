@@ -4,6 +4,7 @@ from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication
 import sys
 import random
+import time
 
 ## All code is in the modules folder
 sys.path.append('./modules')
@@ -32,8 +33,8 @@ ui.show()
 
 ## make a queue and direct sys.stdout to it
 commandqueue = Queue()
-sys.stdout = WriteStream(commandqueue)
-sys.stderr = WriteStream(commandqueue)
+#sys.stdout = WriteStream(commandqueue)
+#sys.stderr = WriteStream(commandqueue)
 
 ## Now create a receiver to listen to the queue
 commandthread = QtCore.QThread()
@@ -41,7 +42,7 @@ commandreceiver = MyReceiver(commandqueue)
 commandreceiver.mysignal.connect(ui.append_text)
 commandreceiver.moveToThread(commandthread)
 commandthread.started.connect(commandreceiver.run)
-commandthread.start()
+#commandthread.start()
 
 #app.exit(app.exec_())
 
