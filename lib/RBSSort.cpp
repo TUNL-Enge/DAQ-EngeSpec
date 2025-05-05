@@ -71,7 +71,7 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
   int c165=0;
   // Define the channels
   if(ADCsize > 0){
-    c165 = dADC[16];
+    c165 = dADC[0];
   }
   
   // Increment 1D histograms
@@ -394,11 +394,13 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
   fRunEventCounter = 0;
+	fModule->eA->setIsRunning(true);
 }
 
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
+	fModule->eA->setIsRunning(false);
 }
 
 BOOST_PYTHON_MODULE(EngeSort)

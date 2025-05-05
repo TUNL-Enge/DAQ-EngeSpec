@@ -34,6 +34,7 @@ class EngeSort {
   
   std::string sayhello( );
   std::string saygoodbye( );
+  //std::string saysomething(std::string mesg);
   void Initialize();
   void ClearData();
   
@@ -46,6 +47,8 @@ class EngeSort {
   np::ndarray getData2D();
 
   void sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC);
+  void FillEndOfRun(int nEvents);
+  // void incScalers(uint32_t *dSCAL);
   
   BoolVector getis2Ds();
   IntVector getNGates();

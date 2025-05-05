@@ -4,7 +4,7 @@
 #include <chrono>
 #include <cmath>		
 
-#include "RBSSort.h"
+#include "88SrSort.h"
 #include "TV792Data.hxx"
 
 Messages messages;
@@ -20,13 +20,17 @@ int Channels1D = 4096;
 int Channels2D = 512;
 
 // 1D Spectra
-Histogram *hDet20;
-Histogram *hDet40;
-Histogram *hDet60;
-Histogram *hDet80;
+Histogram *hDet0;
+Histogram *hDet1;
+Histogram *hDet2;
+Histogram *hDet3;
 Histogram *hNaI;
 Histogram *hMonitor;
 Histogram *hNaICal;
+
+// 2D Spectra
+Histogram *hRecoilvsEjectile0;
+Histogram *hRecoilvsEjectile1;
 
 // Counters
 int totalCounter=0;
@@ -52,14 +56,18 @@ void EngeSort::Initialize(){
   
   //--------------------
   // 1D Histograms
-  hDet20 = new Histogram("Detector 0", Channels1D, 1);
-  hDet40 = new Histogram("Detector 1", Channels1D, 1);
-  hDet60 = new Histogram("Detector 2", Channels1D, 1);
-  hDet80 = new Histogram("Detector 3", Channels1D, 1);
+  hDet0 = new Histogram("Detector 0", Channels1D, 1);
+  hDet1 = new Histogram("Detector 1", Channels1D, 1);
+  hDet2 = new Histogram("Detector 2", Channels1D, 1);
+  hDet3 = new Histogram("Detector 3", Channels1D, 1);
   hMonitor = new Histogram("Monitor Detector", Channels1D, 1);
   hNaI = new Histogram("NaI Detector", Channels1D, 1);
   hNaICal = new Histogram("NaI Energy Calibrated", Channels1D, 1);
 
+	// 2D Histograms
+	hRecoilvsEjectile0 = new Histogram("Ejectile-Recoil Coincidence 0-2", Channels2D, 2);
+	hRecoilvsEjectile1 = new Histogram("Ejectile-Recoil Coincidence 1-2", Channels2D, 2);
+	
   // Build the scalers 
   sGates = new Scaler("Total Gates", 0);    // Name, index
   sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
@@ -79,13 +87,10 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 
   double ADCsize = nADC; //sizeof(&dADC)/sizeof(&dADC[0]);
 
-  //std::cout << ADCsize << "  " << TDCsize << std::endl;
-  //std::cout << dADC << "  " << dTDC << std::endl;
 
 	// Calibration for the NaI detector
 	double slope = 5.436860068259382;
 	double intercept = -749.8174061433435;
-	
   // Thresholds
   int Threshold = 150;
   for (int i=0; i<ADCsize; i++) {
@@ -93,11 +98,11 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 			dADC[i]=0;
 		}
 	}
-  //  std::cout << "Done thresholding" << std::endl;
-	int c20 = 0;
-	int c40 = 0;
-	int c60 = 0;
-	int c80 = 0;
+
+	int c0 = 0;
+	int c1 = 0;
+	int c2 = 0;
+	int c3 = 0;
 	int cMon = 0;
 	int cNaI = 0;
 	int cNaICal = 0;
@@ -105,10 +110,10 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
   // Define the channels
   if(ADCsize > 0){
 
-		c20 = dADC[0];
-		c40 = dADC[1];
-		c60 = dADC[2];
-		c80 = dADC[3];
+		c0 = dADC[0];
+		c1 = dADC[1];
+		c2 = dADC[2];
+		c3 = dADC[3];
 	  cMon = dADC[4];
 		cNaI = dADC[5];
 		
@@ -117,14 +122,25 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 	cNaICal = std::round(((slope * cNaI + intercept) / 10.0)
 											 + uniform_sample(generator)); // Compress by a factor of 2 
 	
-  // Increment 1D histogramsx
-  hDet20 -> inc(c20);
-  hDet40 -> inc(c40);
-  hDet60 -> inc(c60);
-  hDet80 -> inc(c80);
+  // Increment 1D histograms
+  hDet0 -> inc(c0);
+  hDet1 -> inc(c1);
+  hDet2 -> inc(c2);
+  hDet3 -> inc(c3);
 	hMonitor -> inc(cMon);
 	hNaI -> inc(cNaI);
 	hNaICal -> inc(cNaICal);
+
+	// Compress the 2D counts.
+
+	int cc0 = (int) (c0 / 8);
+	int cc1 = (int) (c1 / 8);
+	int cc2 = (int) (c2 / 8);
+	// // Ejectile-Recoil Coincidences
+	hRecoilvsEjectile0 -> inc(cc0, cc2);
+	hRecoilvsEjectile1 -> inc(cc1, cc2);
+
+	
 	
 }
 
@@ -446,11 +462,13 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("ODB Run start time: %d: %s", (int)run_start_time, ctime(&run_start_time));
 
   fRunEventCounter = 0;
+	fModule->eA->setIsRunning(true);
 }
 
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   printf("End run %d\n",runinfo->fRunNo);
   printf("Counted %d events\n",fRunEventCounter);
+	fModule->eA->setIsRunning(false);
 }
 
 BOOST_PYTHON_MODULE(EngeSort)

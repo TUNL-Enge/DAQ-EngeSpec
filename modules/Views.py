@@ -7,6 +7,8 @@ from PySide2.QtCore import QUrl
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_tools import ToolBase
 import time
+import subprocess
+from datetime import datetime
 from queue import Queue, Empty
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -87,7 +89,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dataFrame.setMinimumSize(900,600)
         ##
         scalerFrame = QtWidgets.QFrame()
-        scalerFrame.setMinimumSize(100,720) ## (200, 720) crashes X11 on Windows- Will
+        scalerFrame.setMinimumSize(150,720) ## (200, 720) crashes X11 on Windows- Will
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -118,11 +120,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.PopulateTree()
 
         ##----------------------------------------------------------------------
-        ## The scaler window
+        ## Scaler frame
+        self.scalerFramevbox = QtWidgets.QVBoxLayout()
+
+        ## Run info
+        self.runinfogroup = QtWidgets.QGroupBox("Run Info")
+        self.runinfogroup.setAlignment(QtCore.Qt.AlignCenter)
+                
+        ## The scaler list
         scalertitle = QtWidgets.QLabel()
         scalertitle.setText("Scalers")
         scalertitle.setAlignment(QtCore.Qt.AlignCenter)
-        self.scalerFramevbox = QtWidgets.QVBoxLayout()
+
+        self.scalerFramevbox.addWidget(self.runinfogroup)
         self.scalerFramevbox.addWidget(scalertitle)
         self.scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
         ## now two vboxes in the gbox
@@ -389,8 +399,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def connectmidas(self):
         self.SpecColl.connectmidas()
         self.PopulateTree()
+        self.PopulateRuninfo()
         self.PopulateScalers()
         self.SpecCanvas.setSpecIndex(0,False)
+        self.isOnline = True
 
         view = QWebEngineView()
         view.load(QUrl("http://localhost:8080/"))
@@ -413,7 +425,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecCanvas.setSpecIndex(0,False)
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
-
+        self.isOnline = False
+        
         ## Grey out unsafe menu items!
         self.sortAction.setEnabled(True)
         self.connectOnlineAction.setEnabled(False)
@@ -426,8 +439,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##print("Running midas")
       
         self.SpecColl.startmidas()
-        self.midas_thread.start()
-        self.runningIndicator.showMessage("MIDAS is running...")
+
+
+        if self.isOnline:
+            self.midas_thread.start()
         
         if not self.scalersRunning:
             self.scaler_thread.start()
@@ -508,6 +523,63 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                          allitems[0].parent().spec.is2D,allitems[0].index)
         self.rebinSlider.setValue(self.n)
         Ui_MainWindow.rebin_action(self)
+
+    ## Build the runinfo box
+    def PopulateRuninfo(self):
+        ## Row for the start time
+        hbox = QtWidgets.QHBoxLayout()
+        lab = QtWidgets.QLabel("Run Number: ")
+        proc = subprocess.Popen(["odbedit -d Runinfo -c 'ls -v \"run number\"'"],
+                                stdout=subprocess.PIPE, shell=True)
+        (runno, err) = proc.communicate()
+        self.runnoval = QtWidgets.QLabel(str(int(runno)))
+        self.runnoval.setAlignment(QtCore.Qt.AlignRight)
+        self.runnoval.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        hbox.addWidget(lab)
+        hbox.addWidget(self.runnoval)
+
+        ## Row for the star time of the run
+        hbox2 = QtWidgets.QHBoxLayout()
+        lab = QtWidgets.QLabel("Start time: ")
+        proc = subprocess.Popen(["odbedit -d Runinfo -c 'ls -v \"start time\"'"],
+                                stdout=subprocess.PIPE, shell=True)
+        (starttime, err) = proc.communicate()
+
+        format = '%a %b %d %H:%M:%S %Y'
+        dd = datetime.strptime(starttime.decode().strip(), format)
+        stime = dd.strftime('%H:%M:%S')
+        
+        self.starttimeval = QtWidgets.QLabel(stime)
+        self.starttimeval.setAlignment(QtCore.Qt.AlignRight)
+        self.starttimeval.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        hbox2.addWidget(lab)
+        hbox2.addWidget(self.starttimeval)
+
+        ## Row for the duration so far
+        hbox3 = QtWidgets.QHBoxLayout()
+        lab = QtWidgets.QLabel("Run duration: ")
+        now = datetime.now()
+        duration = now-dd
+        dtime = str(duration).split('.', 2)[0]#.strftime('%H Hours, %M Minutes, %S Seconds')
+        self.dtimeval = QtWidgets.QLabel(dtime)
+        self.dtimeval.setAlignment(QtCore.Qt.AlignRight)
+        self.dtimeval.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        hbox3.addWidget(lab)
+        hbox3.addWidget(self.dtimeval)
+
+        
+        #runinfo_start = QtWidgets.QLabel("Start time: ")
+        #runinfo_stop  = QtWidgets.QLabel("Stop  time: ")
+        runinfo_vbox = QtWidgets.QVBoxLayout()
+        runinfo_vbox.addLayout(hbox)
+        runinfo_vbox.addLayout(hbox2)
+        runinfo_vbox.addLayout(hbox3)
+        #runinfo_vbox.addWidget(runinfo_start)
+        #runinfo_vbox.addWidget(runinfo_stop)
+        self.runinfogroup.setLayout(runinfo_vbox)
+        
+
+        
     ## Build the list of scalers
     def PopulateScalers(self):
         ## Build a bunch of labels in the right-hand scaler frame
@@ -541,6 +613,31 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.sclrval[isclr].setText("{}".format(sc.N))
             ##self.sclrval[isclr].setText(format(sc.N))
             isclr = isclr+1
+
+    ## Update run info
+    def UpdateRuninfo(self):
+        proc = subprocess.Popen(["odbedit -d Runinfo -c 'ls -v \"run number\"'"],
+                                stdout=subprocess.PIPE, shell=True)
+        (runno, err) = proc.communicate()
+        ##print(runno)
+        self.runnoval.setText(str(int(runno)))
+
+        proc = subprocess.Popen(["odbedit -d Runinfo -c 'ls -v \"start time\"'"],
+                                stdout=subprocess.PIPE, shell=True)
+        (starttime, err) = proc.communicate()
+        ##print(starttime)
+        format = '%a %b %d %H:%M:%S %Y'
+        dd = datetime.strptime(starttime.decode().strip(), format)
+        stime = dd.strftime('%H:%M:%S')
+        self.starttimeval.setText(stime)
+
+        now = datetime.now()
+        ##print(now)
+        duration = now-dd
+        dtime = str(duration).split('.', 2)[0]
+        ##print(dtime)
+        self.dtimeval.setText(dtime)
+        
         
 class ScalerCollectionThread(QtCore.QThread):
     def __init__(self,view):
@@ -576,6 +673,9 @@ class MidasStatusThread(QtCore.QThread):
         while True: ##self.specColl.MIDASisRunning:
             ##print("Collecting MIDAS Status")
             isRunning = self.specColl.dm.getIsRunning()
+            ##print("isRunning = ",isRunning, " self.wasRunning = ",self.wasRunning)
+            if(isRunning):
+                self.view.UpdateRuninfo()
             ##print("isRunning = ",isRunning, " self.wasRunning = ",self.wasRunning)
             if((not self.wasRunning) and isRunning):
                 ##print("Changing logo to running logo")
