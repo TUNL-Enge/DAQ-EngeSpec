@@ -61,8 +61,8 @@ class Histogram{
   //void setNGates(int ng){nGates = ng;}
   std::string getName(){return Name;}
   int getnChannels(){return nChannels;}
-  std::vector<int> getData1D(){return Bins1D;}
-  std::vector<std::vector<int>> getData2D(){return Bins2D;}
+  std::vector<int>& getData1D(){return Bins1D;}
+  std::vector<std::vector<int>>& getData2D(){return Bins2D;}
   int getNGates(){return GateCollection.size();}
   void addGate(std::string gname);
   Gate& getGate(int i){return GateCollection[i];}
@@ -80,7 +80,6 @@ class Histogram{
   std::vector<Gate> GateCollection;
 
 };
-
 
 //----------------------------------------------------------------------
 // SCALERS
@@ -109,6 +108,12 @@ class Scaler{
 
 };
 
+// Global variables that are needed by the sort routine.
+
+extern std::vector<Histogram*> Histograms;
+extern std::vector<Scaler*> Scalers;
+extern int nHist1D;
+extern int nHist2D;
 
 extern std::vector<Scaler*> Scalers;
 extern std::vector<Histogram*> Histograms;

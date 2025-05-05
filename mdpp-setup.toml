@@ -1,0 +1,15 @@
+# HPGe + Annulus
+
+[[modules]]
+name = "scp1"
+address = "0xE1FA0000"
+mod_type = "scp"
+nchannels = 16
+setup_file = "./user-config-files/hpge-pulsing.scm"
+
+[[modules]]
+name = "qdc1"
+address = "0x70000000"
+mod_type = "qdc"
+nchannels = 32
+setup_file = "./user-config-files/nai-plastic-config.scm"

@@ -1,6 +1,8 @@
-//#ifndef EngeAnalyzer_H
-//#define EngeAnalyzer_H
+#ifndef MDPP_SORT_H
+#define MDPP_SORT_H
+
 #include "EngeAnalyzerlib.h"
+#include "MDPPEventHandler.h"
 
 #include <vector>
 #include <random>
@@ -10,6 +12,7 @@
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "boost/multi_array.hpp"
+#include <fstream>
 
 #include "manalyzer.h"
 #include "midasio.h"
@@ -24,115 +27,154 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<bool> BoolVector;
 typedef std::vector<int> IntVector;
 
+// This class holds the calibration for one module within the system.
+class Calibrator {
+    public:
+	Calibrator()
+	{
+	}
+
+	void load_file(std::string filename);
+
+	IntVector calibrate(vec_u32 &adc_values);
+
+    private:
+	vec slope;
+	vec intercept;
+};
 
 //class EngeAnalyzer: public TRootanaEventLoop {
 class EngeSort {
- public:
-  
-  EngeSort() {}
-  
-  std::string sayhello( );
-  std::string saygoodbye( );
+    public:
+	EngeSort()
+	{
+	}
+
+	std::string sayhello();
+	std::string saygoodbye();
 	std::string saysomething(std::string);
-  void Initialize();
-  void ClearData();
-  void SimulateData();
+	void Initialize();
+	void ClearData();
+	void SimulateData();
 
-  // Connect the midas analyzer
-  int connectMidasAnalyzer();
-  int runMidasAnalyzer(boost::python::list file_list);
-  
-  // New 2d matrix method
-  np::ndarray getData();
-  np::ndarray getData2D();
+	// Connect the midas analyzer
+	int connectMidasAnalyzer();
+	int runMidasAnalyzer(boost::python::list file_list);
 
-  void sort(uint32_t *dMDPP, int nMDPP);
-  void incScalers(uint32_t *dSCAL);
-  
-  BoolVector getis2Ds();
-  IntVector getNGates();
-  StringVector getGateNames(std::string hname);
-  StringVector getSpectrumNames();
-  StringVector getScalerNames();
-  IntVector getScalers();
+	// New 2d matrix method
+	np::ndarray getData();
+	np::ndarray getData2D();
 
-  void setIsRunning(bool isr){isRunning = isr;}
-  bool getIsRunning(){return isRunning;}
+	void sort(MDPPEvent &event_data);
+	void incScalers(uint32_t *dSCAL);
 
-  
-  // Gate passing
-  void putGate(std::string name, std::string gname, p::list x, p::list y);
-  
-  // For returning the old data arrays (clean this up later)
-  std::vector<int>::iterator begin(){
-    return Dat[0].begin();
-  }
-  std::vector<int>::iterator end(){
-    return Dat[0].end();
-  }
-  
-  
- private:
+	BoolVector getis2Ds();
+	IntVector getNGates();
+	IntVector getNChannels();
+	StringVector getGateNames(std::string hname);
+	StringVector getSpectrumNames();
+	StringVector getScalerNames();
+	IntVector getScalers();
 
-  // The analyzer module
-  //MidasAnalyzerModule mAMod;
+	void setIsRunning(bool isr)
+	{
+		isRunning = isr;
+	}
+	bool getIsRunning()
+	{
+		return isRunning;
+	}
 
-  
-  bool isRunning = false;
+	Calibrator calibrator_annulus_ps;
+	Calibrator calibrator_hpge;
 
-  std::vector<int> Dat[2];
-  std::vector<bool> is2D;
-  std::vector<bool> hasGate;
-  std::vector<std::vector<int>> DataMatrix;
-  std::vector<std::vector<std::vector<int>>> DataMatrix2D;
-  std::default_random_engine generator;
+	// Gate passing
+	void putGate(std::string name, std::string gname, p::list x, p::list y);
 
-  //  std::vector<std::vector<std::vector<double>>> GateCollection;
-  std::vector<Gate> GateCollection;
+	// For returning the old data arrays (clean this up later)
+	std::vector<int>::iterator begin()
+	{
+		return Dat[0].begin();
+	}
+	std::vector<int>::iterator end()
+	{
+		return Dat[0].end();
+	}
 
-  // Scaler list
-  //std::vector<int> Scalers;
-  
-  // Some counters
-  int ipeak1 = 0;
-  int ipeak2 = 0;
-  int igated = 0;
+    private:
+	// The analyzer module
+	//MidasAnalyzerModule mAMod;
+
+	bool isRunning = false;
+
+	std::vector<int> Dat[2];
+	std::vector<bool> is2D;
+	std::vector<bool> hasGate;
+	std::vector<std::vector<int> > DataMatrix;
+	std::vector<std::vector<std::vector<int> > > DataMatrix2D;
+	std::default_random_engine generator;
+
+	//  std::vector<std::vector<std::vector<double>>> GateCollection;
+	std::vector<Gate> GateCollection;
+
+	// Scaler list
+	//std::vector<int> Scalers;
+
+	// Some counters
+	int ipeak1 = 0;
+	int ipeak2 = 0;
+	int igated = 0;
 };
 
 /*
   Classes for manalyzer-type analyzer
 */
-class MidasAnalyzerModule: public TAFactory{
- public:
-  void Init(const std::vector<std::string> &args);
-  void ConnectEngeAnalyzer(EngeSort *ea){eA=ea;}
-  void Finish();
-  TARunObject* NewRunObject(TARunInfo* runinfo);
-    
-  int fTotalEventCounter;
-  EngeSort *eA;
+class MidasAnalyzerModule : public TAFactory {
+    public:
+	void Init(const std::vector<std::string> &args);
+	void ConnectEngeAnalyzer(EngeSort *ea)
+	{
+		eA = ea;
+	}
+	void Finish();
+	TARunObject *NewRunObject(TARunInfo *runinfo);
+
+	int fTotalEventCounter;
+	EngeSort *eA;
 };
 
 MidasAnalyzerModule mAMod;
 
-class MidasAnalyzerRun: public TARunObject{
- public:
+class MidasAnalyzerRun : public TARunObject {
+    public:
+	MidasAnalyzerRun(TARunInfo *runinfo, MidasAnalyzerModule *m)
+		: TARunObject(runinfo)
+	{
+		fModule = m;
+		fRunEventCounter = 0;
+	}
+	~MidasAnalyzerRun()
+	{
+	}
 
- MidasAnalyzerRun(TARunInfo* runinfo, MidasAnalyzerModule *m)
-   : TARunObject(runinfo){
-    fModule = m;
-    fRunEventCounter = 0;
-  }
-  ~MidasAnalyzerRun(){}
-    
-  void BeginRun(TARunInfo* runinfo);
-  void EndRun(TARunInfo* runinfo);
-  void PauseRun(TARunInfo* runinfo){}
-  void ResumeRun(TARunInfo* runinfo){}
-    
-  TAFlowEvent* Analyze(TARunInfo* runinfo, TMEvent* event, TAFlags* flags, TAFlowEvent* flow);
-  void AnalyzeSpecialEvent(TARunInfo* runinfo, TMEvent* event){}
-    
-  int fRunEventCounter;
-  MidasAnalyzerModule* fModule;
+	void BeginRun(TARunInfo *runinfo);
+	void EndRun(TARunInfo *runinfo);
+	void PauseRun(TARunInfo *runinfo)
+	{
+	}
+	void ResumeRun(TARunInfo *runinfo)
+	{
+	}
+
+	TAFlowEvent *Analyze(TARunInfo *runinfo, TMEvent *event, TAFlags *flags,
+			     TAFlowEvent *flow);
+	void AnalyzeSpecialEvent(TARunInfo *runinfo, TMEvent *event)
+	{
+	}
+
+	int fRunEventCounter;
+	MidasAnalyzerModule *fModule;
+	MDPPEvent mdpp_event;
 };
+
+#endif

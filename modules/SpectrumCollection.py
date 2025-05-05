@@ -1,9 +1,9 @@
 ## All of the stuff for opening spectra
-from PyQt5.QtCore import Qt, QThread, QTimer
+from PyQt5.QtCore import QThread
 from PySide6.QtWidgets import QApplication, QFileDialog, QStatusBar
 import numpy as np
-import pandas as pd
-#import matplotlib.pyplot as plt
+
+# import matplotlib.pyplot as plt
 import time
 import os.path
 import pickle
@@ -11,8 +11,9 @@ import pickle
 from SpectrumHandlers import *
 
 ## Import my own c++ library!
-if os.path.exists('EngeSort.so'):
+if os.path.exists("EngeSort.so"):
     import EngeSort
+
 
 class SpectrumCollection:
     def __init__(self, num):
@@ -25,10 +26,9 @@ class SpectrumCollection:
 
         self.sclr = [ScalerObject(0)]
         self.statusBar = QStatusBar()
-        
-        
+
         ## Load the data library
-        if os.path.exists('EngeSort.so'):
+        if os.path.exists("EngeSort.so"):
             self.dm = EngeSort.EngeSort()
 
         self.isRunning = False
@@ -38,28 +38,28 @@ class SpectrumCollection:
 
         self.filedir = None
         self.offlinefiles = [""]
-        
+
     def __str__(self):
-        return 'Spectrum Collection Name: {}'.format(self.Name)
+        return "Spectrum Collection Name: {}".format(self.Name)
 
     ## Print some summary details
     def printSummary(self):
         print(self)
         ## 1D spectra
         l = len(self.spec1d)
-        print("There are",l,"1D spectra:")
+        print("There are", l, "1D spectra:")
         for i in range(l):
             sObj = self.spec1d[i]
             print(sObj)
 
         ## 2D spectra
         l = len(self.spec2d)
-        print("There are",l,"2D spectra:")
+        print("There are", l, "2D spectra:")
         for i in range(l):
             sObj = self.spec2d[i]
             print(sObj)
 
-    def addSpectrum(self,name):
+    def addSpectrum(self, name):
         ## Make a new 1D Histogram
         sObj = SpectrumObject(len(self.spec1d))
         sObj.Name = name
@@ -70,48 +70,49 @@ class SpectrumCollection:
         self.spec2d.clear()
         print("Cleared spectrum collection")
 
-
-
     def LoadPickleData(self):
-        filename = QFileDialog.getOpenFileName(None,
-                                               "Open Data Collection", "./",
-                                               "Data Files (*.pkl)")
-        print("Loading: ",filename[0])
-        with open(filename[0], 'rb') as input:
+        filename = QFileDialog.getOpenFileName(
+            None, "Open Data Collection", "./", "Data Files (*.pkl)"
+        )
+        print("Loading: ", filename[0])
+        with open(filename[0], "rb") as input:
             data = pickle.load(input)
         self.spec1d = []
         self.spec2d = []
         for i in range(len(data)):
             data2 = data[i]
             for j in range(len(data2)):
-                if(data2[j].is2D):
+                if data2[j].is2D:
                     self.spec2d.append(data2[j])
                 else:
                     self.spec1d.append(data2[j])
-                
+                if data2[j].gates:
+                    for g in data2[j].gates:
+                        g.load_gate(self.dm)
 
     ## Save events to a "pickle" file
     def SavePickleData(self):
-        filename = QFileDialog.getSaveFileName(None,
-                                               "Save Data Collection", "./",
-                                               "Data Files (*.pkl)")
-        print("Saving: ",filename[0])
+        filename = QFileDialog.getSaveFileName(
+            None, "Save Data Collection", "./", "Data Files (*.pkl)"
+        )
+        print("Saving: ", filename[0])
 
         ## First make a dataframe out of all of the spectra
         ## Compare "Sort" below with "Create2D.py" script.
         self.printSummary()
 
         #### Make simplified 1D and 2D spectra
-        my_list = list([self.spec1d,self.spec2d])
+        my_list = list([self.spec1d, self.spec2d])
         print(my_list)
 
         def save_object(obj, filename):
-            with open(filename, 'wb') as output:  # Overwrites any existing file.
+            with open(
+                filename, "wb"
+            ) as output:  # Overwrites any existing file.
                 pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
-
         save_object(my_list, filename[0])
-        
+
     def ZeroAll(self):
         for i in self.spec1d:
             i.spec.fill(0)
@@ -122,8 +123,8 @@ class SpectrumCollection:
         for i in self.sclr:
             i.N = 0
 
-        self.dm.ClearData();
-            
+        self.dm.ClearData()
+
     ## Connect midas for data collection
     def connectmidas(self):
         self.midas_thread = MidasThread(self)
@@ -131,10 +132,10 @@ class SpectrumCollection:
 
     ## Replay midas
     def offlinemidas(self):
-#        filename = QFileDialog.getOpenFileNames(None,
-#                                               "Sort MIDAS File(s)", "./",
-#                                               "MIDAS Files (*.mid *.mid.*)")
-#        self.offlinefiles = filename[0]#"run00031.mid.lz4"
+        #        filename = QFileDialog.getOpenFileNames(None,
+        #                                               "Sort MIDAS File(s)", "./",
+        #                                               "MIDAS Files (*.mid *.mid.*)")
+        #        self.offlinefiles = filename[0]#"run00031.mid.lz4"
         self.midas_thread = MidasThread(self)
         self.isOnline = False
 
@@ -142,9 +143,12 @@ class SpectrumCollection:
     def sort(self):
         if self.filedir is None:
             self.filedir = os.getenv("HOME")
-        filename = QFileDialog.getOpenFileNames(None,
-                                                "Sort MIDAS File(s)", self.filedir,
-                                                "MIDAS Files (*.mid *.mid.*)")
+        filename = QFileDialog.getOpenFileNames(
+            None,
+            "Sort MIDAS File(s)",
+            self.filedir,
+            "MIDAS Files (*.mid *.mid.*)",
+        )
         self.offlinefiles = filename[0]
         print("Queued files:", filename[0])
         self.filedir = os.path.dirname(filename[0][0])
@@ -156,52 +160,48 @@ class SpectrumCollection:
         if not self.midas_thread.isRunning():
             self.midas_thread.start()
         self.MIDASisRunning = True
-        
+
         ##self.midas_collection_thread.start()
         if self.isOnline:
             os.system("odbedit -c start")
-            
+
     def stopmidas(self):
         print("MIDAS finished running")
         ## Collect the last bunch of data (not working currently)
         if self.MIDASisRunning:
-            #time.sleep(0.5)
+            # time.sleep(0.5)
             if self.isOnline:
                 os.system("odbedit -c stop")
                 self.midas_collection_thread.start()
                 self.MIDASLastAgg = True
                 self.MIDASisRunning = False
-            #else:
-             #   print("Finished")
-              #  self.MIDASLastAgg = True
-               # self.MIDASisRunning = False
+            # else:
+            #   print("Finished")
+            #  self.MIDASLastAgg = True
+            # self.MIDASisRunning = False
+
+
 ## Run MIDAS in a separate thread so it doesn't lock up the GUI
 class MidasThread(QThread):
-    def __init__(self,specColl):
+    def __init__(self, specColl):
         super().__init__()
-        
+
         self.specColl = specColl
 
-        print(self.specColl.offlinefiles)
-        
+        # print(self.specColl.offlinefiles)
+
         print(self.specColl.dm.sayhello())
         ## Initialize the DataMaker
         self.specColl.dm.Initialize()
-        
+
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
         self.sclrnames = self.specColl.dm.getScalerNames()
-        ##self.sclr = [0] * len(self.sclrnames)   ## fill the scalers with 0
-        ## print(len(self.sclrnames)," scalers have been made:")
-        ## for name in self.sclrnames:
-        ##     print(" - ",name)
-        ## print(len(self.names)," Spectra have been made:")
-        ## for name in self.names:
-        ##     print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.NGates = self.specColl.dm.getNGates()
-        
+        self.NBins = self.specColl.dm.getNChannels()
+
         ## First delete the old spectra
         self.specColl.spec1d = []
         self.specColl.spec2d = []
@@ -210,46 +210,46 @@ class MidasThread(QThread):
         self.specColl.sclr = []
 
         ## Make the empty spectra
-        counter1d=0
-        counter2d=0
+        counter1d = 0
+        counter2d = 0
         for i in range(len(self.names)):
             if not self.is2Ds[i]:
-                sObj = SpectrumObject(counter1d)
+                sObj = SpectrumObject(counter1d, self.NBins[i])
                 sObj.Name = self.names[i]
                 sObj.NGates = self.NGates[i]
                 ## Fill the gate names
-                if(sObj.NGates>0):
+                if sObj.NGates > 0:
                     gnames = self.specColl.dm.getGateNames(sObj.Name)
                     for j in range(len(gnames)):
                         gObj = GateObject()
                         gObj.name = gnames[j]
                         sObj.gates.append(gObj)
-                                            
                 sObj.spec = np.zeros(sObj.NBins)
+
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
                 sObj.spec[0] = 1
                 sObj.spec_temp[:] = sObj.spec
                 self.specColl.spec1d.append(sObj)
-                counter1d = counter1d+1
+                counter1d = counter1d + 1
             else:
-                sObj = SpectrumObject2D(counter2d)
+                sObj = SpectrumObject2D(counter2d, self.NBins[i])
                 sObj.Name = self.names[i]
                 sObj.NGates = self.NGates[i]
                 ## Fill the gate names
-                if(sObj.NGates>0):
+                if sObj.NGates > 0:
                     gnames = self.specColl.dm.getGateNames(sObj.Name)
                     for j in range(len(gnames)):
                         gObj = GateObject()
                         gObj.name = gnames[j]
                         sObj.gates.append(gObj)
-                sObj.xedges = np.array([x for x in range(0,sObj.NBins)])
-                sObj.yedges = np.array([y for y in range(0,sObj.NBins)])
+                sObj.xedges = np.array([x for x in range(0, sObj.NBins)])
+                sObj.yedges = np.array([y for y in range(0, sObj.NBins)])
                 ## TODO: FIX THIS! Just so scaling works on an empty spectrum
-                sObj.spec2d[0,0] = 1
-                sObj.spec2d[sObj.NBins-1,sObj.NBins-1] = 1
+                sObj.spec2d[0, 0] = 1
+                sObj.spec2d[sObj.NBins - 1, sObj.NBins - 1] = 1
                 sObj.spec2d_temp[:] = sObj.spec2d
                 self.specColl.spec2d.append(sObj)
-                counter2d = counter2d+1
+                counter2d = counter2d + 1
 
         ## Make the empty scalers
         for i in range(len(self.sclrnames)):
@@ -259,80 +259,67 @@ class MidasThread(QThread):
 
         ## Connect the analyzer to MIDAS
         self.specColl.dm.connectMidasAnalyzer()
-            
+
     def run(self):
         print("Running MIDAS")
-        #self.specColl.MIDASisRunning = True
+        # self.specColl.MIDASisRunning = True
         self.specColl.dm.runMidasAnalyzer(self.specColl.offlinefiles)
 
-       # self.setStatusBar(self.runningIndicator)
-        
+        # self.setStatusBar(self.runningIndicator)
+
         ## Nothing executes past runMidasAnalyzer
         while self.specColl.dm.getIsRunning():
             time.sleep(1)
-            
+
         print("MIDAS finished running")
-        self.specColl.statusBar.showMessage("hello")
-        print(self.specColl.dm.saysomething(""));
-        ## Collect the last bunch of data 
-        #self.specColl.midas_collection_thread.start()
-        #self.specColl.MIDASisRunning = False
-        #self.specColl.dm.connectMidasAnalyzer()
+        self.specColl.statusBar.showMessage("")
+        print(self.specColl.dm.saysomething(""))
+        ## Collect the last bunch of data
+        # self.specColl.midas_collection_thread.start()
+        # self.specColl.MIDASisRunning = False
+        # self.specColl.dm.connectMidasAnalyzer()
+
 
 class MidasCollectionThread(QThread):
-    def __init__(self,specColl):
+    def __init__(self, specColl):
         super().__init__()
-
         self.specColl = specColl
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
-        ##print(len(self.names)," Spectra have been made:")
-        ##for name in self.names:
-        ##    print(" - ",name)
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.NGates = self.specColl.dm.getNGates()
 
     def run(self):
-        print("Collecting MIDAS data")
-        while True: ##self.specColl.MIDASisRunning:
-##            print("isRunning!")
-            ##print("MidasCollectionThread start 1D fetch: ",time.time())
-            dat = np.transpose(self.specColl.dm.getData())
-            ##print("MidasCollectionThread end 1D fetch: ",time.time())
-            ##print("MidasCollectionThread start 2D fetch: ",time.time())
-            dat2d = self.specColl.dm.getData2D()
-            ##print("MidasCollectionThread end 2D fetch: ",time.time())
+        # probably the huge copy that occurs here
+        dat = np.transpose(self.specColl.dm.getData())
+        dat2d = self.specColl.dm.getData2D()
+        ## Update the scalers
+        sclrvals = self.specColl.dm.getScalers()
+        for i in range(len(self.specColl.sclr)):
+            self.specColl.sclr[i].N = sclrvals[i]
 
-            ## Update the scalers
-            ##print("MidasCollectionThread start scaler fetch: ",time.time())
-            sclrvals = self.specColl.dm.getScalers()
-            for i in range(len(self.specColl.sclr)):
-                self.specColl.sclr[i].N = sclrvals[i]
-            ##print("MidasCollectionThread end scaler fetch: ",time.time())
+        ## Go through the names and fill them for the appropriate data
+        counter1d = 0
+        counter2d = 0
+        for i in range(0, len(self.names)):
+            if not self.is2Ds[i]:
+                sObj = self.specColl.spec1d[counter1d]
+                sObj.spec_temp[:] = dat[: sObj.NBins, counter1d]
+                counter1d = counter1d + 1
+            else:
+                sObj = self.specColl.spec2d[counter2d]
+                sObj.spec2d_temp[:] = dat2d[
+                    counter2d, : sObj.NBins, : sObj.NBins
+                ]
+                counter2d = counter2d + 1
 
-            ## Go through the names and fill them for the appropriate data
-            ##print("MidasCollectionThread start namefill: ",time.time())
-            counter1d=0
-            counter2d=0
-            for i in range(0,len(self.names)):
-                if not self.is2Ds[i]:
-                    sObj = self.specColl.spec1d[counter1d]
-                    sObj.spec_temp[:] = dat[:,counter1d]
-                    counter1d = counter1d+1
-                else:
-                    sObj = self.specColl.spec2d[counter2d]
-                    sObj.spec2d_temp[:] = dat2d[counter2d,:,:]
-                    counter2d = counter2d+1
-            ##print("MidasCollectionThread end namefill: ",time.time())
-                
-            #time.sleep(1)
-            break  ## run only once for data collection when the update button is pressed
-        
-            
-## Run this if this file is run alone for debugging purposes            
-if __name__ == '__main__':
-    #import matplotlib.pyplot as plt
+        # run only once for data collection when the update button is pressed
+
+
+## Run this if this file is run alone for debugging purposes
+if __name__ == "__main__":
+    # import matplotlib.pyplot as plt
     SpecColl = SpectrumCollection(0)
 
     app = QApplication([])

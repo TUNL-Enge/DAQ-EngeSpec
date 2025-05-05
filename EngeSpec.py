@@ -7,12 +7,13 @@ import random
 import time
 
 ## All code is in the modules folder
-sys.path.append('./modules')
+sys.path.append("./modules")
 
 from Views import Ui_MainWindow, WriteStream, MyReceiver
 from SpectrumCanvas import *
 from SpectrumCollection import *
-#from SpectrumHandlers import *
+
+# from SpectrumHandlers import *
 from queue import Queue
 
 ## Define the spectrum
@@ -21,7 +22,7 @@ app = QApplication([])
 
 ## Here is a new comment
 
-## Load and initialize a collection of spectra 
+## Load and initialize a collection of spectra
 SpecColl = SpectrumCollection(0)
 
 ## Load the spectrum drawing routines
@@ -44,15 +45,13 @@ commandreceiver.moveToThread(commandthread)
 commandthread.started.connect(commandreceiver.run)
 #commandthread.start()
 
-#app.exit(app.exec_())
+# app.exit(app.exec_())
 
-app.exec_()
+app.exec()
 
 ## A little trick to make the text printer exit nicely
 print("Exiting")
 commandthread.quit()
-#commandthread.wait()
+# commandthread.wait()
 
 app.exit(0)
-
-

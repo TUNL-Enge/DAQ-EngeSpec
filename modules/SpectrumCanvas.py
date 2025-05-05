@@ -2,10 +2,13 @@ import matplotlib
 import matplotlib.gridspec as gridspec
 import numpy as np
 from PySide6.QtWidgets import QSizePolicy
-from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, \
-                                                NavigationToolbar2QT as NavigationToolbar)
-matplotlib.rcParams['toolbar'] = 'toolmanager'
-#matplotlib.rcParams['toolbar'] = 'toolmanager'
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar,
+)
+
+matplotlib.rcParams["toolbar"] = "toolmanager"
+# matplotlib.rcParams['toolbar'] = 'toolmanager'
 from matplotlib.figure import Figure
 from matplotlib.widgets import SpanSelector
 from matplotlib.backend_tools import ToolBase, ToolToggleBase
@@ -16,24 +19,27 @@ from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import copy
 import time
+
 # Victor's additional libraries:
-#import IPython.display as display
+# import IPython.display as display
 from scipy.special import gammaincc as gam
 from scipy.special import erfinv
 from scipy.optimize import curve_fit as cf
+
 # Will's additional libraries:
 from lmfit import Model
 
 
 class SpectrumCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
     def __init__(self, SpecColl=None, parent=None, width=5, height=4, dpi=50):
 
         ## Keep track of what spectrum is currently being displayed on this canvas
         self.sindex1d = 0
         self.sindex1dOverlay = 0
         self.sindex2d = 0
-        
+
         self.SpecColl = SpecColl
         self.Spec = SpecColl.spec1d[self.sindex1d]
         self.SpecOverlay = 0
@@ -50,50 +56,50 @@ class SpectrumCanvas(FigureCanvas):
         self.doFitGaus = True
         
         self.isZoomed = False
-        
+
         self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.fig.subplots_adjust(top=0.96,bottom=0.115,left=0.082,right=.979)
-        self.gs = gridspec.GridSpec(2,1,height_ratios=[11,1])
+        self.fig.subplots_adjust(
+            top=0.96, bottom=0.115, left=0.082, right=0.979
+        )
+        self.gs = gridspec.GridSpec(2, 1, height_ratios=[11, 1])
         self.a = self.fig.add_subplot(self.gs[0])
         self.fig.tight_layout()
-        self.fig.subplots_adjust(hspace = .07)
-        #self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
-        
+        self.fig.subplots_adjust(hspace=0.07)
+        # self.a.format_coord = lambda x, y: "x = % 8.1f \ny = % 8.1f" % (x,y)
+
         ## Colormaps
-        ##basecolormap = cm.ColormapRegistry.get_cmap("inferno")
-        basecolormap = matplotlib.colormaps['inferno']
-        newcolors = basecolormap(np.linspace(0,1,256))
-        newcolors[:1,:] = np.array([0.99,0.99,0.99,1])
+        basecolormap = cm.get_cmap("viridis", 256)
+        newcolors = basecolormap(np.linspace(0, 1, 256))
+        newcolors[:1, :] = np.array([0.99, 0.99, 0.99, 1])
         self.cols = ListedColormap(newcolors)
 
         self.a.set_xlim(self.Spec.xzoom)
-        #self.a.set_ylim([0,800])
+        # self.a.set_ylim([0,800])
         self.a.set_xlabel("channel")
         self.a.set_ylabel("counts")
         self.a.tick_params(labelsize=20)
 
-        self.maximumX    = self.Spec.NBins-1
+        self.maximumX = self.Spec.NBins - 1
         ##self.isLogPlot  = False
-        self.isReslot   = False
+        self.isReslot = False
 
-        self.stream=None
-        self.key=0
+        self.stream = None
+        self.key = 0
 
         self.lincb = False
         self.colorbar_axes = None
         self.original_loc = self.a.get_axes_locator()
-        
+
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
-        FigureCanvas.setSizePolicy(self,
-                                   QSizePolicy.Expanding,
-                                   QSizePolicy.Expanding)
+        FigureCanvas.setSizePolicy(
+            self, QSizePolicy.Expanding, QSizePolicy.Expanding
+        )
         FigureCanvas.updateGeometry(self)
         self.fc = FigureCanvas
 
-##        self.cid = FigureCanvas.mpl_connect(self, 'button_press_event', self.onclick)
+        ##        self.cid = FigureCanvas.mpl_connect(self, 'button_press_event', self.onclick)
 
-        
         ## This shouldn't happen, but check that we don't have a zeros spectrum
         if not self.Spec.spec.any():
             print("WARNING: Spectrum hasn't been initialized!")
@@ -151,29 +157,29 @@ class SpectrumCanvas(FigureCanvas):
             self.sindex2d = i
             self.Spec2D = self.SpecColl.spec2d[self.sindex2d]
             self.Spec2D.GateIndex = drawGate
-        else:            
+        else:
             self.sindex1d = i
             ##self.sindex2d = 0
             self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.is2D = is2D
         self.SpecOverlay = []
-        self.PlotGeneral(is2D,drawGate)
+        self.PlotGeneral(is2D, drawGate)
 
     def setOverlayIndex(self, i):
         ##print("Overlaying spectrum ",i)
         self.sindex1dOverlay = i
         self.SpecOverlay = self.SpecColl.spec1d[self.sindex1dOverlay]
         self.PlotData()
-        
-    def PlotGeneral(self,is2D,drawGate=-1):
+
+    def PlotGeneral(self, is2D, drawGate=-1):
         if not is2D:
             self.PlotData(drawGate)
         else:
             self.PlotData2D(drawGate)
-            
+
     def LoadASCIIData(self):
         self.SpecColl.addSpectrum("Test Spectrum")
-        idx = len(self.SpecColl.spec1d)-1
+        idx = len(self.SpecColl.spec1d) - 1
         self.setSpecIndex(idx, is2D=False)
         self.Spec = self.SpecColl.spec1d[idx]
         self.Spec.LoadASCIIData()
@@ -190,131 +196,111 @@ class SpectrumCanvas(FigureCanvas):
         self.SpecColl.LoadPickleData()
         self.sindex1d = 0
         for i in range(len(self.SpecColl.spec1d)):
-            self.SpecColl.spec1d[i].isLog=False
+            self.SpecColl.spec1d[i].isLog = False
         for i in range(len(self.SpecColl.spec2d)):
-            self.SpecColl.spec2d[i].isLog=False
+            self.SpecColl.spec2d[i].isLog = False
         self.Spec = self.SpecColl.spec1d[self.sindex1d]
         self.PlotData()
         ##self.PlotData2D()
-    
+
     def SavePickleData(self):
         self.SpecColl.SavePickleData()
 
-    def PlotData(self,drawGate=-1, reBin = []):
-        x = np.array([x for x in range(0,self.Spec.NBins)],dtype=int)
+    def PlotData(self, drawGate=-1, reBin=[]):
+        x = np.arange(self.Spec.NBins, dtype=int)
         y = self.Spec.spec
 
         self.x = x
         self.y = y
 
-        if len(reBin)!=0:
+        if len(reBin) != 0:
             x = np.array(reBin[0][0])
             y = np.array(reBin[1][0])
 
-                 
         ## delete the 2D colorbar
         if self.lincb:
             self.image.remove()
-            #self.lincb.remove()
+            # self.lincb.remove()
             self.lincb = False
             self.fig.delaxes(self.colorbar_axes)
             self.colorbar_axes = None
             self.a.set_axes_locator(self.original_loc)
 
-        ##self.a.set_axes_locator(self.original_loc)
-        
+        # TODO: Make this aware of the data...
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
         ymin = self.Spec.yzoom[0]
         ymax = self.Spec.yzoom[1]
 
-     #   if self.autobin:
-            ## Auto rebin.
-            ## The principle, here, is to plot a maximum of
-            ## nBinMax bins, so rebin the data to fit
-      #     byBin = round((xmax-xmin)/1000)
-       #     print("auto binning by: ",byBin)
-        #    x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-         #   y_rebin = np.zeros(len(x_rebin))
-          #  for i in range(len(x_rebin)):
-                #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-           #     y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-       # else:
-        #    x_rebin = x
-         #   y_rebin = y
         x_rebin = x
         y_rebin = y
-        
-        self.a.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
+
+        self.a.format_coord = (
+            lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x, y)
+        )
         self.a.clear()
         if not self.dots:
-            
-            self.a.step(x_rebin,y_rebin,'k',where='mid')
-            #self.a.step(x,y,'k',where='mid')
+
+            self.a.step(x_rebin, y_rebin, "k", where="mid")
+            # self.a.step(x,y,'k',where='mid')
         else:
-            self.a.plot(x_rebin, y_rebin, 'k+')
-            
-        self.a.set_xlim([xmin,xmax])
-        self.a.set_ylim([ymin,ymax])
+            self.a.plot(x_rebin, y_rebin, "k+")
+
+        self.a.set_xlim([xmin, xmax])
+        self.a.set_ylim([ymin, ymax])
         if self.Spec.isLog:
-            self.a.set_ylim([0.1,self.a.get_ylim()[1]])
-            self.a.set_yscale('log')
+            self.a.set_ylim([0.1, self.a.get_ylim()[1]])
+            self.a.set_yscale("log")
             #        self.Resize()
 
         ## Now the overlay spectrum
         if self.SpecOverlay:
             y = self.SpecOverlay.spec
-            self.a.step(x,y,'red',alpha=0.6,where='mid')
-
+            self.a.step(x, y, "red", alpha=0.6, where="mid")
 
         if drawGate == -1:
             for i in range(self.Spec.NGates):
-                #print(i)
-                if len(self.Spec.gates[i].x)>0:
+                if len(self.Spec.gates[i].x) > 0:
                     self.drawGates(i)
         else:
-            if len(self.Spec.gates[drawGate].x)>0:
-                    self.drawGates(drawGate)
-                    
+            if len(self.Spec.gates[drawGate].x) > 0:
+                self.drawGates(drawGate)
+
         self.fig.canvas.draw()
         self.twoD = False
-        
+
     def ReBin(self, binNum):
         try:
             n = binNum
             new_y = []
-            new_x = list(range(self.x[0],len(self.x),n))
-            
-            if new_x.count(self.x[-1])==0:
+            new_x = list(range(self.x[0], len(self.x), n))
+
+            if new_x.count(self.x[-1]) == 0:
                 new_x.append(self.x[-1])
 
             for i in range(len(new_x)):
-                if i==len(new_x)-1:
-                    y_vals = self.y[i*n:len(self.y)]
-                    if len(y_vals)==0:
+                if i == len(new_x) - 1:
+                    y_vals = self.y[i * n : len(self.y)]
+                    if len(y_vals) == 0:
                         new_y.append(self.y[-1])
                     else:
-                        new_y.append(sum(y_vals)/len(y_vals))
+                        new_y.append(sum(y_vals) / len(y_vals))
 
-                        
                 else:
-                    y_vals = self.y[i*n:(i+1)*n]
+                    y_vals = self.y[i * n : (i + 1) * n]
 
-                    if len(y_vals)==0:
+                    if len(y_vals) == 0:
                         new_y.append(self.y[i])
                     else:
-                        new_y.append(sum(y_vals)/len(y_vals))
+                        new_y.append(sum(y_vals) / len(y_vals))
 
-            SpectrumCanvas.PlotData(self, reBin = [[new_x],[new_y]])
-
-            ##print("Re-binned by "+str(binNum))
+            SpectrumCanvas.PlotData(self, reBin=[[new_x], [new_y]])
             self.n1 = n
-            
-            
+
         except:
             print("No bins currently displayed")
-        
-    def PlotData2D(self,drawGate=-1, reBin = []):
+
+    def PlotData2D(self, drawGate=-1, reBin=[]):
         xmin = self.Spec2D.xzoom[0]
         xmax = self.Spec2D.xzoom[1]
         ymin = self.Spec2D.yzoom[0]
@@ -323,102 +309,97 @@ class SpectrumCanvas(FigureCanvas):
         H = self.Spec2D.spec2d.T
         xe = self.Spec2D.xedges
         ye = self.Spec2D.yedges
-        #print(ye)
-        X, Y = np.meshgrid(xe,ye)
-        #print(X)
-        #print(Y)
 
+        X, Y = np.meshgrid(xe, ye)
         self.X = X.astype(int)
         self.Y = Y.astype(int)
         self.H = H
 
-        if len(reBin)!=0:
+        if len(reBin) != 0:
             H = np.array(reBin[0])
-            X = np.array(reBin[1]+[X[0][-1]])
-            Y = np.array(reBin[2]+[Y[-1][0]])
+            X = np.array(reBin[1] + [X[0][-1]])
+            Y = np.array(reBin[2] + [Y[-1][0]])
 
-            X,Y = np.meshgrid(X,Y)
+            X, Y = np.meshgrid(X, Y)
 
-        x = xe[xe>xmin]# & xe<xmax]
-        x = x[x<xmax].astype(int)
-        y = ye[ye>ymin]# & ye<ymax]
-        y = y[y<ymax].astype(int)
-        Xcut, Ycut = np.meshgrid(x,y)
+        x = xe[xe > xmin]  # & xe<xmax]
+        x = x[x < xmax].astype(int)
+        y = ye[ye > ymin]  # & ye<ymax]
+        y = y[y < ymax].astype(int)
+        Xcut, Ycut = np.meshgrid(x, y)
 
         if self.Spec2D.zmax == 0:
-            Hmax = H[Xcut,Ycut].max()
+            Hmax = H[Xcut, Ycut].max()
             self.Spec2D.zmax = Hmax
         else:
-           # Hmax = self.Spec2D.zmax
+            # Hmax = self.Spec2D.zmax
             Hmax = np.amax(H)
 
         if Hmax == 0:
             Hmax = 1
-            #Hmax = self.Spec2D.zmax
+            # Hmax = self.Spec2D.zmax
         Nc = 255
-        cbreak = np.zeros(Nc+1)
+        cbreak = np.zeros(Nc + 1)
         if not self.Spec2D.isLog:
             cbreak[1] = 1.0
-            for i in range(1,Nc):
-                cbreak[i+1] = 1+i* Hmax/(Nc-1)
+            for i in range(1, Nc):
+                cbreak[i + 1] = 1 + i * Hmax / (Nc - 1)
         else:
             cbreak[1] = 0
-            for i in range(1,Nc):
-                cbreak[i+1] = i* np.log10(Hmax)/(Nc-1)
-            cbreak = 10**(cbreak)
-            cbreak[0]=0.1
+            for i in range(1, Nc):
+                cbreak[i + 1] = i * np.log10(Hmax) / (Nc - 1)
+            cbreak = 10 ** (cbreak)
+            cbreak[0] = 0.1
 
-        norm = BoundaryNorm(cbreak,Nc)
+        norm = BoundaryNorm(cbreak, Nc)
         self.norm = norm
-        
+
         def format_coord(x, y):
-            col = int(x/self.n2)
-            row = int(y/self.n2)
-            if col >= 0 and col < (self.Spec2D.NBins-1) and row >= 0 and row < (self.Spec2D.NBins-1):
+            col = int(x / self.n2)
+            row = int(y / self.n2)
+            if (
+                col >= 0
+                and col < (self.Spec2D.NBins - 1)
+                and row >= 0
+                and row < (self.Spec2D.NBins - 1)
+            ):
                 z = H[row, col]
-                return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(x, y, z)
-            return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(0, 0, 0)
-            
+                return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(
+                    x, y, z
+                )
+            return "(x,y) = ({0:<4.0f}, {1:>4.0f}) \nz = {2:>8.0f}".format(
+                0, 0, 0
+            )
+
         self.a.format_coord = format_coord
         self.a.clear()
-        ##self.image = self.a.pcolormesh(X,Y,H,vmin=0,vmax= Hmax,norm = norm,cmap=self.cols)
-        
-        self.image = self.a.pcolormesh(X,Y,H,norm = norm,cmap=self.cols, shading = "auto")
-       # self.image = self.a.pcolormesh(H, norm = norm, cmap=self.cols)
+
+        self.image = self.a.pcolormesh(
+            X, Y, H, norm=norm, cmap=self.cols, shading="auto"
+        )
+
         if self.lincb:
             self.lincb.update_normal(self.image)
         else:
-            ##self.sm = cm.ScalarMappable(norm=norm,cmap= self.cols)
             divider = make_axes_locatable(self.a)
             cax = divider.append_axes("right", size="3%", pad="5%")
-            ##blah = divider.append_axes("right",size="5%",pad="5%",add_to_figure=False)
-            ##cax = make_axes_locatable(self.a).new_horizontal(size="3%", pad="1%")
-            self.lincb = self.fig.colorbar(self.image,cax=cax)
-            ##self.lincb = matplotlib.pyplot.colorbar(image)#,cax=cax)
-        ##self.lincb = self.fig.colorbar(self.image,cax=self.colorbar_axes)
+            self.lincb = self.fig.colorbar(self.image, cax=cax)
         self.a, self.colorbar_axes = self.fig.get_axes()
 
-        self.a.set_xlim([xmin,xmax])
-        self.a.set_ylim([ymin,ymax])
+        self.a.set_xlim([xmin, xmax])
+        self.a.set_ylim([ymin, ymax])
 
-        #self.lincb.remove()
-        #self.lincb = False
-        #self.a.set_axes_locator(self.original_loc)
         if drawGate == -1:
-            ##for g in self.Spec2D.gates:
-            ##print("NGates = ",self.Spec2D.NGates)
             for i in range(self.Spec2D.NGates):
-                ##print(i)
-                if len(self.Spec2D.gates[i].x)>0:
+                if len(self.Spec2D.gates[i].x) > 0:
                     self.drawGates2D(i)
         else:
-            if len(self.Spec2D.gates[drawGate].x)>0:
-                    self.drawGates2D(drawGate)
+            if len(self.Spec2D.gates[drawGate].x) > 0:
+                self.drawGates2D(drawGate)
 
         self.updateSlider()
         self.fig.canvas.draw()
 
-        
         self.twoD = True
 
         
@@ -426,84 +407,72 @@ class SpectrumCanvas(FigureCanvas):
         print("ReBin2D: This shouldn't have been called!")
         try:
             n = binNum
-            
-            
-            new_y = list(range(self.Y[0][0],len(self.Y[0])-1,n))
-            new_x = list(range(self.X[0][0],len(self.X[0])-1,n))
 
-    
+            new_y = list(range(self.Y[0][0], len(self.Y[0]) - 1, n))
+            new_x = list(range(self.X[0][0], len(self.X[0]) - 1, n))
+
             new_H = []
 
-
-        
-           # if new_x[-1]!=self.X[0][-2]:
+            # if new_x[-1]!=self.X[0][-2]:
             #    new_x.append(self.X[0][-2])
-                
-           # if new_y[-1]!=self.Y[-2][0]:
+
+            # if new_y[-1]!=self.Y[-2][0]:
             #    new_y.append(self.Y[-2][0])
 
-            
             for i in range(len(new_y)):
-            
+
                 new_h = []
-                
-                if i == len(new_y)-1:
-                    y_indices = list(range(n*i,self.Y[-2][0]))
+
+                if i == len(new_y) - 1:
+                    y_indices = list(range(n * i, self.Y[-2][0]))
 
                     if len(y_indices) == 0:
                         y_indices = [self.Y[-2][0]]
 
                 else:
-                    y_indices = list(range(n*i,(i+1)*n))
-            
+                    y_indices = list(range(n * i, (i + 1) * n))
+
                 for j in range(len(new_x)):
-                   # for k in range(len(y_indices)):
-                   
-                        
-                   if j == len(new_x)-1:
+                    # for k in range(len(y_indices)):
 
-                            
-                            #h_val = self.H[j*n:len(new_x),i]
-                       h_val = self.H[y_indices[0]:y_indices[-1]+1,j*n:len(new_x)]
-                       if np.size(h_val) == 0:
-                           h_val = self.H[y_indices[0]:y_indices[-1]+1,-1]
+                    if j == len(new_x) - 1:
 
-                           if np.size(h_val) == 0:
-                               h_val = self.H[y_indices[0],-1]
-                               
-                        
-                   else:
-                        
-                       h_val =  self.H[y_indices[0]:y_indices[-1]+1,j*n:(j+1)*n]
-                       if np.size(h_val) == 0:
-                           h_val = self.H[y_indices[0]:y_indices[-1]+1,j]
+                        # h_val = self.H[j*n:len(new_x),i]
+                        h_val = self.H[
+                            y_indices[0] : y_indices[-1] + 1, j * n : len(new_x)
+                        ]
+                        if np.size(h_val) == 0:
+                            h_val = self.H[y_indices[0] : y_indices[-1] + 1, -1]
 
-                           
-                           if np.size(h_val) == 0:
-                               h_val = self.H[y_indices[0],j]
+                            if np.size(h_val) == 0:
+                                h_val = self.H[y_indices[0], -1]
 
-                   H_val = np.sum(h_val)
-                    
-            
-            
-                   H_val/=(np.size(h_val))
+                    else:
 
-                  
-                   new_h.append(H_val)
-                    
-            
+                        h_val = self.H[
+                            y_indices[0] : y_indices[-1] + 1,
+                            j * n : (j + 1) * n,
+                        ]
+                        if np.size(h_val) == 0:
+                            h_val = self.H[y_indices[0] : y_indices[-1] + 1, j]
+
+                            if np.size(h_val) == 0:
+                                h_val = self.H[y_indices[0], j]
+
+                    H_val = np.sum(h_val)
+
+                    H_val /= np.size(h_val)
+
+                    new_h.append(H_val)
+
                 new_H.append(new_h)
-           
-        
-            new_H = np.array(new_H)
-          #  for i in range(len(new_H)):
-           #     print(new_H[i])
 
-            ##print("Re-binned by "+str(n))
+            new_H = np.array(new_H)
             self.n2 = n
-            SpectrumCanvas.PlotData2D(self, reBin = [new_H,new_x,new_y])
+            SpectrumCanvas.PlotData2D(self, reBin=[new_H, new_x, new_y])
         except:
             print("No bins currently displayed")
+
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
         print("SpectrumCanvas UpdatePlotstart:", time.time())
@@ -520,7 +489,6 @@ class SpectrumCanvas(FigureCanvas):
             time.sleep(0.5)
             print("SpectrumCanvas collectionthread after sleep:", time.time())
 
-            
         if self.SpecColl.MIDASLastAgg:
             self.SpecColl.midas_collection_thread.start()
             self.SpecColl.MIDASLastAgg = False
@@ -602,48 +570,49 @@ class SpectrumCanvas(FigureCanvas):
     
 
     def GetMax(self):
-        binlow = max(1,int(self.a.get_xlim()[0]))
-        binhigh= min(self.Spec.NBins-1,int(self.a.get_xlim()[1]))
-        maxarray=self.Spec.spec[binlow:binhigh]
+        binlow = max(1, int(self.a.get_xlim()[0]))
+        binhigh = min(self.Spec.NBins - 1, int(self.a.get_xlim()[1]))
+        maxarray = self.Spec.spec[binlow:binhigh]
         return max(maxarray)
 
     def GetMin(self):
         binlow = int(self.a.get_xlim()[0])
-        binhigh= int(self.a.get_xlim()[1])
-        maxarray=self.Spec.spec[binlow:binhigh]
+        binhigh = int(self.a.get_xlim()[1])
+        maxarray = self.Spec.spec[binlow:binhigh]
         return min(maxarray)
-    
+
     def Autosize(self):
         if not self.is2D:
             if self.Spec.isLog == True:
-                ymin = 0.1 #max(0.1,0.9*self.GetMin())
-                self.a.set_ylim([ymin,1.10*self.GetMax()])
+                ymin = 0.1  # max(0.1,0.9*self.GetMin())
+                self.a.set_ylim([ymin, 1.10 * self.GetMax()])
             else:
-                ymin = 0 #max(0,0.9*self.GetMin())
-                self.a.set_ylim([ymin,1.10*self.GetMax()])
+                ymin = 0  # max(0,0.9*self.GetMin())
+                self.a.set_ylim([ymin, 1.10 * self.GetMax()])
             self.Spec.yzoom = self.a.get_ylim()
             self.fig.canvas.draw()
         else:
             zmax = 0
-            self.Spec2D.zmax = zmax 
+
+            self.Spec2D.zmax = zmax
             self.PlotData2D()
 
         self.updateSlider()
-            
+
     def Resize(self):
         if not self.is2D:
-            self.a.set_xlim(0,self.Spec.NBins-1)
-            if(self.Spec.isLog==True):
-                self.a.set_ylim([1,1.20*self.GetMax()])
-            else:                    
-                self.a.set_ylim([0,1.20*self.GetMax()])
+            self.a.set_xlim(0, self.Spec.NBins - 1)
+            if self.Spec.isLog == True:
+                self.a.set_ylim([1, 1.20 * self.GetMax()])
+            else:
+                self.a.set_ylim([0, 1.20 * self.GetMax()])
             self.Spec.yzoom = self.a.get_ylim()
             self.Spec.xzoom = self.a.get_xlim()
         else:
-            self.a.set_xlim([0,self.Spec2D.NBins])
-            self.a.set_ylim([0,self.Spec2D.NBins])#self.maximumX)
-            self.Spec2D.yzoom = [0,self.Spec2D.NBins]#self.a.get_ylim()
-            self.Spec2D.xzoom = [0,self.Spec2D.NBins]#self.a.get_xlim()
+            self.a.set_xlim([0, self.Spec2D.NBins])
+            self.a.set_ylim([0, self.Spec2D.NBins])  # self.maximumX)
+            self.Spec2D.yzoom = [0, self.Spec2D.NBins]  # self.a.get_ylim()
+            self.Spec2D.xzoom = [0, self.Spec2D.NBins]  # self.a.get_xlim()
         self.updateSlider()
         self.fig.canvas.draw()
 
@@ -651,14 +620,14 @@ class SpectrumCanvas(FigureCanvas):
         if not self.is2D:
             if self.Spec.isLog == False:
                 if self.a.get_ylim()[0] < 1:
-                    self.a.set_ylim([0.1,self.a.get_ylim()[1]])
-                    self.a.set_yscale('log')
-                    self.Spec.isLog=True
+                    self.a.set_ylim([0.1, self.a.get_ylim()[1]])
+                    self.a.set_yscale("log")
+                    self.Spec.isLog = True
             else:
-                self.a.set_yscale('linear')
-                self.Spec.isLog=False
+                self.a.set_yscale("linear")
+                self.Spec.isLog = False
             self.fig.canvas.draw()
-            
+
         else:
             if not self.Spec2D.isLog:
                 self.Spec2D.isLog = True
@@ -667,46 +636,48 @@ class SpectrumCanvas(FigureCanvas):
                 self.Spec2D.isLog = False
                 self.PlotData2D()
 
-    def onclick(self,event):
-        '''
+    def onclick(self, event):
+        """
         Event handler for button_press_event
         @param event MouseEvent
-        '''
+        """
         ## Count down from NClicks to zero
-        self.NClicks = self.NClicks-1
+        self.NClicks = self.NClicks - 1
         global ix, iy
         ix = event.xdata
         iy = event.ydata
-        
+
         if ix is not None:
-            #print('x = %f' %(ix))
-            self.cxdata.append(ix) 
+            # print('x = %f' %(ix))
+            self.cxdata.append(ix)
         else:
-            #print('in margin')
-            self.cxdata.append(-1)  
+            # print('in margin')
+            self.cxdata.append(-1)
         if iy is not None:
-            #print('x = %f' %(ix))
-            self.cydata.append(iy) 
+            # print('x = %f' %(ix))
+            self.cydata.append(iy)
         else:
-            #print('in margin')
-            self.cydata.append(-1)       
+            # print('in margin')
+            self.cydata.append(-1)
 
         if self.isZoomed == True:
-            if self.NClicks == 1 and ix is not None:              
-                self.zoomMarker =  self.a.axvline(x=ix,ls="--")
+            if self.NClicks == 1 and ix is not None:
+                self.zoomMarker = self.a.axvline(x=ix, ls="--")
                 self.fig.canvas.draw()
 
         if self.NClicks == 0 or event.button == 3:
-            #print("disconnecting clicker")
-            self.fc.mpl_disconnect(self,cid)
+            # print("disconnecting clicker")
+            self.fc.mpl_disconnect(self, cid)
             self.fc.stop_event_loop(self)
-            #print("now we're unblocked")
+            # print("now we're unblocked")
+
     def RescaleZPlot(self):
         try:
             self.ax2.set_xlim(self.Spec.xzoom)
             self.fig.canvas.draw()
         except:
             pass
+
     def JamZoom(self):
         print("Click on the zoom limits")
         self.isZoomed = True
@@ -716,90 +687,96 @@ class SpectrumCanvas(FigureCanvas):
             self.cxdata[0] = xlow
         if self.cxdata[1] == -1:
             self.cxdata[1] = xhigh
-        newlowx,newhighx = min(self.cxdata),max(self.cxdata)
-        self.a.set_xlim(newlowx,newhighx)
+        newlowx, newhighx = min(self.cxdata), max(self.cxdata)
+        self.a.set_xlim(newlowx, newhighx)
 
         if self.is2D:
-            ylow,yhigh = self.a.get_ylim()
+            ylow, yhigh = self.a.get_ylim()
             if self.cydata[0] == -1:
                 self.cydata[0] = ylow
             if self.cydata[1] == -1:
                 self.cydata[1] = yhigh
-            newlowy,newhighy = min(self.cydata),max(self.cydata)
-            self.a.set_ylim(newlowy,newhighy)
+            newlowy, newhighy = min(self.cydata), max(self.cydata)
+            self.a.set_ylim(newlowy, newhighy)
             ## Save to spectrum
             self.Spec2D.xzoom = self.a.get_xlim()
             self.Spec2D.yzoom = self.a.get_ylim()
         else:
             self.Spec.xzoom = self.a.get_xlim()
         self.isZoomed = False
-        if 'self.zoomMarker' in locals():
+        if "self.zoomMarker" in locals():
             self.zoomMarker.remove()
-        
+
         self.updateSlider()
         self.fig.canvas.draw()
-        self.newIncrement = np.ceil((newhighx-newlowx)/50)
+        self.newIncrement = np.ceil((newhighx - newlowx) / 50)
         try:
             self.scroll.setSingleStep(self.newIncrement)
         except:
             pass
-        
-           # if newlowx > self.x[0]:
-            #    zval_xlow = newlowx
-           # else:
-            #    zval_xlow = self.x[0]
 
-           # if newhighx<self.x[-1]:
-            #    zval_xhigh = newhighx
-           # else:
-            #    zval_xhigh = self.x[-1]
-        
-           # self.ax2.set_xlim(zval_xlow,zval_xhigh)
+        # if newlowx > self.x[0]:
+        #    zval_xlow = newlowx
+        # else:
+        #    zval_xlow = self.x[0]
+
+        # if newhighx<self.x[-1]:
+        #    zval_xhigh = newhighx
+        # else:
+        #    zval_xhigh = self.x[-1]
+
+        # self.ax2.set_xlim(zval_xlow,zval_xhigh)
         self.RescaleZPlot()
-   
+
     def JamZoomy(self):
         print("Click on the y-limits\n")
         #x = self.fig.ginput(2)
         #print(x)
         self.getNClicks(False,2)
         print(self.cydata)
-        ylow,yhigh = self.a.get_ylim()
+        ylow, yhigh = self.a.get_ylim()
         if self.cydata[0] == -1:
             self.cydata[0] = ylow
         if self.cydata[1] == -1:
             self.cydata[1] = self.cydata[0]
             self.cydata[0] = ylow
-        newlowy,newhighy = min(self.cydata),max(self.cydata)
-        self.a.set_ylim(newlowy,newhighy)
+        newlowy, newhighy = min(self.cydata), max(self.cydata)
+        self.a.set_ylim(newlowy, newhighy)
         ## Save to spectrum
         if self.is2D:
             self.Spec2D.yzoom = self.a.get_ylim()
         else:
             self.Spec.yzoom = self.a.get_ylim()
         self.fig.canvas.draw()
-        
+
     def xZoomIn(self):
         ## Get the current settings
-        xlow,xhigh = self.a.get_xlim()
-        ylow,yhigh = self.a.get_ylim()
-        numbinsx=xhigh-xlow
-        midbinx =xlow+numbinsx/2
-        numbinsy=yhigh-ylow
-        midbiny=ylow+numbinsy/2
+        xlow, xhigh = self.a.get_xlim()
+        ylow, yhigh = self.a.get_ylim()
+        numbinsx = xhigh - xlow
+        midbinx = xlow + numbinsx / 2
+        numbinsy = yhigh - ylow
+        midbiny = ylow + numbinsy / 2
         ## Do the scaling
-        newlowx,newhighx = (midbinx-0.80*(midbinx-xlow),midbinx+0.80*(xhigh-midbinx))
+        newlowx, newhighx = (
+            midbinx - 0.80 * (midbinx - xlow),
+            midbinx + 0.80 * (xhigh - midbinx),
+        )
         ## Check that it's not out of bounds
-        newlowx = max(newlowx,0)
-        newhighx = min(newhighx,self.Spec.NBins)
+        newlowx = max(newlowx, 0)
+        newhighx = min(newhighx, self.Spec.NBins)
         ## Same for y
-        newlowy,newhighy = (midbiny-0.80*(midbiny-ylow),midbiny+0.80*(yhigh-midbiny))
-        newlowy = max(newlowy,0)
-        newhighy = min(newhighy,self.Spec.NBins)
-        
+        newlowy, newhighy = (
+            midbiny - 0.80 * (midbiny - ylow),
+            midbiny + 0.80 * (yhigh - midbiny),
+        )
+        newlowy = max(newlowy, 0)
+        newhighy = min(newhighy, self.Spec.NBins)
+
         ## Apply to the spectrum
-        self.a.set_xlim(newlowx,newhighx)
+        self.a.set_xlim(newlowx, newhighx)
         if self.is2D:
-            self.a.set_ylim(newlowy,newhighy)
+            self.a.set_ylim(newlowy, newhighy)
             ## Save to spectrum
             self.Spec2D.xzoom = self.a.get_xlim()
             self.Spec2D.yzoom = self.a.get_ylim()
@@ -807,7 +784,7 @@ class SpectrumCanvas(FigureCanvas):
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
-        self.newIncrement = np.ceil((newhighx-newlowx)/50)
+        self.newIncrement = np.ceil((newhighx - newlowx) / 50)
         try:
             self.scroll.setSingleStep(self.newIncrement)
         except:
@@ -815,33 +792,39 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
         self.RescaleZPlot()
         self.updateSlider()
-     
+
     def xZoomOut(self):
-        xlow,xhigh = self.a.get_xlim()
-        ylow,yhigh = self.a.get_ylim()
-        numbinsx=xhigh-xlow
-        midbinx =xlow+numbinsx/2
-        newlowx,newhighx = (midbinx-1.20*(midbinx-xlow),midbinx+1.20*(xhigh-midbinx))
-        newlowx = max(newlowx,0)
-        newhighx = min(newhighx,self.Spec.NBins)
+        xlow, xhigh = self.a.get_xlim()
+        ylow, yhigh = self.a.get_ylim()
+        numbinsx = xhigh - xlow
+        midbinx = xlow + numbinsx / 2
+        newlowx, newhighx = (
+            midbinx - 1.20 * (midbinx - xlow),
+            midbinx + 1.20 * (xhigh - midbinx),
+        )
+        newlowx = max(newlowx, 0)
+        newhighx = min(newhighx, self.Spec.NBins)
         ## now for y
-        numbinsy=yhigh-ylow
-        midbiny =ylow+numbinsy/2
-        newlowy,newhighy = (midbiny-1.20*(midbiny-ylow),midbiny+1.20*(yhigh-midbiny))
-        newlowy = max(newlowy,0)
-        newhighy = min(newhighy,self.Spec.NBins)
+        numbinsy = yhigh - ylow
+        midbiny = ylow + numbinsy / 2
+        newlowy, newhighy = (
+            midbiny - 1.20 * (midbiny - ylow),
+            midbiny + 1.20 * (yhigh - midbiny),
+        )
+        newlowy = max(newlowy, 0)
+        newhighy = min(newhighy, self.Spec.NBins)
 
         ## Update plot and save to spectrum
-        self.a.set_xlim(newlowx,newhighx)
+        self.a.set_xlim(newlowx, newhighx)
         if self.is2D:
-            self.a.set_ylim(newlowy,newhighy)
+            self.a.set_ylim(newlowy, newhighy)
             self.Spec2D.xzoom = self.a.get_xlim()
             self.Spec2D.yzoom = self.a.get_ylim()
         else:
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
         ## And plot!
-        self.newIncrement = np.ceil((newhighx-newlowx)/50)
+        self.newIncrement = np.ceil((newhighx - newlowx) / 50)
         try:
             self.scroll.setSingleStep(self.newIncrement)
         except:
@@ -851,9 +834,9 @@ class SpectrumCanvas(FigureCanvas):
         self.updateSlider()
 
     def yZoomIn(self):
-        ylow,yhigh = self.a.get_ylim()
-        newhigh = 0.80*yhigh
-        self.a.set_ylim(ylow,newhigh)
+        ylow, yhigh = self.a.get_ylim()
+        newhigh = 0.80 * yhigh
+        self.a.set_ylim(ylow, newhigh)
         if self.is2D:
             self.Spec2D.yzoom = self.a.get_ylim()
         else:
@@ -862,9 +845,9 @@ class SpectrumCanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def yZoomOut(self):
-        ylow,yhigh = self.a.get_ylim()
-        newhigh = 1.20*yhigh
-        self.a.set_ylim(ylow,newhigh)
+        ylow, yhigh = self.a.get_ylim()
+        newhigh = 1.20 * yhigh
+        self.a.set_ylim(ylow, newhigh)
         if self.is2D:
             self.Spec2D.yzoom = self.a.get_ylim()
         else:
@@ -872,15 +855,15 @@ class SpectrumCanvas(FigureCanvas):
 
         self.fig.canvas.draw()
 
-#    def getClicks(self,n=1):
-#        print("Click ",n," times\n")
-#        x = self.fig.ginput(n)
-#        print(x)
+    #    def getClicks(self,n=1):
+    #        print("Click ",n," times\n")
+    #        x = self.fig.ginput(n)
+    #        print(x)
 
-    def setupSlider(self,scroll):
+    def setupSlider(self, scroll):
         self.scroll = scroll
-        self.scroll.setRange(self.Spec.NBins/2,self.Spec.NBins/2)
-        self.scroll.setValue(self.Spec.NBins/2)
+        self.scroll.setRange(self.Spec.NBins / 2, self.Spec.NBins / 2)
+        self.scroll.setValue(self.Spec.NBins / 2)
         self.scroll.setPageStep(self.Spec.NBins)
         self.scroll.actionTriggered.connect(self.sliderUpdate)
         self.sliderUpdate()
@@ -888,21 +871,20 @@ class SpectrumCanvas(FigureCanvas):
     def updateSlider(self):
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
-        page = (xmax-xmin)
+        page = xmax - xmin
         self.scroll.setPageStep(0)
-           
-        
-        self.scroll.setRange(page/2, self.Spec.NBins-page/2)
-        self.scroll.setValue(round((xmax+xmin)/2))
+
+        self.scroll.setRange(page / 2, self.Spec.NBins - page / 2)
+        self.scroll.setValue(round((xmax + xmin) / 2))
 
     def sliderUpdate(self, evt=None):
         v = self.scroll.value()
         xmin = self.Spec.xzoom[0]
         xmax = self.Spec.xzoom[1]
-        dspan=(xmax-xmin)/2
-        newlowx = v-dspan
-        newhighx = v+dspan
-        self.a.set_xlim(newlowx,newhighx)
+        dspan = (xmax - xmin) / 2
+        newlowx = v - dspan
+        newhighx = v + dspan
+        self.a.set_xlim(newlowx, newhighx)
         ## Save to spectrum
         if self.is2D:
             self.Spec2D.xzoom = self.a.get_xlim()
@@ -914,25 +896,24 @@ class SpectrumCanvas(FigureCanvas):
         self.RescaleZPlot()
         self.fig.canvas.draw()
 
-    def setupVSlider(self,vscroll):
+    def setupVSlider(self, vscroll):
         self.vscroll = vscroll
-        self.vscroll.setRange(20,80)
+        self.vscroll.setRange(20, 80)
         self.vscroll.setValue(50)
         self.vscroll.setPageStep(20)
-#        self.vscroll.actionTriggered.connect(self.vsliderUpdate)
+        #        self.vscroll.actionTriggered.connect(self.vsliderUpdate)
         self.vscroll.valueChanged.connect(self.vsliderUpdate)
-
 
     def vsliderUpdate(self, evt=None):
         v = self.vscroll.value()
         if not self.is2D:
             ymin = self.Spec.yzoom[0]
             ymax = self.Spec.yzoom[1]
-            dspan=(ymax-ymin)
+            dspan = ymax - ymin
             newymin = ymin
-            newymax = ymin+dspan*(50+v)/100
+            newymax = ymin + dspan * (50 + v) / 100
 
-            self.a.set_ylim(newymin,newymax)
+            self.a.set_ylim(newymin, newymax)
             ## Save to spectrum
             self.Spec.xzoom = self.a.get_xlim()
             self.Spec.yzoom = self.a.get_ylim()
@@ -940,125 +921,124 @@ class SpectrumCanvas(FigureCanvas):
             ## And plot!
             self.fig.canvas.draw()
         else:
-            scale = (100+(v-50)/2)/100
-            self.Spec2D.zmax = self.Spec2D.zmax*scale
+            scale = (100 + (v - 50) / 2) / 100
+            self.Spec2D.zmax = self.Spec2D.zmax * scale
             ##print(self.Spec2D.zmax)
             ## Save to spectrum
             self.Spec2D.xzoom = self.a.get_xlim()
             self.Spec2D.yzoom = self.a.get_ylim()
             self.PlotData2D()
-            
+
         self.vscroll.setValue(50)
-        
 
     def ZeroAll(self):
         self.SpecColl.ZeroAll()
         self.UpdatePlot()
-        
-    def getGate(self):
+
+    def getGate(self, index):
         if self.is2D:
             ##tup = self.fig.ginput(n=-1,mouse_stop=3,mouse_pop=2)
             self.getNClicks(self.is2D,-1)
             #x = [i[0] for i in tup]
             x = self.cxdata
             x.append(x[0])
-            #y = [i[1] for i in tup]
             y = self.cydata
             y.append(y[0])
-            self.a.plot(x,y, 'r-')
+            self.a.plot(x, y, "r-")
             self.fig.canvas.draw()
-            ##self.Spec2D.NGates = self.Spec2D.NGates+1
-            ig = self.Spec2D.GateIndex
-            self.Spec2D.gates[ig].setGate(x,y)
-                    
-            ## Send the gate over to c++
-            self.SpecColl.dm.putGate(self.Spec2D.Name,self.Spec2D.gates[ig].name,
-                                     self.Spec2D.gates[ig].x,self.Spec2D.gates[ig].y)
+            self.Spec2D.gates[index].setGate(
+                self.SpecColl.dm, self.Spec2D.Name, x, y
+            )
+
+            # Send the gate over to c++
+
         else:
             ##tup = self.fig.ginput(n=2)
             self.getNClicks(False,2)
             x = self.cxdata
-            ##x = [i[0] for i in tup]
             y = self.cydata
-            ##y = [i[1] for i in tup]   ## we don't need this but it helps reuse the algorithms
+
             self.a.vlines(x=x, ymin=0.1, ymax=self.a.get_ylim()[1], color="red")
             self.fig.canvas.draw()
 
-            self.Spec.NGates = self.Spec.NGates+1
-            ig = self.Spec.GateIndex
-            self.Spec.gates[ig].setGate(x, y)
-            ## Send the gate over to c++
-            self.SpecColl.dm.putGate(self.Spec.Name, self.Spec.gates[ig].name,
-                                     self.Spec.gates[ig].x, self.Spec.gates[ig].y)
+            self.Spec.gates[index].setGate(
+                self.SpecColl.dm, self.Spec.Name, x, y
+            )
 
     def drawGates2D(self, i):
         x = self.Spec2D.gates[i].x
         y = self.Spec2D.gates[i].y
-        self.a.plot(x,y,color="C{}".format(i))
+        self.a.plot(x, y, color="C{}".format(i))
 
     def drawGates(self, i):
         x = self.Spec.gates[i].x
-        self.a.vlines(x=x,ymin=self.a.get_ylim()[0],ymax=self.a.get_ylim()[1],color="C{}".format(i))
-        
-    def getSingle(self,color="red"):
+        self.a.vlines(
+            x=x,
+            ymin=self.a.get_ylim()[0],
+            ymax=self.a.get_ylim()[1],
+            color="C{}".format(i),
+        )
+
+    def getSingle(self, color="red"):
         ##clicks = self.fig.ginput(2)
         self.getNClicks(False,2)
         clicks = self.cxdata
-        xcut = list(range(int(np.floor(clicks[0])),int(1+np.ceil(clicks[1]))))
+        xcut = list(
+            range(int(np.floor(clicks[0])), int(1 + np.ceil(clicks[1])))
+        )
         ##print(xcut)
         ##print(self.Spec.spec)
         ##        ycut = list(self.Spec.spec[xcut])
         ycut = [self.Spec.spec[i] for i in xcut]
-        self.a.step(xcut,ycut,color,where='mid')
-        
+        self.a.step(xcut, ycut, color, where="mid")
+
         ## Do some weird python shit to shade the region
         xplot = xcut.copy()
         yplot = ycut.copy()
-        xplot.insert(0,xcut[0])
-        xplot.extend([xplot[-1],xplot[0]])
-        yplot.insert(0,0.1)
-        yplot.extend([0,0])
+        xplot.insert(0, xcut[0])
+        xplot.extend([xplot[-1], xplot[0]])
+        yplot.insert(0, 0.1)
+        yplot.extend([0, 0])
         ##        self.a.fill(xplot,yplot,facecolor=color,alpha=0.5)
-        self.a.fill_between(xcut,ycut, step="mid", alpha=0.4, color=color)
-        
+        self.a.fill_between(xcut, ycut, step="mid", alpha=0.4, color=color)
+
         self.fig.canvas.draw()
 
-        return xcut,ycut
-        
+        return xcut, ycut
+
     def grossArea(self):
         print("Click around peak")
         if not self.is2D:
             points = self.getSingle("forestgreen")
-            #print(points[1])
+            # print(points[1])
             area = sum(points[1])
             darea = np.sqrt(area)
-            print("From ",points[0][0]," to ",points[0][-1])
+            print("From ", points[0][0], " to ", points[0][-1])
             dprecis = self.getprecis(darea)
             nprecis = self.getprecis(area)
-            print("Area = ", self.round_to_n(area,nprecis), " +/- ",
-                  self.round_to_n(darea,dprecis))
+            print(
+                "Area = ",
+                self.round_to_n(area, nprecis),
+                " +/- ",
+                self.round_to_n(darea, dprecis),
+            )
         else:
             ##clicks = self.fig.ginput(4)
             self.getNClicks(False,4)
             clicks = self.cxdata
-            
 
     # Will's Modifications (See SpectrumCanvas_old for original):
-    #---------------------------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------------------------
 
     def line(self, x, m, b):
-        return (m*x) + b
+        return (m * x) + b
 
     def gaussian(self, x, A, c, sig):
-        #return a * np.exp(-(x-c)**2/(2.0*(sig)**2))
-        return (A / (np.sqrt(2 * np.pi) * sig)) * np.exp(-(x-c)**2/(2.0*(sig)**2))
+        # return a * np.exp(-(x-c)**2/(2.0*(sig)**2))
+        return (A / (np.sqrt(2 * np.pi) * sig)) * np.exp(
+            -((x - c) ** 2) / (2.0 * (sig) ** 2)
+        )
 
-    #def gauss_plus_line(self,x,a1,x1,sig1,m,b):
-    #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b
-
-    #def double_gauss_plus_line(self,x,a1,x1,sig1,a2,x2,sig2,m,b):
-    #    return a1*np.exp(-(x-x1)**2/(2.0*(sig1)**2))+m*x+b+a2*np.exp(-(x-x2)**2/(2.0*(sig2)**2))
-    
     def netArea(self):
         if self.is2D:
             print("Not available in 2D spectra")
@@ -1074,33 +1054,33 @@ class SpectrumCanvas(FigureCanvas):
             ## Calculate the background
             bgx = bg1points[0] + bg2points[0]
             bgy = bg1points[1] + bg2points[1]
-            bgfit = np.polyfit(bgx,bgy,deg=1)
-            m,b = bgfit
-            bgCounts = np.polyval(bgfit,bgx)
-            res = bgy-bgCounts
+            bgfit = np.polyfit(bgx, bgy, deg=1)
+            m, b = bgfit
+            bgCounts = np.polyval(bgfit, bgx)
+            res = bgy - bgCounts
 
             ubgCounts = np.mean(res)
-            
+
             ## Draw background line
-            xplot = list(range(min(bgx),max(bgx)))
+            xplot = list(range(min(bgx), max(bgx)))
             yplot = np.poly1d(bgfit)
-            self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
-            self.fig.canvas.draw()
+            # self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
+            # self.fig.canvas.draw()
 
             ## Find the peak position
             Chn = peakpoints[0]
-            #print(len(Chn))
-            
-            Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)# - peakpoints[1]
-            #print(len(Counts))
-            centroid = sum(Chn*Counts/sum(Counts))
-            #print(centroid)
+            # print(len(Chn))
+
+            Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)  # - peakpoints[1]
+            # print(len(Counts))
+            centroid = sum(Chn * Counts / sum(Counts))
+            # print(centroid)
             a1 = Counts[Chn.index(int(centroid))]
-            #print(a1)
-            sig1 = (peakpoints[0][-1] - peakpoints[0][0])/2.0
-            ucentroid = sum(Counts * (Chn - centroid)**2)/(sum(Counts) - 1)
-            ucentroid = np.sqrt(ucentroid)/np.sqrt(sum(Counts))
-            
+            # print(a1)
+            sig1 = (peakpoints[0][-1] - peakpoints[0][0]) / 2.0
+            ucentroid = sum(Counts * (Chn - centroid) ** 2) / (sum(Counts) - 1)
+            ucentroid = np.sqrt(ucentroid) / np.sqrt(sum(Counts))
+
             ## Calculate the number of counts
             bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
             ubgsum = np.sqrt(bgsum + ubgCounts**2)
@@ -1108,7 +1088,7 @@ class SpectrumCanvas(FigureCanvas):
             net = totalsum - bgsum
             unet = np.sqrt(net + ubgsum**2)
 
-            print("From",peakpoints[0][0],"to",peakpoints[0][-1]) 
+            print("From", peakpoints[0][0], "to", peakpoints[0][-1])
             ## rounding
             dprecis = self.getprecis(ucentroid)
             nprecis = self.getprecis(centroid)
@@ -1227,9 +1207,8 @@ class SpectrumCanvas(FigureCanvas):
 
                 self.fig.canvas.draw()
 
-            
             ## Writing (appending) centroids and FWHM to .txt file
-            '''
+            """
             cent_fwhm_data = open(r"/home/daq/midas/online/src/v1730/CentFWHMRuns/Co60Emulator/cent_fwhm_data_Co60Emulator.txt", "a+")
             cent_fwhm_data.write("\n")
             fit_data = [self.round_to_n(cent,1+self.getprecis(cent)), self.round_to_n(ucent,self.getprecis(ucent)), 
@@ -1239,18 +1218,18 @@ class SpectrumCanvas(FigureCanvas):
             for i in range(len(fit_data)):
                 cent_fwhm_data.write("%5.2f\n" % fit_data[i])
             cent_fwhm_data.close()
-            '''
+            """
 
-    #---------------------------------------------------------------------------------------------
-    
-    def getprecis(self,x):
+    # ---------------------------------------------------------------------------------------------
+
+    def getprecis(self, x):
         l = np.log10(x)
-        return(int(np.ceil(l)))
-            
+        return int(np.ceil(l))
+
     def round_to_n(self, x, n):
         if n < 2:
-            n=2 #raise ValueError("number of significant digits must be >= 1")
+            n = 2  # raise ValueError("number of significant digits must be >= 1")
         # Use %e format to get the n most significant digits, as a string.
-        format = "%." + str(n-1) + "e"
+        format = "%." + str(n - 1) + "e"
         as_string = format % x
         return float(as_string)

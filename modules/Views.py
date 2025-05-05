@@ -1,27 +1,31 @@
 import sys, os
 import matplotlib
+
 ##from PyQt5.QtCore import Qt, QThread, QTimer
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtCore import QUrl
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import (
+    NavigationToolbar2QT as NavigationToolbar,
+)
 from matplotlib.backend_tools import ToolBase
 import time
 import subprocess
 from datetime import datetime
 from queue import Queue, Empty
 
+
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, SpecCanvas):
 
-        super(Ui_MainWindow,self).__init__()
+        super(Ui_MainWindow, self).__init__()
 
         self.SpecCanvas = SpecCanvas
         ## Grab the spectrum collection
         self.SpecColl = self.SpecCanvas.SpecColl
 
         self.scalersRunning = False
-        
+
         ##  -----------------------------------------------------------------
         ##  Menu ..  ..                                                Help
         ##  -----------------------------------------------------------------
@@ -47,7 +51,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## The main widget that holds everything else
         self.main_widget = QtWidgets.QWidget(self)
 
-
         self.rebinSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.rebinSlider.setMinimum(1)
         self.rebinSlider.setMaximum(20)
@@ -56,13 +59,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.rebinSlider.setTickPosition(QtWidgets.QSlider.TicksAbove)
         self.rebinSlider.valueChanged.connect(self.rebin_action)
         self.n = 1
-        
+
         self.rebinLabel = QtWidgets.QLabel()
-        self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
+        self.rebinLabel.setText("Rebin: " + str(self.rebinSlider.value()))
 
         self.runningIndicator = self.SpecColl.statusBar
         self.setStatusBar(self.runningIndicator)
-        
+
         ## Start with two vertical groups
         ## - toolbar holds all of the run start, stop, gates, etc.
         ## - mainFrame holds the tree, spectrum, etc
@@ -71,25 +74,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         mainFrame = QtWidgets.QFrame()
         ##mainFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         ##mainFrame.setFrameShadow(QtWidgets.QFrame.Raised)
-        
+
         ## Layout of vertical groups
         ## Note: only one group now
         gridmain = QtWidgets.QGridLayout(self.main_widget)
         gridmain.setSpacing(10)
         gridmain.addWidget(mainFrame, 1, 0)
-        
+
         ## Make a second grid for the mainFrame
         ## - treeFrame is Left-hand frame for the tree
         ## - dataFrame holds the spectrum tabs and command window
         treeFrame = QtWidgets.QFrame()
-        treeFrame.setMinimumSize(260,720)
+        treeFrame.setMinimumSize(260, 720)
         ##treeFrame.setMaximumWidth(260)
         ##treeFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         dataFrame = QtWidgets.QFrame()
-        dataFrame.setMinimumSize(900,600)
+        dataFrame.setMinimumSize(900, 600)
         ##
         scalerFrame = QtWidgets.QFrame()
-        scalerFrame.setMinimumSize(150,720) ## (200, 720) crashes X11 on Windows- Will
+        scalerFrame.setMinimumSize(
+            100, 720
+        )  ## (200, 720) crashes X11 on Windows- Will
 
         ##----------------------------------------------------------------------
         ## The tree widget
@@ -97,18 +102,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.treeWidget.setColumnCount(1)
         header = QtWidgets.QTreeWidgetItem(["Spectra"])
         self.treeWidget.setHeaderItem(header)
-        item = QtWidgets.QTreeWidgetItem(self.treeWidget, [self.SpecCanvas.Spec.Name])
+        item = QtWidgets.QTreeWidgetItem(
+            self.treeWidget, [self.SpecCanvas.Spec.Name]
+        )
         item.spec = SpecCanvas.Spec
         self.treeWidget.addTopLevelItem(item)
         self.treeWidget.itemClicked.connect(self.itemclicked)
-        self.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-
+        self.treeWidget.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection
+        )
 
         ## FENRIS logo
         pixmap = QtGui.QPixmap('images/FENRISLogo-notext.png')
         self.logolabel = QtWidgets.QLabel()
         self.logolabel.resize(240, 100)
         self.logolabel.setPixmap(pixmap)
+
         ## Within the tree frame, make a vertical box layout
         treeFramevbox = QtWidgets.QVBoxLayout()
         treeFramevbox.addWidget(self.treeWidget)
@@ -140,23 +149,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##self.scalerlabvbox.setAlignment(QtCore.Qt.AlignTop)
         ##self.scalervalvbox = QtWidgets.QVBoxLayout()
         ##self.scalervalvbox.setAlignment(QtCore.Qt.AlignTop)
-        
+
         ##scalerFramegbox.addWidget(self.scalerlabvbox,1,0,1,0)
         ##scalerFramegbox.addWidget(self.scalervalvbox,1,1,1,1)
-        
+
         scalerFrame.setLayout(self.scalerFramevbox)
-        
+
         ##----------------------------------------------------------------------
         ## Layout the mainFrame grid
         gridmainFrame = QtWidgets.QGridLayout(mainFrame)
         gridmainFrame.setSpacing(10)
 
-        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)##
-        splitter.addWidget(treeFrame)#,1,0)
-        splitter.addWidget(dataFrame)#,1,1)
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)  ##
+        splitter.addWidget(treeFrame)  # ,1,0)
+        splitter.addWidget(dataFrame)  # ,1,1)
         splitter.addWidget(scalerFrame)
         ##splitter.setSizes([200,600])
-        gridmainFrame.addWidget(splitter,1,0)
+        gridmainFrame.addWidget(splitter, 1, 0)
         ## Make a third grid for the spectrum and command window
         ## - tabWidget holds the spectra
         ## - commandWidget is the command editor
@@ -185,15 +194,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         l.addWidget(hscroll)
 
         tab1.setLayout(l)
-        
-        tabWidget.addTab(tab1,"")
+
+        tabWidget.addTab(tab1, "")
         tabWidget.setTabText(tabWidget.indexOf(tab1), "Spectrum Inspector")
         ## Tab 2
         tab2 = QtWidgets.QWidget()
         self.tab2 = tab2
-        tabWidget.addTab(tab2,"There's nothing in this tab!")
+        tabWidget.addTab(tab2, "There's nothing in this tab!")
         tabWidget.setTabText(tabWidget.indexOf(tab2), "Empty Tab")
-        
+
         ## the command editor
         self.commandWidget = QtWidgets.QTextEdit()
         self.commandWidget.setText("Welcome to EngeSpec!\n")
@@ -203,46 +212,39 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##sys.stdout = OutLog(commandWidget, sys.stdout)
         ##sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
 
-        
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
         gridDataFrame.setSpacing(10)
-        gridDataFrame.addWidget(tabWidget,1,0)
-        gridDataFrame.addWidget(self.commandWidget,2,0)
-        
-        self.setLayout(gridmain) 
+        gridDataFrame.addWidget(tabWidget, 1, 0)
+        gridDataFrame.addWidget(self.commandWidget, 2, 0)
+
+        self.setLayout(gridmain)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
         self.setGeometry(300, 300, 350, 300)
-        self.setWindowTitle('EngeSpec')    
+        self.setWindowTitle("EngeSpec")
         self.show()
-
-
-
 
     def fileQuit(self):
         self.close()
 
     def about(self):
-        QtWidgets.QMessageBox.about(self, "About",
-                          """This is EngeSpec!"""
-        )
+        QtWidgets.QMessageBox.about(self, "About", """This is EngeSpec!""")
 
     ##--------------------------------------------------
     ## Settings
     def setting_autobin(self):
         if self.SpecCanvas.autobin:
-            self.SpecCanvas.autobin=False
+            self.SpecCanvas.autobin = False
         else:
-            self.SpecCanvas.autobin=True
+            self.SpecCanvas.autobin = True
 
     def setting_dots(self):
         if self.SpecCanvas.dots:
-            self.SpecCanvas.dots=False
+            self.SpecCanvas.dots = False
         else:
-            self.SpecCanvas.dots=True
-
+            self.SpecCanvas.dots = True
 
     def rebin_action(self):
          self.rebinLabel.setText("Rebin: "+str(self.rebinSlider.value()))
@@ -251,6 +253,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
              self.SpecCanvas.ReBin(self.n)
          else:
              self.SpecCanvas.PlotData2D()
+
+    def setting_target(self):
+        text, ok = QtWidgets.QInputDialog.getText(
+            self,
+            "Set Target",
+            f"Current Target: {get_target_id()}\n\nEnter Your Target:",
+        )
+        if ok:
+            if text:
+                set_target_id(text)
+            else:
+                set_target_id("Unknown")
+
     ## --------------------------------------------------
     ## Function to write to the command editor
     def append_text(self, text, col=None):
@@ -266,57 +281,60 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def createMenus(self):
         ## -----
         ## File menu
-        self.file_menu = QtWidgets.QMenu('&File', self)
+        self.file_menu = QtWidgets.QMenu("&File", self)
         ## Load ascii spectrum
-        self.file_menu.addAction('&Load Spectrum File (ascii)',
-                                 self.LoadASCIIData)
+        self.file_menu.addAction(
+            "&Load Spectrum File (ascii)", self.LoadASCIIData
+        )
         ## Save ascii spectrum
-        self.file_menu.addAction('&Save Spectrum File (ascii)',
-                                 self.SaveASCIIData)
+        self.file_menu.addAction(
+            "&Save Spectrum File (ascii)", self.SaveASCIIData
+        )
         ## Load ADDITIONAL ascii spectrum
-        self.file_menu.addAction('&Load Additional Spectrum File (ascii)',
-                                 self.LoadAdditionalASCIIData)
+        self.file_menu.addAction(
+            "&Load Additional Spectrum File (ascii)",
+            self.LoadAdditionalASCIIData,
+        )
 
         self.file_menu.addSeparator()
         ## Load pickle data
-        self.file_menu.addAction('&Load Pickle File',
-                                 self.LoadPickleData)
+        self.file_menu.addAction("&Load Pickle File", self.LoadPickleData)
         ## Save pickle data
-        self.file_menu.addAction('&Save Pickle File',
-                                 self.SavePickleData)
+        self.file_menu.addAction("&Save Pickle File", self.SavePickleData)
 
         self.file_menu.addSeparator()
         ## Quit
-        self.file_menu.addAction('&Quit', self.fileQuit,
-           QtCore.Qt.CTRL | QtCore.Qt.Key_Q)
+        self.file_menu.addAction(
+            "&Quit", self.fileQuit, QtCore.Qt.CTRL | QtCore.Qt.Key_Q
+        )
         self.menuBar().addMenu(self.file_menu)
 
         ## -----
         ## Connection options
-        self.connections_menu = QtWidgets.QMenu('&Connect MIDAS', self)
+        self.connections_menu = QtWidgets.QMenu("&Connect MIDAS", self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.connections_menu)
 
         ## Connect to MIDAS
-        self.connectOnlineAction = QtGui.QAction('&Online MIDAS')
+        self.connectOnlineAction = QtGui.QAction("&Online MIDAS")
         self.connectOnlineAction.triggered.connect(self.connectmidas)
         self.connections_menu.addAction(self.connectOnlineAction)
 
         self.connections_menu.addSeparator()
         ## Connect to MIDAS offline
-        self.connectOfflineAction = QtGui.QAction('&Offline MIDAS')
+        self.connectOfflineAction = QtGui.QAction("&Offline MIDAS")
         self.connectOfflineAction.triggered.connect(self.offlinemidas)
         self.connections_menu.addAction(self.connectOfflineAction)
 
         ## Sort a file in offline mode
-        self.sortAction = QtGui.QAction('&Queue sort file(s)', self)
+        self.sortAction = QtGui.QAction("&Queue sort file(s)", self)
         self.sortAction.setEnabled(False)
         self.sortAction.triggered.connect(self.sort)
         self.connections_menu.addAction(self.sortAction)
-        
+
         ## -----
         ## Settings Menu
-        self.settings_menu = QtWidgets.QMenu('&Settings', self)
+        self.settings_menu = QtWidgets.QMenu("&Settings", self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.settings_menu)
         # autobinAction = QtGui.QAction('&Auto bin',self.settings_menu)
@@ -324,55 +342,79 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # autobinAction.setChecked(False)
         # autobinAction.triggered.connect(self.setting_autobin)
         # self.settings_menu.addAction(autobinAction)
-        
-        dotsAction = QtGui.QAction('&dots',self.settings_menu)
+
+        dotsAction = QtGui.QAction("&dots", self.settings_menu)
         dotsAction.setCheckable(True)
         dotsAction.setChecked(False)
         dotsAction.triggered.connect(self.setting_dots)
         self.settings_menu.addAction(dotsAction)
-        
+
+        # set target
+        targetAction = QtGui.QAction("&Set Current Target", self.settings_menu)
+        targetAction.triggered.connect(self.setting_target)
+        self.settings_menu.addAction(targetAction)
+
         ## -----
         ## Help Menu
-        self.help_menu = QtWidgets.QMenu('&Help', self)
+        self.help_menu = QtWidgets.QMenu("&Help", self)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.help_menu)
-        self.help_menu.addAction('&About', self.about)
+        self.help_menu.addAction("&About", self.about)
 
     ## Make the toolbar for starting, stopping runs etc.
     def makeToolbar(self):
-        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
-                               "..", "images", "icons", "")
-        exitAction = QtGui.QAction(QtGui.QIcon(iconDir + 'Exit.ico'), 'Exit', self)
+        iconDir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "images",
+            "icons",
+            "",
+        )
+        exitAction = QtGui.QAction(
+            QtGui.QIcon(iconDir + "Exit.ico"), "Exit", self
+        )
         exitAction.triggered.connect(self.close)
-        startAction = QtGui.QAction(QtGui.QIcon(iconDir + 'Start.ico'), 'Start Run/Sort', self)
+        startAction = QtGui.QAction(
+            QtGui.QIcon(iconDir + "Start.ico"), "Start Run/Sort", self
+        )
         startAction.triggered.connect(self.startmidas)
-        stopAction = QtGui.QAction(QtGui.QIcon(iconDir + 'Stop.ico'), 'Stop Run', self)
+        stopAction = QtGui.QAction(
+            QtGui.QIcon(iconDir + "Stop.ico"), "Stop Run", self
+        )
         stopAction.triggered.connect(self.stopmidas)
-        gateAction = QtGui.QAction(QtGui.QIcon(iconDir + 'MakeGate.ico'), 'Set Gate', self)
-        gateAction.triggered.connect(self.setgate)
+        gateAction = QtGui.QAction(
+            QtGui.QIcon(iconDir + "MakeGate.ico"), "Set Gate", self
+        )
 
-        zeroAction = QtGui.QAction(QtGui.QIcon(iconDir + 'ZeroIcon.ico'), 'Zero all', self)
+        zeroAction = QtGui.QAction(
+            QtGui.QIcon(iconDir + "ZeroIcon.ico"), "Zero all", self
+        )
         zeroAction.setToolTip("Zero all spectra")
         zeroAction.triggered.connect(self.zeroall)
-        
-        self.runControlsToolbar = self.addToolBar('Exit')
+
+        gateAction.triggered.connect(self.setgate)
+
+        self.runControlsToolbar = self.addToolBar("Exit")
         self.runControlsToolbar.addAction(exitAction)
+        self.runControlsToolbar.addSeparator()
         self.runControlsToolbar.addAction(startAction)
         self.runControlsToolbar.addAction(stopAction)
+        self.runControlsToolbar.addSeparator()
         self.runControlsToolbar.addAction(gateAction)
         ## Add a Splitter
         self.runControlsToolbar.addSeparator()
         self.runControlsToolbar.addAction(zeroAction)
 
-        #self.rebinSlider.setFixedWidth(20)
+        # self.rebinSlider.setFixedWidth(20)
         right_spacer = QtWidgets.QWidget()
-        right_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        
+        right_spacer.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+
         self.runControlsToolbar.addWidget(right_spacer)
         self.runControlsToolbar.addWidget(self.rebinLabel)
         self.runControlsToolbar.addWidget(self.rebinSlider)
 
-        
     def LoadASCIIData(self):
         ## Clear the old spectrum collection
         self.SpecColl.ClearCollection()
@@ -414,8 +456,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         view = QWebEngineView()
         view.load(QUrl("http://localhost:8080/"))
         self.tabWidget.removeTab(1)
-        self.tabWidget.addTab(view,"Midas info")
-       # view.show()
+        self.tabWidget.addTab(view, "Midas info")
+        # view.show()
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
         ## Make a MIDAS status thread
@@ -429,7 +471,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.offlinemidas()
         self.PopulateTree()
         self.PopulateScalers()
-        self.SpecCanvas.setSpecIndex(0,False)
+        self.SpecCanvas.setSpecIndex(0, False)
         ## make a scaler update thread
         self.scaler_thread = ScalerCollectionThread(self)
         self.isOnline = False
@@ -438,10 +480,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.sortAction.setEnabled(True)
         self.connectOnlineAction.setEnabled(False)
         self.connectOfflineAction.setEnabled(False)
-        
+
     def sort(self):
         self.SpecColl.sort()
-        
+
+    def zeroall(self):
+        self.SpecCanvas.ZeroAll()
+
     def startmidas(self):
         ##print("Running midas")
       
@@ -453,9 +498,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         if not self.scalersRunning:
             self.scaler_thread.start()
-            self.scalersRunning=True
+            self.scalersRunning = True
 
-        
     def stopmidas(self):
         ##print("Stopping midas")
         self.SpecColl.stopmidas()
@@ -467,7 +511,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.MIDASisRunning = False
         
     def setgate(self):
-        self.SpecCanvas.getGate()
+        # tell the gate function which gate you are on.
+        item = self.treeWidget.selectedItems()
+        if len(item) != 1:
+            print("Cannot set gate when multiple spectra are selected.")
+            return None
+        if item[0].parent() is None:
+            print("Must select gated spectrum!")
+            return None
+        self.SpecCanvas.getGate(item[0].index)
 
     def zeroall(self):
         self.SpecCanvas.ZeroAll()
@@ -493,9 +545,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             for gObj in gates:
                 subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
                 subitem.index = count
-                count = count+1
+                count = count + 1
             self.treeWidget.addTopLevelItem(item)
-            
+
         l2d = len(SpecColl.spec2d)
         for i in range(l2d):
             spec = SpecColl.spec2d[i]
@@ -504,33 +556,37 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             gates = spec.gates
             item = QtWidgets.QTreeWidgetItem(self.treeWidget, [name])
             item.spec = spec
-            #for i in range(NGates):
+            # for i in range(NGates):
             #    subitem = QtWidgets.QTreeWidgetItem(item, ["Gate {}".format(i)])
             #    subitem.spec = spec.gate
             count = 0
             for gObj in gates:
                 subitem = QtWidgets.QTreeWidgetItem(item, [gObj.name])
                 subitem.index = count
-                count = count+1
+                count = count + 1
                 self.treeWidget.addTopLevelItem(item)
 
         self.treeWidget.expandAll()
-           
 
-    def itemclicked(self,it,col):
+    def itemclicked(self, it, col):
         ## Loop through all items to find the clicked ones
         allitems = self.treeWidget.selectedItems()
-        
+
         ##print("Old item: ",allitems[0])
         ##print("Selected: ",allitems)
         ##print("Parent: ",allitems[0].parent())
         if it.parent() is None:
-            self.SpecCanvas.setSpecIndex(allitems[0].spec.num,allitems[0].spec.is2D,-1)
-            if(len(allitems)>1):
+            self.SpecCanvas.setSpecIndex(
+                allitems[0].spec.num, allitems[0].spec.is2D, -1
+            )
+            if len(allitems) > 1:
                 self.SpecCanvas.setOverlayIndex(allitems[1].spec.num)
         else:
-            self.SpecCanvas.setSpecIndex(allitems[0].parent().spec.num,
-                                         allitems[0].parent().spec.is2D,allitems[0].index)
+            self.SpecCanvas.setSpecIndex(
+                allitems[0].parent().spec.num,
+                allitems[0].parent().spec.is2D,
+                allitems[0].index,
+            )
         self.rebinSlider.setValue(self.n)
         Ui_MainWindow.rebin_action(self)
 
@@ -612,8 +668,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             hbox.addWidget(self.sclrlab[isclr])
             hbox.addWidget(self.sclrval[isclr])
             self.scalerFramevbox.addLayout(hbox)
-            isclr = isclr+1
-        
+            isclr = isclr + 1
+
     ## Update scaler values
     def UpdateScalers(self):
         SpecColl = self.SpecCanvas.SpecColl
@@ -622,7 +678,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             ##txt = "{name:<17}:  {num:>8}"
             self.sclrval[isclr].setText("{}".format(sc.N))
             ##self.sclrval[isclr].setText(format(sc.N))
-            isclr = isclr+1
+            isclr = isclr + 1
+
 
     ## Update run info
     def UpdateRuninfo(self):
@@ -650,7 +707,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         
 class ScalerCollectionThread(QtCore.QThread):
-    def __init__(self,view):
+    def __init__(self, view):
         super().__init__()
 
         self.view = view
@@ -661,8 +718,8 @@ class ScalerCollectionThread(QtCore.QThread):
         ##    print(" - ",name)
 
     def run(self):
-        
-        while True: ##self.specColl.MIDASisRunning:
+
+        while True:  ##self.specColl.MIDASisRunning:
             ##print("Collecting Scalers")
             sclrvals = self.specColl.dm.getScalers()
             for i in range(len(self.specColl.sclr)):
@@ -700,7 +757,8 @@ class MidasStatusThread(QtCore.QThread):
             time.sleep(1)
             
 
-class MyCustomToolbar(NavigationToolbar): 
+
+class MyCustomToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent=None):
         self.toolitems = ()
         # create the default toolbar
@@ -708,39 +766,57 @@ class MyCustomToolbar(NavigationToolbar):
 
         ## --------------------------------------------------
         ## Custom items
-        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
-                                    "..", "images", "icons", "")
+        iconDir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "images",
+            "icons",
+            "",
+        )
 
         ## Update
-        self.a = self.addAction(QtGui.QIcon(iconDir + "ReloadIcon.ico"),
-                                "Reload", plotCanvas.UpdatePlot)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "ReloadIcon.ico"),
+            "Reload",
+            plotCanvas.UpdatePlot,
+        )
         self.a.setToolTip("Update the plot")
-        self._actions['update'] = self.a
+        self._actions["update"] = self.a
 
         ## LogLin
-        self.a = self.addAction(QtGui.QIcon(iconDir + "LogLinIcon.ico"),
-                                "LogLin", plotCanvas.ToggleLog)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "LogLinIcon.ico"),
+            "LogLin",
+            plotCanvas.ToggleLog,
+        )
         self.a.setToolTip("Change to Log or Linear Scale")
-        self._actions['loglin'] = self.a
+        self._actions["loglin"] = self.a
 
         ## Scale-all
-        self.a = self.addAction(QtGui.QIcon(iconDir + "ScaleAllIcon.ico"),
-                                "Auto Scale", plotCanvas.Resize)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "ScaleAllIcon.ico"),
+            "Auto Scale",
+            plotCanvas.Resize,
+        )
         self.a.setToolTip("Resize to all")
-        self._actions['scaleall'] = self.a
-        
+        self._actions["scaleall"] = self.a
+
         ## Auto y-scale
-        self.a = self.addAction(QtGui.QIcon(iconDir + "AutoScaleIcon.ico"),
-                                "Auto Scale", plotCanvas.Autosize)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "AutoScaleIcon.ico"),
+            "Auto Scale",
+            plotCanvas.Autosize,
+        )
         self.a.setToolTip("Auto-scale the y-direction")
-        self._actions['autoscale'] = self.a
+        self._actions["autoscale"] = self.a
 
         ## Jam-like zoom button
-        self.a = self.addAction(QtGui.QIcon(iconDir + "JamZoomIcon.ico"),
-                                "Zoom", plotCanvas.JamZoom)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "JamZoomIcon.ico"), "Zoom", plotCanvas.JamZoom
+        )
         self.a.setToolTip("Zoom in with clicks")
-        self._actions['zoom'] = self.a
-        
+        self._actions["zoom"] = self.a
+
         ## XRange
         ##self.a = self.addAction(QtGui.QIcon(iconDir + "XRangeIcon.ico"),
         ##                        "X Range", plotCanvas.xInteractiveZoom)
@@ -748,23 +824,32 @@ class MyCustomToolbar(NavigationToolbar):
         ##self._actions['xrange'] = self.a
 
         ## YRange
-        self.a = self.addAction(QtGui.QIcon(iconDir + "YRangeIcon.ico"),
-                                "Y Range", plotCanvas.JamZoomy)
-#                                "Y Range", plotCanvas.yInteractiveZoom)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "YRangeIcon.ico"),
+            "Y Range",
+            plotCanvas.JamZoomy,
+        )
+        #                                "Y Range", plotCanvas.yInteractiveZoom)
         self.a.setToolTip("Adjust the y-range")
-        self._actions['yrange'] = self.a
+        self._actions["yrange"] = self.a
 
         ## Zoom in
-        self.a = self.addAction(QtGui.QIcon(iconDir + "ZoomInIcon.ico"),
-                                "Zoom in", plotCanvas.xZoomIn)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "ZoomInIcon.ico"),
+            "Zoom in",
+            plotCanvas.xZoomIn,
+        )
         self.a.setToolTip("Zoom in")
-        self._actions['zoomin'] = self.a
+        self._actions["zoomin"] = self.a
 
         ## Zoom in
-        self.a = self.addAction(QtGui.QIcon(iconDir + "ZoomOutIcon.ico"),
-                                "Zoom out", plotCanvas.xZoomOut)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "ZoomOutIcon.ico"),
+            "Zoom out",
+            plotCanvas.xZoomOut,
+        )
         self.a.setToolTip("Zoom out")
-        self._actions['zoomout'] = self.a
+        self._actions["zoomout"] = self.a
 
         ## Zero all spectra
         ##self.a = self.addAction(QtGui.QIcon(iconDir + "ZeroIcon.ico"),
@@ -772,32 +857,39 @@ class MyCustomToolbar(NavigationToolbar):
         ##self.a.setToolTip("Zero all spectra")
         ##self._actions['zeroall'] = self.a
 
-
-        
         ## Add a Splitter
         self.a = self.addWidget(QtWidgets.QSplitter())
 
         ## gross area
-        self.a = self.addAction(QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
-                                "Gross Area", plotCanvas.grossArea)
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "GrossAreaIcon.ico"),
+            "Gross Area",
+            plotCanvas.grossArea,
+        )
         self.a.setToolTip("Calculate the gross area under a peak")
-        self._actions['grossarea'] = self.a
+        self._actions["grossarea"] = self.a
 
         ## net area
-        self.a = self.addAction(QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
-                                "Net Area", plotCanvas.netArea)
-        self.a.setToolTip("Calculate the net, background-subtracted area under a peak")
-        self._actions['netarea'] = self.a
-        
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "NetAreaIcon.ico"),
+            "Net Area",
+            plotCanvas.netArea,
+        )
+        self.a.setToolTip(
+            "Calculate the net, background-subtracted area under a peak"
+        )
+        self._actions["netarea"] = self.a
+
         ## Add a Splitter
         self.a = self.addWidget(QtWidgets.QSplitter())
-        
+
     def select_tool(self):
         print("You clicked the selection tool")
 
+
 ##
 ##def main():
-##    
+##
 ##    app = QtWidgets.QApplication(sys.argv)
 ##    ex = Ui_MainWindow()
 ##    sys.exit(app.exec_())
@@ -824,7 +916,7 @@ class OutLog:
             self.edit.setTextColor(self.color)
 
         self.edit.moveCursor(QtGui.QTextCursor.End)
-        self.edit.insertPlainText( m )
+        self.edit.insertPlainText(m)
 
         if self.color:
             self.edit.setTextColor(tc)
@@ -840,23 +932,25 @@ class OutLog:
 # The new Stream Object which replaces the default stream associated with sys.stdout
 # This object just puts data in a queue!
 class WriteStream(object):
-    def __init__(self,queue):
+    def __init__(self, queue):
         self.queue = queue
 
     def write(self, text):
         self.queue.put(text)
 
+
 # A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
 # It blocks until data is available, and one it has got something from the queue, it sends
-# it to the "MainThread" by emitting a Qt Signal 
+# it to the "MainThread" by emitting a Qt Signal
 class MyReceiver(QtCore.QObject):
     mysignal = QtCore.Signal(str)
 
-    def __init__(self,queue,*args,**kwargs):
-        QtCore.QObject.__init__(self,*args,**kwargs)
+    def __init__(self, queue, *args, **kwargs):
+        QtCore.QObject.__init__(self, *args, **kwargs)
         self.queue = queue
 
         ##    @pyqtSlot()
+
     def run(self):
         while True:
             text = self.queue.get()
@@ -865,4 +959,33 @@ class MyReceiver(QtCore.QObject):
                 break
 
 
+class TargetDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__()
 
+        self.setWindowTitle("Target Setup")
+
+        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+
+        self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        layout = QtWidgets.QVBoxLayout()
+        message = QtWidgets.QLineEdit(get_target_id())
+        layout.addWidget(message)
+        layout.addWidget(self.buttonBox)
+        self.setLayout(layout)
+
+
+def set_target_id(target_id):
+    s = f'set "/Targets/Target ID" "{target_id}"'
+    os.system("odbedit -c '" + s + "'")
+
+
+def get_target_id():
+    l = os.popen('odbedit -d "/Targets/Target ID" -c " ls " ').readlines()[0]
+    l = l.split()
+    if l[0] == "Target" and l[1] == "ID":
+        return " ".join(l[2:])
+    return None
