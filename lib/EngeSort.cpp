@@ -79,6 +79,7 @@ Scaler *sBackLE;
 Scaler *sBackHE;
 Scaler *sE;
 Scaler *sDE;
+Scaler *sSiPulser;
 Scaler *BCI;
 
 double pSiSlope = 0.0;
@@ -170,6 +171,7 @@ void EngeSort::Initialize(){
   sBackHE = new Scaler("Back LE",7);
   sE = new Scaler("E",8);
   sDE = new Scaler("DE",9);
+	sSiPulser = new Scaler("Si Pulser",11);
   BCI = new Scaler("BCI",15);
 
 }
@@ -335,6 +337,7 @@ void EngeSort::incScalers(uint32_t *dSCAL){
   sBackHE -> inc(dSCAL);
   sE -> inc(dSCAL);
   sDE -> inc(dSCAL);
+	sSiPulser -> inc(dSCAL);
   BCI -> inc(dSCAL);
 }
 
@@ -657,6 +660,7 @@ void MidasAnalyzerRun::BeginRun(TARunInfo* runinfo){
   printf("Silicon slope = %f\n",pSiSlope);
   
   fRunEventCounter = 0;
+	fModule->eA->setIsRunning(true);
 }
 
 void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){

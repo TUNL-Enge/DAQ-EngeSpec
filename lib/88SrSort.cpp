@@ -2,14 +2,15 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <cmath>		
 
-#include "RBSSort.h"
+#include "88SrSort.h"
 #include "TV792Data.hxx"
 
 Messages messages;
 
 std::string EngeSort::sayhello( ) {
-  return messages.sayhello("RBSSort");
+  return messages.sayhello("best");
 }
 std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
@@ -19,7 +20,17 @@ int Channels1D = 4096;
 int Channels2D = 512;
 
 // 1D Spectra
-Histogram *hDet165;
+Histogram *hDet0;
+Histogram *hDet1;
+Histogram *hDet2;
+Histogram *hDet3;
+Histogram *hNaI;
+Histogram *hMonitor;
+Histogram *hNaICal;
+
+// 2D Spectra
+Histogram *hRecoilvsEjectile0;
+Histogram *hRecoilvsEjectile1;
 
 // Counters
 int totalCounter=0;
@@ -31,6 +42,12 @@ Scaler *sGatesLive;
 Scaler *sClock;
 Scaler *sClockLive;
 Scaler *BCI;
+Scaler *sPulser;
+
+// random number generator for calibration values.
+std::random_device rand_dev;
+std::mt19937 generator(rand_dev());
+std::uniform_int_distribution<int> uniform_sample(-1, 1);
 
 
 void EngeSort::Initialize(){
@@ -39,14 +56,25 @@ void EngeSort::Initialize(){
   
   //--------------------
   // 1D Histograms
-  hDet165 = new Histogram("165-deg Detector", Channels1D, 1);
+  hDet0 = new Histogram("Detector 0", Channels1D, 1);
+  hDet1 = new Histogram("Detector 1", Channels1D, 1);
+  hDet2 = new Histogram("Detector 2", Channels1D, 1);
+  hDet3 = new Histogram("Detector 3", Channels1D, 1);
+  hMonitor = new Histogram("Monitor Detector", Channels1D, 1);
+  hNaI = new Histogram("NaI Detector", Channels1D, 1);
+  hNaICal = new Histogram("NaI Energy Calibrated", Channels1D, 1);
 
-  // Build the scalers
+	// 2D Histograms
+	hRecoilvsEjectile0 = new Histogram("Ejectile-Recoil Coincidence 0-2", Channels2D, 2);
+	hRecoilvsEjectile1 = new Histogram("Ejectile-Recoil Coincidence 1-2", Channels2D, 2);
+	
+  // Build the scalers 
   sGates = new Scaler("Total Gates", 0);    // Name, index
   sGatesLive = new Scaler("Total Gates Live", 1);    // Name, index
   sClock = new Scaler("Clock",2);
   sClockLive = new Scaler("Clock Live",3);
   BCI = new Scaler("BCI",15);
+  sPulser = new Scaler("Pulser", 11);
 
  
 }
@@ -59,24 +87,61 @@ void EngeSort::sort(uint32_t *dADC, int nADC){
 
   double ADCsize = nADC; //sizeof(&dADC)/sizeof(&dADC[0]);
 
-  //std::cout << ADCsize << "  " << TDCsize << std::endl;
-  //std::cout << dADC << "  " << dTDC << std::endl;
-  
+
+	// Calibration for the NaI detector
+	double slope = 5.436860068259382;
+	double intercept = -749.8174061433435;
   // Thresholds
   int Threshold = 150;
-  for(int i=0; i<ADCsize; i++)
-    if(dADC[i] < Threshold || dADC[i] > Channels1D)dADC[i]=0;
+  for (int i=0; i<ADCsize; i++) {
+    if (dADC[i] < Threshold || dADC[i] > Channels1D) {
+			dADC[i]=0;
+		}
+	}
 
-  //  std::cout << "Done thresholding" << std::endl;
-  int c165=0;
+	int c0 = 0;
+	int c1 = 0;
+	int c2 = 0;
+	int c3 = 0;
+	int cMon = 0;
+	int cNaI = 0;
+	int cNaICal = 0;
+
   // Define the channels
   if(ADCsize > 0){
-    c165 = dADC[0];
+
+		c0 = dADC[0];
+		c1 = dADC[1];
+		c2 = dADC[2];
+		c3 = dADC[3];
+	  cMon = dADC[4];
+		cNaI = dADC[5];
+		
   }
-  
+
+	cNaICal = std::round(((slope * cNaI + intercept) / 10.0)
+											 + uniform_sample(generator)); // Compress by a factor of 2 
+	
   // Increment 1D histograms
-  hDet165 -> inc(c165);
-  
+  hDet0 -> inc(c0);
+  hDet1 -> inc(c1);
+  hDet2 -> inc(c2);
+  hDet3 -> inc(c3);
+	hMonitor -> inc(cMon);
+	hNaI -> inc(cNaI);
+	hNaICal -> inc(cNaICal);
+
+	// Compress the 2D counts.
+
+	int cc0 = (int) (c0 / 8);
+	int cc1 = (int) (c1 / 8);
+	int cc2 = (int) (c2 / 8);
+	// // Ejectile-Recoil Coincidences
+	hRecoilvsEjectile0 -> inc(cc0, cc2);
+	hRecoilvsEjectile1 -> inc(cc1, cc2);
+
+	
+	
 }
 
 // Increment the scalers
@@ -88,9 +153,12 @@ void EngeSort::incScalers(uint32_t *dSCAL){
   
   sGates -> inc(dSCAL);
   sGatesLive -> inc(dSCAL);
-  sClock-> inc(dSCAL);
+	sClock-> inc(dSCAL);
   sClockLive -> inc(dSCAL);
+	sPulser -> inc(dSCAL);
   BCI -> inc(dSCAL);
+
+	//	std::cout << "The pulser rate is: " << dSCAL[16] << std::endl;
 }
 
 

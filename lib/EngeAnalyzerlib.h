@@ -35,6 +35,8 @@ class Gate{
   void Print();
   void Clear();
   std::string getName(){return Name;}
+  double getMaxx(){return maxx;}
+  double getMinx(){return minx;}
   
  private:
 
