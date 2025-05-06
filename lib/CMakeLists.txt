@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.2 )
+cmake_minimum_required( VERSION 3.2...3.31 )
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_FLAGS "-O3")
@@ -18,9 +18,9 @@ if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
 endif()
 
 # Find necessary packages
-find_package( PythonLibs 3 REQUIRED )
-include_directories( ${PYTHON_INCLUDE_DIRS} )
-MESSAGE(STATUS "Pythonlibs: " ${PYTHON_INCLUDE_DIRS})
+find_package( Python3 REQUIRED COMPONENTS Development )
+include_directories( ${Python3_INCLUDE_DIRS} )
+MESSAGE(STATUS "Python: " ${Python3_INCLUDE_DIRS})
 
 find_package( Boost COMPONENTS numpy REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
@@ -45,59 +45,10 @@ LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so conve
 # Define the general Enge analyzer library
 add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 
-# Multi Card Crap
-add_library( MDPPevt SHARED MDPPEventHandler.cpp )
-add_library( tomlread SHARED mdpp_module_config.cpp )
-
 # Build our Sort Routine
-add_library( MDPPSort_CI SHARED MDPPSort_CI.cpp)
-
-add_library( v1730EngeSort SHARED v1730EngeSort.cpp)
-
-# Build our Sort Routine
-add_library( MDPPSort SHARED MDPPSort.cpp)
-
-# Build our Sort Routine
-add_library( SiliconSort SHARED SiliconSort.cpp)
-
-# Build our Sort Routine
-add_library( RBSSort SHARED RBSSort.cpp)
-
-# Build our Sort Routine
-add_library( 88SrSort SHARED 88SrSort.cpp)
-
-
+add_library( EngeSort SHARED EngeSort.cpp)
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES} libmidas.a ) 
 
-target_link_libraries( v1730Sort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
-
-target_link_libraries( v1730EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
-
-target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
-
-target_link_libraries( SiliconSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES} libmidas.a )
-
-target_link_libraries( RBSSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
-
-target_link_libraries( 88SrSort ${Boost_LIBRARIES} EngeAnalyzer 
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a -lrt )
-
-# Ensure .so extension, which is needed by python when it imports the module.
-set_target_properties(MDPPSort tomlread MDPPevt EngeAnalyzer PROPERTIES SUFFIX ".so")
-
-# rt is needed by midas on linux, not sure if it is actually required to build the library
-if(NOT APPLE)
-  link_libraries(rt)
-endif()
-# The extra target is just so CMake does not screw up the dependencies.
-target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
-target_link_libraries( MDPPSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
-  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
-
+## Include all of the user files
+include( CMakeUserLists.txt )

@@ -40,3 +40,4 @@ Makefile
 /modules/SpectrumCanvas-V.py
 test
 
+/lib/CMakeUserLists.txt
