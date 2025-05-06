@@ -1,5 +1,5 @@
-#ifndef MDPP_SORT_H
-#define MDPP_SORT_H
+#ifndef LENA_SORT_H
+#define LENA_SORT_H
 
 #include "EngeAnalyzerlib.h"
 #include "MDPPEventHandler.h"

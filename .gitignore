@@ -40,4 +40,19 @@ Makefile
 /modules/SpectrumCanvas-V.py
 test
 
+## User sort routines
 /lib/CMakeUserLists.txt
+## Ignore all and then add back the ones to keep
+/lib/*.cpp
+/lib/*.h
+!/lib/EngeSort.cpp
+!/lib/EngeSort.h
+!/lib/LenaSort.cpp
+!/lib/LenaSort.h
+!/lib/EngeAnalyzerlib.cpp
+!/lib/EngeAnalyzerlib.h
+!/lib/mdpp_module_config.cpp
+!/lib/mdpp_module_config.h
+!/lib/MDPPEventHandler.cpp
+!/lib/MDPPEventHandler.h
+!/lib/toml.hpp

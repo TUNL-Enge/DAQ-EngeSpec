@@ -122,7 +122,7 @@
 
 #include "EngeAnalyzerlib.h"
 #include "MDPPEventHandler.h"
-#include "MDPPSort.h"
+#include "LenaSort.h"
 #include "TV792Data.hxx"
 
 #include <fstream>
@@ -131,7 +131,7 @@ Messages messages;
 
 std::string EngeSort::sayhello()
 {
-	return messages.sayhello("MDPPSort");
+	return messages.sayhello("LenaSort");
 }
 std::string EngeSort::saygoodbye()
 {

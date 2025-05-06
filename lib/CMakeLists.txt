@@ -45,10 +45,23 @@ LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so conve
 # Define the general Enge analyzer library
 add_library( EngeAnalyzer SHARED EngeAnalyzerlib.cpp )
 
-# Build our Sort Routine
+# Build the standard Enge sort routine
 add_library( EngeSort SHARED EngeSort.cpp)
 target_link_libraries( EngeSort ${Boost_LIBRARIES} EngeAnalyzer 
   librootana.a -lz ${ROOT_LIBRARIES} libmidas.a ) 
+
+# Build the standard LENA sort routine
+# Multi Card Crap
+add_library( MDPPevt SHARED MDPPEventHandler.cpp )
+add_library( tomlread SHARED mdpp_module_config.cpp )
+add_library( LenaSort SHARED LenaSort.cpp)
+# Ensure .so extension, which is needed by python when it imports the module.
+set_target_properties(LenaSort tomlread MDPPevt EngeAnalyzer PROPERTIES SUFFIX ".so")
+# The extra target is just so CMake does not screw up the dependencies.
+target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
+target_link_libraries( LenaSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
+  librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 
 ## Include all of the user files
 include( CMakeUserLists.txt )
