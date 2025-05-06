@@ -475,7 +475,7 @@ class SpectrumCanvas(FigureCanvas):
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
-        print("SpectrumCanvas UpdatePlotstart:", time.time())
+        ##print("SpectrumCanvas UpdatePlotstart:", time.time())
         ##xmin  = self.a.get_xlim()[0]
         ##xmax  = self.a.get_xlim()[1]
         ##ymin    = self.a.get_ylim()[0]
@@ -487,7 +487,7 @@ class SpectrumCanvas(FigureCanvas):
             self.SpecColl.midas_collection_thread.start()
 ##            print("SpectrumCanvas collectionthread start:", time.time())
             time.sleep(0.5)
-            print("SpectrumCanvas collectionthread after sleep:", time.time())
+            ##print("SpectrumCanvas collectionthread after sleep:", time.time())
 
         if self.SpecColl.MIDASLastAgg:
             self.SpecColl.midas_collection_thread.start()
@@ -500,7 +500,7 @@ class SpectrumCanvas(FigureCanvas):
         for sp in self.SpecColl.spec2d:
             sp.spec2d[:] = sp.spec2d_temp
 
-        print("SpectrumCanvas CopiedData:", time.time())
+        ##print("SpectrumCanvas CopiedData:", time.time())
             
         if not self.is2D:
             xmin = self.Spec.xzoom[0]
@@ -547,26 +547,26 @@ class SpectrumCanvas(FigureCanvas):
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
             #print(ye)
-            print("SpectrumCanvas beforemeshgrid:",time.time())
+            ##print("SpectrumCanvas beforemeshgrid:",time.time())
             X, Y = np.meshgrid(xe,ye)
-            print("SpectrumCanvas aftermeshgrid:",time.time())
+            ##print("SpectrumCanvas aftermeshgrid:",time.time())
             self.H = H
             self.X = X.astype(int)
             self.Y = Y.astype(int)
 
-            print("SpectrumCanvas beforeRebin:",time.time())
+            ##print("SpectrumCanvas beforeRebin:",time.time())
             ##SpectrumCanvas.ReBin2D(self,self.n2)
             self.PlotData2D()
-            print("SpectrumCanvas afterRebin:",time.time())
+            ##print("SpectrumCanvas afterRebin:",time.time())
            #self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
         try:
             self.fig.delaxes(self.ax2)
         except:
             pass
-        print("SpectrumCanvas endSpectraBuilding:",time.time())
+        ##print("SpectrumCanvas endSpectraBuilding:",time.time())
         self.updateSlider()
         self.fig.canvas.draw()
-        print("SpectrumCanvas CanvasDrawn:",time.time())
+        ##print("SpectrumCanvas CanvasDrawn:",time.time())
     
 
     def GetMax(self):
