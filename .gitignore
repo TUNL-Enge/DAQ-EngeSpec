@@ -20,6 +20,7 @@ runs
 ## Folders we don't need
 modules/backup
 notes
+QtDesigner
 
 ## Random other files
 conversioncommand
@@ -56,3 +57,5 @@ test
 !/lib/MDPPEventHandler.cpp
 !/lib/MDPPEventHandler.h
 !/lib/toml.hpp
+/31P_dd_Run52_10MeV_Si
+/nai_cal.csv
