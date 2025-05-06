@@ -209,8 +209,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.commandWidget.setMaximumHeight(100)
 
         ## Add the output streams to the text editor
-        ##sys.stdout = OutLog(commandWidget, sys.stdout)
-        ##sys.stderr = OutLog(commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
+        sys.stdout = OutLog(self.commandWidget, sys.stdout)
+        sys.stderr = OutLog(self.commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
 
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
         gridDataFrame.setSpacing(10)
@@ -738,7 +738,7 @@ class MidasStatusThread(QtCore.QThread):
     def run(self):
         
         while True: ##self.specColl.MIDASisRunning:
-            ##print("Collecting MIDAS Status")
+            #print("Collecting MIDAS Status")
             isRunning = self.specColl.dm.getIsRunning()
             ##print("isRunning = ",isRunning, " self.wasRunning = ",self.wasRunning)
             if(isRunning):
