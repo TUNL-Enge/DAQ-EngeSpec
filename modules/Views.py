@@ -327,7 +327,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.connections_menu.addAction(self.connectOfflineAction)
 
         ## Sort a file in offline mode
-        self.sortAction = QtGui.QAction("&Queue sort file(s)", self)
+        self.sortAction = QtGui.QAction("&Queue event file(s)", self)
         self.sortAction.setEnabled(False)
         self.sortAction.triggered.connect(self.sort)
         self.connections_menu.addAction(self.sortAction)
