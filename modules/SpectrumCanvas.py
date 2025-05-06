@@ -542,7 +542,7 @@ class SpectrumCanvas(FigureCanvas):
            # self.a.set_ylim([ymin,ymax])
            
         else:
-            print("2D")
+            #print("2D")
             H = self.Spec2D.spec2d.T
             xe = self.Spec2D.xedges
             ye = self.Spec2D.yedges
