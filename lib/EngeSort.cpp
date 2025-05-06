@@ -430,6 +430,17 @@ IntVector EngeSort::getNGates(){
   return ngates;
 }
 
+// Return the number of channels in each Histogram
+IntVector EngeSort::getNChannels()
+{
+	IntVector nchannels;
+	for (auto h : Histograms) {
+		nchannels.push_back(h->getnChannels());
+	}
+	return nchannels;
+}
+
+
 // Return a vector of scalers
 IntVector EngeSort::getScalers(){
 
@@ -710,6 +721,7 @@ BOOST_PYTHON_MODULE(EngeSort)
     .def("getData2D", &EngeSort::getData2D)            // 2D histograms
     .def("getis2Ds", &EngeSort::getis2Ds)                // bool vector
     .def("getNGates", &EngeSort::getNGates)            // int vector
+		.def("getNChannels", &EngeSort::getNChannels) // int vector
     .def("getSpectrumNames", &EngeSort::getSpectrumNames) // string vector
     .def("getIsRunning", &EngeSort::getIsRunning)        // bool value
     .def("getScalerNames", &EngeSort::getScalerNames)     // string vector
