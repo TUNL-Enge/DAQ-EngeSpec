@@ -15,9 +15,9 @@ std::string EngeSort::sayhello( ) {
 std::string EngeSort::saygoodbye( ) {
   return messages.saygoodbye();
 }
-std::string EngeSort::saysomething(std::string str) {
-  
-  return messages.saysomething(str);
+std::string EngeSort::saysomething(std::string str)
+{
+	return messages.saysomething(str);
 }
 
 int Channels1D = 4096;
@@ -686,6 +686,8 @@ void MidasAnalyzerRun::EndRun(TARunInfo* runinfo){
   std::cout << "Stop time = " << std::ctime(&stop_time) << "\n";
 
   printf("BCI was %d\n",fModule->eA->getScalers()[10]);
+
+  fModule->eA->setIsRunning(false);
   
 }
 

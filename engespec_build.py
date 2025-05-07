@@ -43,7 +43,7 @@ def main(clean):
         run_command("make clean", lib_directory)
     run_command("make", lib_directory)
 
-    source_file = os.path.join(lib_directory, "libMDPPSort.so")
+    source_file = os.path.join(lib_directory, "libLenaSort.so")
     dest_file = os.path.abspath("EngeSort.so")
 
     # Ensure the source file exists

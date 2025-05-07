@@ -946,6 +946,7 @@ void MidasAnalyzerRun::EndRun(TARunInfo *runinfo)
 {
 	printf("End run %d\n", runinfo->fRunNo);
 	printf("Counted %d events\n", fRunEventCounter);
+  fModule->eA->setIsRunning(false);
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
