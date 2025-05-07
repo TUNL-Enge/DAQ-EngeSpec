@@ -936,8 +936,8 @@ void MidasAnalyzerRun::BeginRun(TARunInfo *runinfo)
 	uint32_t run_start_time_binary = 0;
 	//runinfo->fOdb->RU32("/Runinfo/Start time binary", &run_start_time_binary);
 	time_t run_start_time = run_start_time_binary;
-	printf("ODB Run start time: %d: %s", (int)run_start_time,
-	       ctime(&run_start_time));
+	//printf("ODB Run start time: %d: %s", (int)run_start_time,
+	//       ctime(&run_start_time));
 
 	fRunEventCounter = 0;
 }
