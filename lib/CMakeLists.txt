@@ -64,4 +64,4 @@ target_link_libraries( LenaSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 
 ## Include all of the user files
-include( CMakeUserLists.txt )
+#include( CMakeUserLists.txt )
