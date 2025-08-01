@@ -1048,8 +1048,6 @@ class SpectrumCanvas(FigureCanvas):
             bg1points = self.getSingle("firebrick")
             print("Click second background region")
             bg2points = self.getSingle("firebrick")
-            print("Click peak")
-            peakpoints = self.getSingle("forestgreen")
 
             ## Calculate the background
             bgx = bg1points[0] + bg2points[0]
@@ -1064,8 +1062,11 @@ class SpectrumCanvas(FigureCanvas):
             ## Draw background line
             xplot = list(range(min(bgx), max(bgx)))
             yplot = np.poly1d(bgfit)
-            # self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
-            # self.fig.canvas.draw()
+            self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
+            self.fig.canvas.draw()
+
+            print("Click peak")
+            peakpoints = self.getSingle("forestgreen")
 
             ## Find the peak position
             Chn = peakpoints[0]

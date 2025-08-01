@@ -544,22 +544,22 @@ void EngeSort::putGate(std::string name, std::string gname, p::list x, p::list y
       //if(h -> getNGates() > 0){
       //std::cout << "Yes, this histogram has gates!" << std::endl;
       for(int ig = 0; ig < (h -> getNGates()); ig++){
-	Gate &G1 = h->getGate(ig);
-	if(G1.getName() == gname){
+	      Gate &G1 = h->getGate(ig);
+	      if(G1.getName() == gname){
 
-	  G1.Clear();
-	  //G1.Print();
+	        G1.Clear();
+	        //G1.Print();
 
-	  p::ssize_t len = p::len(x);
-	  // Make a vector for the gate
-	  for(int i=0; i<len; i++){
-	    std::vector<double> tmp;
-	    tmp.push_back(p::extract<double>(x[i]));
-	    tmp.push_back(p::extract<double>(y[i]));
-	    G1.addVertex(tmp);
-	  }
-	  //G1.Print();
-	}
+	        p::ssize_t len = p::len(x);
+	        // Make a vector for the gate
+	        for(int i=0; i<len; i++){
+	          std::vector<double> tmp;
+	          tmp.push_back(p::extract<double>(x[i]));
+	          tmp.push_back(p::extract<double>(y[i]));
+	          G1.addVertex(tmp);
+	        }
+	        //G1.Print();
+	      }
       }
     }
   }
