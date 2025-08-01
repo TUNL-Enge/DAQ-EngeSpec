@@ -209,8 +209,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.commandWidget.setMaximumHeight(100)
 
         ## Add the output streams to the text editor
-        sys.stdout = OutLog(self.commandWidget, sys.stdout)
-        sys.stderr = OutLog(self.commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
+        ##sys.stdout = OutLog(self.commandWidget, sys.stdout)
+        ##sys.stderr = OutLog(self.commandWidget, sys.stderr, QtGui.QColor(255,0,0) )
 
         gridDataFrame = QtWidgets.QGridLayout(dataFrame)
         gridDataFrame.setSpacing(10)
@@ -385,6 +385,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         gateAction = QtGui.QAction(
             QtGui.QIcon(iconDir + "MakeGate.ico"), "Set Gate", self
         )
+        gateAction.triggered.connect(self.setgate)
 
         zeroAction = QtGui.QAction(
             QtGui.QIcon(iconDir + "ZeroIcon.ico"), "Zero all", self
@@ -392,7 +393,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         zeroAction.setToolTip("Zero all spectra")
         zeroAction.triggered.connect(self.zeroall)
 
-        gateAction.triggered.connect(self.setgate)
 
         self.runControlsToolbar = self.addToolBar("Exit")
         self.runControlsToolbar.addAction(exitAction)

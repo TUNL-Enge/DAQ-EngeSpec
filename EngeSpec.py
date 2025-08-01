@@ -34,8 +34,8 @@ ui.show()
 
 ## make a queue and direct sys.stdout to it
 commandqueue = Queue()
-#sys.stdout = WriteStream(commandqueue)
-#sys.stderr = WriteStream(commandqueue)
+sys.stdout = WriteStream(commandqueue)
+sys.stderr = WriteStream(commandqueue)
 
 ## Now create a receiver to listen to the queue
 commandthread = QtCore.QThread()
@@ -43,7 +43,7 @@ commandreceiver = MyReceiver(commandqueue)
 commandreceiver.mysignal.connect(ui.append_text)
 commandreceiver.moveToThread(commandthread)
 commandthread.started.connect(commandreceiver.run)
-#commandthread.start()
+commandthread.start()
 
 # app.exit(app.exec_())
 
