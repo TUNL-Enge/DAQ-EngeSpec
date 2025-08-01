@@ -273,7 +273,7 @@ class MidasThread(QThread):
 
         print("MIDAS finished running")
         self.specColl.statusBar.showMessage("")
-        print(self.specColl.dm.saysomething(""))
+        print(self.specColl.dm.saysomething("Finished"))
         ## Collect the last bunch of data
         # self.specColl.midas_collection_thread.start()
         # self.specColl.MIDASisRunning = False
