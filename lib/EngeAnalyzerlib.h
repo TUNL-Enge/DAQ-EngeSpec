@@ -115,9 +115,4 @@ extern std::vector<Scaler*> Scalers;
 extern int nHist1D;
 extern int nHist2D;
 
-extern std::vector<Scaler*> Scalers;
-extern std::vector<Histogram*> Histograms;
-extern int nHist1D;
-extern int nHist2D;
-
 #endif
