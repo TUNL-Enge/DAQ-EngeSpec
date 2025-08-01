@@ -241,7 +241,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if self.SpecCanvas.twoD == False:
             self.SpecCanvas.ReBin(self.n)
         else:
-            self.SpecCanvas.ReBin2D(self.n)
+            self.SpecCanvas.PlotData2D()
 
     def setting_target(self):
         text, ok = QtWidgets.QInputDialog.getText(

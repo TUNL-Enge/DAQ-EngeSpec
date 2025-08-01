@@ -462,7 +462,7 @@ class SpectrumCanvas(FigureCanvas):
             self.X = X.astype(int)
             self.Y = Y.astype(int)
 
-            SpectrumCanvas.ReBin2D(self, self.n2)
+            self.PlotData2D()
 
         else:
             x = np.arange(self.Spec.NBins, dtype=int)
