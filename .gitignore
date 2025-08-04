@@ -57,6 +57,8 @@ test
 !/lib/MDPPEventHandler.cpp
 !/lib/MDPPEventHandler.h
 !/lib/toml.hpp
+!/lib/hpge_cal_template.csv
 /31P_dd_Run52_10MeV_Si
 /nai_cal.csv
+/hpge_cal.csv
 /images/CI_large.jpg
