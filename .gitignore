@@ -61,6 +61,6 @@ test
 !/lib/hpge_cal_template.csv
 !/lib/nai_cal_template.csv
 
-# Calibration files
+# Ignore user calibration files
 *_cal.csv
 
