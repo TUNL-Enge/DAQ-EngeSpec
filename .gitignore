@@ -60,6 +60,7 @@ test
 !/lib/toml.hpp
 !/lib/hpge_cal_template.csv
 !/lib/nai_cal_template.csv
+!/lib/mdpp-setup_template.csv
 
 # Ignore user calibration files
 *_cal.csv
