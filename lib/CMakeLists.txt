@@ -62,7 +62,7 @@ target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 target_link_libraries( LenaSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
-# Copy across the calibration files ONLY if they do not exist
+# Copy across the calibration files and mdpp setup files ONLY if they do not exist
 if(NOT EXISTS "../hpge_cal.csv")
   file(COPY_FILE "hpge_cal_template.csv" "../hpge_cal.csv")
 endif()
