@@ -69,8 +69,8 @@ endif()
 if(NOT EXISTS "../nai_cal.csv")
   file(COPY_FILE "nai_cal_template.csv" "../nai_cal.csv")
 endif()
-if(NOT EXISTS "../mdpp-setup.csv")
-  file(COPY_FILE "mdpp-setup_template.csv" "../mdpp-setup.csv")
+if(NOT EXISTS "../mdpp-setup.toml")
+  file(COPY_FILE "mdpp-setup_template.toml" "../mdpp-setup.toml")
 endif()
 
 ## Include all of the user files
