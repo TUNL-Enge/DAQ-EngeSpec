@@ -62,6 +62,13 @@ target_link_libraries( MDPPevt ${Boost_LIBRARIES} EngeAnalyzer tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
 target_link_libraries( LenaSort ${Boost_LIBRARIES} EngeAnalyzer MDPPevt tomlread
   librootana.a -lz ${ROOT_LIBRARIES}  libmidas.a )
+# Copy across the calibration files ONLY if they do not exist
+if(NOT EXISTS "../hpge_cal.csv")
+  file(COPY_FILE "hpge_cal_template.csv" "../hpge_cal.csv")
+endif()
+if(NOT EXISTS "../nai_cal.csv")
+  file(COPY_FILE "nai_cal_template.csv" "../nai_cal.csv")
+endif()
 
 ## Include all of the user files
 #include( CMakeUserLists.txt )
