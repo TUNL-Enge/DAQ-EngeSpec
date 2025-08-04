@@ -31,6 +31,7 @@ Will.dat
 qlong_engespec.txt
 *_backup*
 EngeSpec\ for\ Mac\ Users.pdf
+/images/CI_large.jpg
 
 ## CMake stuff
 CMakeFiles
@@ -58,7 +59,8 @@ test
 !/lib/MDPPEventHandler.h
 !/lib/toml.hpp
 !/lib/hpge_cal_template.csv
-/31P_dd_Run52_10MeV_Si
-/nai_cal.csv
-/hpge_cal.csv
-/images/CI_large.jpg
+!/lib/nai_cal_template.csv
+
+# Calibration files
+*_cal.csv
+
