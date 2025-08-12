@@ -1039,6 +1039,10 @@ class SpectrumCanvas(FigureCanvas):
             -((x - c) ** 2) / (2.0 * (sig) ** 2)
         )
 
+    def gausFit(self):
+        if self.is2D:
+            print("Not available in 2D spectra")
+
     def netArea(self):
         if self.is2D:
             print("Not available in 2D spectra")

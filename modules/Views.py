@@ -880,6 +880,17 @@ class MyCustomToolbar(NavigationToolbar):
         )
         self._actions["netarea"] = self.a
 
+        ## Gaussian Fit
+        self.a = self.addAction(
+            QtGui.QIcon(iconDir + "GausFitIcon.ico"),
+            "Gaussian Fit",
+            plotCanvas.gausFit,
+        )
+        self.a.setToolTip(
+            "Fit a Gaussian peak and linear background"
+        )
+        self._actions["gausfit"] = self.a
+
         ## Add a Splitter
         self.a = self.addWidget(QtWidgets.QSplitter())
 
