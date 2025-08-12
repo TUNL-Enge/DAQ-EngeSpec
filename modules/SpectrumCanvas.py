@@ -1042,6 +1042,141 @@ class SpectrumCanvas(FigureCanvas):
     def gausFit(self):
         if self.is2D:
             print("Not available in 2D spectra")
+        else:
+                        ## Collect the regions
+            print("Click first background region")
+            bg1points = self.getSingle("firebrick")
+            print("Click second background region")
+            bg2points = self.getSingle("firebrick")
+
+            ## Calculate the background
+            bgx = bg1points[0] + bg2points[0]
+            bgy = bg1points[1] + bg2points[1]
+            bgfit = np.polyfit(bgx, bgy, deg=1)
+            m, b = bgfit
+            bgCounts = np.polyval(bgfit, bgx)
+            res = bgy - bgCounts
+
+            ubgCounts = np.mean(res)
+
+            ## Draw background line
+            xplot = list(range(min(bgx), max(bgx)))
+            yplot = np.poly1d(bgfit)
+            self.a.plot(xplot,yplot(xplot), c = "firebrick", ls = "dotted")
+            self.fig.canvas.draw()
+
+            print("Click peak")
+            peakpoints = self.getSingle("forestgreen")
+
+            ## Find the peak position
+            Chn = peakpoints[0]
+            # print(len(Chn))
+
+            Counts = peakpoints[1] - np.poly1d(bgfit)(Chn)  # - peakpoints[1]
+            # print(len(Counts))
+            centroid = sum(Chn * Counts / sum(Counts))
+            # print(centroid)
+            a1 = Counts[Chn.index(int(centroid))]
+            # print(a1)
+            sig1 = (peakpoints[0][-1] - peakpoints[0][0]) / 2.0
+            ucentroid = sum(Counts * (Chn - centroid) ** 2) / (sum(Counts) - 1)
+            ucentroid = np.sqrt(ucentroid) / np.sqrt(sum(Counts))
+
+            ## Calculate the number of counts
+            bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
+            ubgsum = np.sqrt(bgsum + ubgCounts**2)
+            totalsum = sum(peakpoints[1])
+            net = totalsum - bgsum
+            unet = np.sqrt(net + ubgsum**2)
+
+            ## Come up with some guesses
+            self.guess = [net,centroid,sig1,m,b] ## Net area as param
+##            self.guess = [np.max(gCnt),
+##                          np.min(gChn)+(np.max(gChn)-np.min(gChn))/2,
+##                          (np.max(gChn)-np.min(gChn))/2,
+##                          0,
+##                          np.min(gCnt)]
+##            
+            ## lmfit
+            gChn = np.array(Chn)
+            gCnt = np.array(peakpoints[1])
+            glmod = Model(self.gaussian) + Model(self.line)
+            ## TODO: NEED GUESS PARAMETERS
+            pars = glmod.make_params(A=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
+            result = glmod.fit(gCnt, pars, x=gChn)
+            print(result)
+            ## Best-fit values
+            cent = result.best_values.get('c')
+            ucent = result.params.get('c').stderr
+            sd = np.abs(result.best_values.get('sig'))
+            usd = result.params.get('sig').stderr
+            fwhm = 2 * np.sqrt(2 * np.log(2)) * sd
+            ufwhm = 2 * np.sqrt(2 * np.log(2)) * usd ## Might be wrong
+            netarea = result.best_values.get('A')
+            unetarea = result.params.get('A').stderr
+            print("Cent: ", cent) # Centroid
+            print("uCent: ", ucent) # Uncertainty in centroid
+            #print("SD: ", sd) # standard deviation
+            #print("uSD: ", usd) # Uncertainty in standard deviation
+            print("FWHM: ", fwhm) # FWHM
+            print("UFWHM: ", ufwhm) # Uncertainty in FWHM
+            print("NetArea (fit): ", netarea) # Net area of peak
+            print("uNetArea (fit)", unetarea) # Uncertainty in net area
+
+           
+            ## Plotting fits
+            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
+            self.fig.canvas.draw()
+
+            ## Not sure what this does
+            try:
+                self.fig.delaxes(self.ax2)
+            except:
+                pass
+        
+            ax2 = self.fig.add_subplot(self.gs[1])
+            self.ax2 = ax2
+            height = result.best_values.get('A')
+            x_vals = np.arange(bgx[0],bgx[-1]+1,1)
+            self.x = x_vals
+            exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
+            obs_y =  [self.Spec.spec[i] for i in x_vals]
+
+            p_values = []
+            signs = []
+            for i in range(len(obs_y)):
+                D = obs_y[i]
+                B = exp_y[i]
+                
+                if D>B:
+                    p_value = 1-gam(D,B)
+                    if p_value < .5:
+                        signs.append(1)
+                    else:
+                        signs.append(0)
+                else:
+                    p_value = gam(D+1,B)
+                    
+                    if p_value < .5:
+                        signs.append(-1)
+                    else:
+                        signs.append(0)
+                
+                p_values.append(p_value)
+                    
+            p_values = np.array(p_values)
+            z_values = signs*(np.sqrt(2)*erfinv(1-2*p_values))
+
+            ax2.step(x_vals,z_values,where="mid")
+            ax2.set_xlim(self.Spec.xzoom)
+            ax2.set_ylim([-5,5])
+            ax2.axis('off')
+            ax2.plot([min(x_vals),max(x_vals)],[0,0],   linestyle="--", c="black")
+            ax2.plot([min(x_vals),max(x_vals)],[2,2],   linestyle="--", c="red")
+            ax2.plot([min(x_vals),max(x_vals)],[-2,-2], linestyle="--", c="red")
+            ax2.format_coord = lambda x, y: "x = {0:>8.1f} \ny = {1:>8.1f}".format(x,y)
+
+            self.fig.canvas.draw()
 
     def netArea(self):
         if self.is2D:
