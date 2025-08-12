@@ -1091,18 +1091,16 @@ class SpectrumCanvas(FigureCanvas):
 
             ## Come up with some guesses
             self.guess = [net,centroid,sig1,m,b] ## Net area as param
-##            self.guess = [np.max(gCnt),
-##                          np.min(gChn)+(np.max(gChn)-np.min(gChn))/2,
-##                          (np.max(gChn)-np.min(gChn))/2,
-##                          0,
-##                          np.min(gCnt)]
-##            
+
+
             ## lmfit
             gChn = np.array(Chn)
-            gCnt = np.array(peakpoints[1])
-            glmod = Model(self.gaussian) + Model(self.line)
+            ## For fitting everything
+            ##gCnt = np.array(peakpoints[1])
+            gCnt = Counts ## background-subtracted Gaussian
+            glmod = Model(self.gaussian) ##+ Model(self.line)
             ## TODO: NEED GUESS PARAMETERS
-            pars = glmod.make_params(A=self.guess[0], c=self.guess[1], sig=self.guess[2], m=self.guess[3], b=self.guess[4])
+            pars = glmod.make_params(A=self.guess[0], c=self.guess[1], sig=self.guess[2])#, m=self.guess[3], b=self.guess[4])
             result = glmod.fit(gCnt, pars, x=gChn)
             print(result)
             ## Best-fit values
@@ -1125,7 +1123,7 @@ class SpectrumCanvas(FigureCanvas):
 
            
             ## Plotting fits
-            self.a.plot(gChn, result.best_fit, c = 'C0', linewidth = 2.0)
+            self.a.plot(gChn, result.best_fit +(m*gChn+b), c = 'C0', linewidth = 2.0)
             self.fig.canvas.draw()
 
             ## Not sure what this does
@@ -1133,11 +1131,12 @@ class SpectrumCanvas(FigureCanvas):
                 self.fig.delaxes(self.ax2)
             except:
                 pass
-        
+
+            ## This plots the goodness-of-fit "residuals"
             ax2 = self.fig.add_subplot(self.gs[1])
             self.ax2 = ax2
             height = result.best_values.get('A')
-            x_vals = np.arange(bgx[0],bgx[-1]+1,1)
+            x_vals = np.arange(gChn[0],gChn[-1]+1,1)
             self.x = x_vals
             exp_y =  self.gaussian(x_vals,height,cent,sd)+(m*x_vals+b)
             obs_y =  [self.Spec.spec[i] for i in x_vals]
