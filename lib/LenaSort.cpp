@@ -938,7 +938,7 @@ void MidasAnalyzerRun::BeginRun(TARunInfo *runinfo)
 	time_t run_start_time = run_start_time_binary;
 	//printf("ODB Run start time: %d: %s", (int)run_start_time,
 	//       ctime(&run_start_time));
-
+	fModule->eA->setIsRunning(true);
 	fRunEventCounter = 0;
 }
 
@@ -946,7 +946,7 @@ void MidasAnalyzerRun::EndRun(TARunInfo *runinfo)
 {
 	printf("End run %d\n", runinfo->fRunNo);
 	printf("Counted %d events\n", fRunEventCounter);
-  fModule->eA->setIsRunning(false);
+	fModule->eA->setIsRunning(false);
 }
 
 BOOST_PYTHON_MODULE(EngeSort)

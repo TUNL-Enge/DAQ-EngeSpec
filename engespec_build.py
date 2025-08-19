@@ -44,7 +44,7 @@ def main(clean):
     run_command("make", lib_directory)
 
     source_file = os.path.join(lib_directory, "libLenaSort.so")
-    dest_file = os.path.abspath("EngeSort.so")
+    dest_file = os.path.join(current_path, "EngeSort.so")
 
     # Ensure the source file exists
     if not os.path.exists(source_file):
