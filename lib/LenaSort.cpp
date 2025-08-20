@@ -745,7 +745,6 @@ np::ndarray EngeSort::getData()
 	p::tuple shape = p::make_tuple(n_rows, n_cols);
 	p::tuple stride = p::make_tuple(sizeof(int));
 	np::dtype dtype = np::dtype::get_builtin<int>();
-	p::object own;
 	np::ndarray converted = np::zeros(shape, dtype);
 
 	// Loop through all histograms and pack the 1D histograms into a numpy matrix

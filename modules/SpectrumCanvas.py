@@ -475,24 +475,15 @@ class SpectrumCanvas(FigureCanvas):
 
     ## TODO: Clean this up. It's not very efficient currently
     def UpdatePlot(self):
-        ##print("SpectrumCanvas UpdatePlotstart:", time.time())
-        ##xmin  = self.a.get_xlim()[0]
-        ##xmax  = self.a.get_xlim()[1]
-        ##ymin    = self.a.get_ylim()[0]
-        ##ymax    = self.a.get_ylim()[1]
 
         ## Is MIDAS running? If so, run the collection thread
         if self.SpecColl.MIDASisRunning:
-##            print("SpectrumCanvas collectionthread start:", time.time())
-            self.SpecColl.midas_collection_thread.start()
-##            print("SpectrumCanvas collectionthread start:", time.time())
-            time.sleep(0.5)
-            ##print("SpectrumCanvas collectionthread after sleep:", time.time())
-
+            self.SpecColl.midas_collection_thread.run()
+            
         if self.SpecColl.MIDASLastAgg:
-            self.SpecColl.midas_collection_thread.start()
+            self.SpecColl.midas_collection_thread.run()
             self.SpecColl.MIDASLastAgg = False
-            time.sleep(0.5)
+
 
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
@@ -514,32 +505,7 @@ class SpectrumCanvas(FigureCanvas):
             self.x = x
             self.y = y
             SpectrumCanvas.ReBin(self,self.n1)
-          #  if self.autobin:
-                ## Auto rebin.
-                ## The principle, here, is to plot a maximum of
-                ## nBinMax bins, so rebin the data to fit
-           #     nBinMax = 1000
-            #    byBin = round((xmax-xmin)/1000)
-             #   print("auto binning by: ",byBin)
-              #  x_rebin = np.array([x for x in range(0,self.Spec.NBins,byBin)],dtype=int)
-               # y_rebin = np.zeros(len(x_rebin))
-                #for i in range(len(x_rebin)):
-                    #y_rebin[i] = sum(y[slice(i*byBin,(i+1)*byBin)])
-                 #   y_rebin[i] = np.mean(y[slice(i*byBin,(i+1)*byBin)])
-           # else:
-           
-           # x_rebin = x
-           # y_rebin = y
-            
-           # self.a.clear()
-           # if not self.dots:
-           #     self.a.step(x_rebin,y_rebin,'k',where='mid')
-                #self.a.step(x,y,'k',where='mid')
-          #  else:
-            #    self.a.plot(x_rebin, y_rebin, 'k+')
-                #            self.a.step(x_rebin,y_rebin,'k',where='mid')
-           #self.a.set_xlim([xmin,xmax])
-           # self.a.set_ylim([ymin,ymax])
+   
            
         else:
             #print("2D")
@@ -561,12 +527,12 @@ class SpectrumCanvas(FigureCanvas):
            #self.fig.colorbar(cm.ScalarMappable(norm=norm,cmap= self.cols))
         try:
             self.fig.delaxes(self.ax2)
-        except:
+        except AttributeError:
             pass
         ##print("SpectrumCanvas endSpectraBuilding:",time.time())
         self.updateSlider()
         self.fig.canvas.draw()
-        ##print("SpectrumCanvas CanvasDrawn:",time.time())
+
     
 
     def GetMax(self):

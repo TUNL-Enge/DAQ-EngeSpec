@@ -161,7 +161,7 @@ class SpectrumCollection:
             self.midas_thread.start()
         self.MIDASisRunning = True
 
-        ##self.midas_collection_thread.start()
+        
         if self.isOnline:
             os.system("odbedit -c start")
 
@@ -172,7 +172,7 @@ class SpectrumCollection:
             # time.sleep(0.5)
             if self.isOnline:
                 os.system("odbedit -c stop")
-                self.midas_collection_thread.start()
+                self.midas_collection_thread.run()
                 self.MIDASLastAgg = True
                 self.MIDASisRunning = False
             # else:
@@ -280,7 +280,7 @@ class MidasThread(QThread):
         # self.specColl.dm.connectMidasAnalyzer()
 
 
-class MidasCollectionThread(QThread):
+class MidasCollectionThread():
     def __init__(self, specColl):
         super().__init__()
         self.specColl = specColl
@@ -292,8 +292,11 @@ class MidasCollectionThread(QThread):
 
     def run(self):
         # probably the huge copy that occurs here
+
         dat = np.transpose(self.specColl.dm.getData())
+
         dat2d = self.specColl.dm.getData2D()
+
         ## Update the scalers
         sclrvals = self.specColl.dm.getScalers()
         for i in range(len(self.specColl.sclr)):
@@ -313,8 +316,6 @@ class MidasCollectionThread(QThread):
                     counter2d, : sObj.NBins, : sObj.NBins
                 ]
                 counter2d = counter2d + 1
-
-        # run only once for data collection when the update button is pressed
 
 
 ## Run this if this file is run alone for debugging purposes

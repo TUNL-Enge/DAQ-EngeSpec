@@ -4,6 +4,7 @@
 #include "EngeAnalyzerlib.h"
 #include "MDPPEventHandler.h"
 
+#include <boost/python/numpy/ndarray.hpp>
 #include <vector>
 #include <random>
 #include <string>
