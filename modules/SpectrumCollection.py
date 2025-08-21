@@ -169,7 +169,6 @@ class SpectrumCollection:
         print("MIDAS finished running")
         ## Collect the last bunch of data (not working currently)
         if self.MIDASisRunning:
-            # time.sleep(0.5)
             if self.isOnline:
                 os.system("odbedit -c stop")
                 self.midas_collection_thread.run()

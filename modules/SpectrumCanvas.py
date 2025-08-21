@@ -486,13 +486,11 @@ class SpectrumCanvas(FigureCanvas):
 ##            print("SpectrumCanvas collectionthread start:", time.time())
             self.SpecColl.midas_collection_thread.run()
 ##            print("SpectrumCanvas collectionthread start:", time.time())
-            time.sleep(0.5)
             ##print("SpectrumCanvas collectionthread after sleep:", time.time())
 
         if self.SpecColl.MIDASLastAgg:
             self.SpecColl.midas_collection_thread.run()
             self.SpecColl.MIDASLastAgg = False
-            time.sleep(0.5)
 
         ## Update the background data in all plots
         for sp in self.SpecColl.spec1d:
