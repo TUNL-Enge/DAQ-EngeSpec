@@ -1220,6 +1220,10 @@ class SpectrumCanvas(FigureCanvas):
             ucentroid = sum(Counts * (Chn - centroid) ** 2) / (sum(Counts) - 1)
             ucentroid = np.sqrt(ucentroid) / np.sqrt(sum(Counts))
 
+            ## The sample standard deviation
+            S2 = np.sum(Counts*(Chn-centroid)**2)/(sum(Counts)-1)
+            FWHM = 2 * np.sqrt(2 * np.log(2) * S2)
+            
             ## Calculate the number of counts
             bgsum = sum(np.poly1d(bgfit)(peakpoints[0]))
             ubgsum = np.sqrt(bgsum + ubgCounts**2)
@@ -1235,12 +1239,14 @@ class SpectrumCanvas(FigureCanvas):
             #print(dprecis,nprecis)
             print("Peak at ",self.round_to_n(centroid,1+nprecis), "+/-",
                   self.round_to_n(ucentroid,dprecis))
+            print("FWHM =", self.round_to_n(FWHM,1+nprecis))
             ## rounding
             dprecis = self.getprecis(unet)
             nprecis = self.getprecis(net)
             #            print(net,unet)
             print("Net Area (tot - bkg) =",self.round_to_n(net,1+nprecis),"+/-",
                   self.round_to_n(unet,dprecis))
+
 
             
             #self.guess = [a1,centroid,sig1,m,b] ## Peak height as param
