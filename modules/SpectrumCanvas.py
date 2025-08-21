@@ -484,13 +484,13 @@ class SpectrumCanvas(FigureCanvas):
         ## Is MIDAS running? If so, run the collection thread
         if self.SpecColl.MIDASisRunning:
 ##            print("SpectrumCanvas collectionthread start:", time.time())
-            self.SpecColl.midas_collection_thread.start()
+            self.SpecColl.midas_collection_thread.run()
 ##            print("SpectrumCanvas collectionthread start:", time.time())
             time.sleep(0.5)
             ##print("SpectrumCanvas collectionthread after sleep:", time.time())
 
         if self.SpecColl.MIDASLastAgg:
-            self.SpecColl.midas_collection_thread.start()
+            self.SpecColl.midas_collection_thread.run()
             self.SpecColl.MIDASLastAgg = False
             time.sleep(0.5)
 

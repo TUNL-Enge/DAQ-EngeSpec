@@ -172,7 +172,7 @@ class SpectrumCollection:
             # time.sleep(0.5)
             if self.isOnline:
                 os.system("odbedit -c stop")
-                self.midas_collection_thread.start()
+                self.midas_collection_thread.run()
                 self.MIDASLastAgg = True
                 self.MIDASisRunning = False
             # else:
@@ -280,7 +280,7 @@ class MidasThread(QThread):
         # self.specColl.dm.connectMidasAnalyzer()
 
 
-class MidasCollectionThread(QThread):
+class MidasCollectionThread():
     def __init__(self, specColl):
         super().__init__()
         self.specColl = specColl
