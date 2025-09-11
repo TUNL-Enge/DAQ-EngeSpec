@@ -1,6 +1,7 @@
 
 #include <vector>
-
+#include <chrono>
+#include <cmath>
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -211,16 +212,57 @@ Scaler::Scaler(std::string name, int index){
   Name = name;
   Index = index;
   count = 0;
-  //std::cout << "Made a scaler called " << name << " with index: " << index << std::endl;
-
+  temp_count = 0;
+  last_update = std::chrono::steady_clock::now();
   Scalers.push_back(this);
   
 }
 
+Scaler::Scaler(std::string name, bool rate){
+
+  Name = name;
+  Index = -1;
+  count = 0;
+  temp_count = 0;
+  last_update = std::chrono::steady_clock::now();
+  is_rate = rate;
+  Scalers.push_back(this);
+}
+
+int Scaler::getValue(){
+  if (is_rate == true) {
+    float rate = this->getRate();
+    return std::floor(rate);
+  } else {
+    return count;
+  }
+}
+
+float Scaler::getRate(){
+  auto now = std::chrono::steady_clock::now();
+  std::chrono::duration<float> dur = now - last_update;
+  float dt = std::chrono::duration_cast<std::chrono::seconds>(dur).count();
+  float rate = temp_count / dt;
+  // reset for next update
+  last_update = now;
+  temp_count = 0;
+  return rate;
+}
+
+
 // Increment a scaler
+void Scaler::inc(int c){
+  if (c > 0) {
+    count += 1;
+    temp_count += 1;
+  }
+}
+
+
 void Scaler::inc(uint32_t *scal){
   //std::cout << "incrementing " << Name << " at index " << Index << " by " << scal[Index] << std::endl;
   count = count+scal[Index];
+  temp_count += scal[Index];
 }
 
 // Print the Scaler

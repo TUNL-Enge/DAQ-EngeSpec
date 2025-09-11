@@ -1,5 +1,6 @@
 #ifndef EngeAnalyzerlib_H
 #define EngeAnalyzerlib_H
+#include <chrono>
 typedef std::vector<std::string> StringVector;
 
 //----------------------------------------------------------------------
@@ -92,20 +93,24 @@ class Scaler{
  public:
 
   Scaler(std::string name, int index);
+  Scaler(std::string name, bool rate);
 
+  void inc(int c);
   void inc(uint32_t*);
   void Print();
   std::string getName(){return Name;}
   int getIndex(){return Index;}
-  int getValue(){return count;}
+  int getValue();
+  float getRate();
   void Clear();
   
  private:
-
+  std::chrono::time_point<std::chrono::steady_clock> last_update;
+  int temp_count;
   std::string Name;
   int Index;
   int count;
-
+  bool is_rate;
 };
 
 // Global variables that are needed by the sort routine.

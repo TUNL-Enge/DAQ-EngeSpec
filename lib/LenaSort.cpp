@@ -171,6 +171,8 @@ Scaler *sPulser;
 Scaler *sBCI;
 Scaler *sTriggers;
 Scaler *sLN2;
+Scaler *sHPGe;
+Scaler *sPRate;
 
 // -----------------------
 // 1D HISTOGRAMS: UNGATED
@@ -349,6 +351,8 @@ void EngeSort::Initialize()
 	sPulser = new Scaler("Pulser", 1);
 	sTriggers = new Scaler("Trigger", 2);
 	sLN2 = new Scaler("LN2", 3);
+	sHPGe = new Scaler("HPGe Rate", true);
+	sPRate = new Scaler("Pulser Rate", true);
 
 	//------------------------------
 	// 1D Histograms: ungated/vetoed
@@ -506,6 +510,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	bool pulser_event = false;
 	if (cpulser > 0) {
 		hPulser->inc(scp_adc[0]);
+		sPRate->inc(scp_adc[0]);
 		pulser_event = true;
 	}
 
@@ -517,6 +522,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	if (!pulser_event) {
 		hGe->inc(scp_adc[0]);
 		hGeE->inc(hpge_cal[0]);
+		sHPGe->inc(scp_adc[0]);
 	}
 
 	// NaI
