@@ -1,5 +1,7 @@
 #ifndef EngeAnalyzerlib_H
 #define EngeAnalyzerlib_H
+#include <string>
+#include <vector>
 typedef std::vector<std::string> StringVector;
 
 //----------------------------------------------------------------------

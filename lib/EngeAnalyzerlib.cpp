@@ -1,10 +1,6 @@
-
+#include <string>
 #include <vector>
-
-#include <boost/python.hpp>
-#include <boost/python/numpy.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-
+#include <iostream>
 #include "EngeAnalyzerlib.h"
 
 // Initialize the global variables.
