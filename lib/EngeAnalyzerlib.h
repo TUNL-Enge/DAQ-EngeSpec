@@ -107,13 +107,41 @@ class Scaler{
   std::string Name;
   int Index;
   int count;
+};
 
+//----------------------------------------------------------------------
+// MONITORS
+
+// A class to hold monitors. Perhaps there should be in the scalers?
+// But maybe they could be defined off anything so make them their own
+// thing.
+class Monitor{
+
+public:
+  
+  Monitor(std::string name, int index);
+
+  void Update(int counter);
+
+  void Print();
+  std::string getName(){return Name;}
+  int getIndex(){return Index;}
+  double getValue(){return value;}
+  void Clear();
+
+private:
+
+  std::string Name;
+  int Index;
+
+  double value;
 };
 
 // Global variables that are needed by the sort routine.
 
 extern std::vector<Histogram*> Histograms;
 extern std::vector<Scaler*> Scalers;
+extern std::vector<Monitor*> Monitors;
 extern int nHist1D;
 extern int nHist2D;
 

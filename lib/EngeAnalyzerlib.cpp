@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <chrono>
+#include <ctime>
 #include "EngeAnalyzerlib.h"
 
 // Initialize the global variables.
@@ -228,4 +230,41 @@ void Scaler::Print(){
 // Clear the scaler
 void Scaler::Clear(){
   count = 0;
+}
+
+
+//----------------------------------------------------------------------
+// MONITORS
+
+// Make a monitor
+Monitor::Monitor(std::string name, int index) {
+
+  Name = name;
+  Index = index;
+  value = 0.0;
+
+  std::cout << "Made a monitor called " << name << " with index: " << index << std::endl;
+
+  Monitors.push_back(this);
+  
+}
+
+// Update a monitor value. These should calculated be per unit time so
+// each monitor should keep track of time passed and calculate rate
+auto oldTime = std::chrono::system_clock::now();
+void Monitor::Update(int counter) {
+
+  auto newTime = std::chrono::system_clock::now();
+  std::chrono::duration<double> deltaTime = oldTime - newTime;
+
+  value = ((double)counter) / deltaTime.count();
+  oldTime = newTime;
+}
+
+void Monitor::Clear() { value = 0.0; }
+
+void Monitor::Print() {
+
+  std::cout << "Monitor " << Index << ": " << Name << " = " << value << std::endl;
+
 }
