@@ -237,11 +237,12 @@ void Scaler::Clear(){
 // MONITORS
 
 // Make a monitor
-Monitor::Monitor(std::string name, int index) {
+Monitor::Monitor(std::string name, std::string u, int index) {
 
   Name = name;
   Index = index;
-  value = 0.0;
+  units = u;
+  rate = 0.0;
 
   std::cout << "Made a monitor called " << name << " with index: " << index << std::endl;
 
@@ -249,22 +250,33 @@ Monitor::Monitor(std::string name, int index) {
   
 }
 
-// Update a monitor value. These should calculated be per unit time so
-// each monitor should keep track of time passed and calculate rate
-auto oldTime = std::chrono::system_clock::now();
-void Monitor::Update(int counter) {
-
-  auto newTime = std::chrono::system_clock::now();
-  std::chrono::duration<double> deltaTime = oldTime - newTime;
-
-  value = ((double)counter) / deltaTime.count();
-  oldTime = newTime;
+// Define the clock and get the current time in ms
+static inline std::int64_t now_ms() {
+      return std::chrono::duration_cast<std::chrono::milliseconds>(
+                 std::chrono::steady_clock::now().time_since_epoch())
+          .count();
 }
 
-void Monitor::Clear() { value = 0.0; }
+// Update a monitor value. These should calculated be per unit time so
+// each monitor should keep track of time passed and calculate rate
+void Monitor::Update(int counter) {
+  // Get the new time
+  auto newTime_ms = now_ms();
+  // Find the change in time (in ms)
+  if(oldTime_ms >= 0) deltaTime_ms = newTime_ms - oldTime_ms;
+
+  // Finally calculate the rate in Hz
+  rate = 1000.0 *
+          (static_cast<double>(counter) / static_cast<double>(deltaTime_ms));
+  
+  oldTime_ms = newTime_ms;
+}
+
+void Monitor::Clear() { rate = 0.0; }
 
 void Monitor::Print() {
 
-  std::cout << "Monitor " << Index << ": " << Name << " = " << value << std::endl;
+  std::cout << "Monitor " << Index << ": " << Name << " = " << rate << " " <<
+    units << std::endl;
 
 }

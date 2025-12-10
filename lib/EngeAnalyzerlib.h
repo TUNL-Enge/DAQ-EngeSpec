@@ -119,22 +119,23 @@ class Monitor{
 
 public:
   
-  Monitor(std::string name, int index);
+  Monitor(std::string name, std::string u, int index);
 
   void Update(int counter);
 
   void Print();
   std::string getName(){return Name;}
   int getIndex(){return Index;}
-  double getValue(){return value;}
+  double getRate(){return rate;}
   void Clear();
 
 private:
 
-  std::string Name;
+  std::string Name, units;
   int Index;
-
-  double value;
+  std::uint64_t oldTime_ms = -1;
+  std::uint64_t deltaTime_ms = 0;
+  double rate;
 };
 
 // Global variables that are needed by the sort routine.
