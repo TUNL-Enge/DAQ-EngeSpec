@@ -140,20 +140,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ## Run info
         self.runinfogroup = QtWidgets.QGroupBox("Run Info")
         self.runinfogroup.setAlignment(QtCore.Qt.AlignCenter)
-                
+        self.runinfogroup.setMinimumSize(30, 30)
+
+        ## The monitor list
+        self.monitorgroup = QtWidgets.QGroupBox("Monitors")
+        self.monitorgroup.setAlignment(QtCore.Qt.AlignCenter)
+        self.monitorgroup.setMinimumSize(30, 30)
+       
         ## The scaler list
         scalertitle = QtWidgets.QLabel()
         scalertitle.setText("Scalers")
         scalertitle.setAlignment(QtCore.Qt.AlignCenter)
 
-        ## The monitor list
-        monitortitle = QtWidgets.QLabel()
-        monitortitle.setText("Monitors")
-        monitortitle.setAlignment(QtCore.Qt.AlignCenter)
-
         self.scalerFramevbox.addWidget(self.runinfogroup)
+        self.scalerFramevbox.addWidget(self.monitorgroup)
         self.scalerFramevbox.addWidget(scalertitle)
-        self.scalerFramevbox.addWidget(monitortitle)
+        ##self.scalerFramevbox.addStretch(1)
         self.scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
         ## now two vboxes in the gbox
         ##self.scalerlabvbox = QtWidgets.QVBoxLayout()
