@@ -95,7 +95,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         scalerFrame.setMinimumSize(
             100, 720
         )  ## (200, 720) crashes X11 on Windows- Will
-
+        ##
+        monitorFrame = QtWidgets.QFrame()
+        monitorFrame.setMinimumSize(
+            100,720
+        )
+        
         ##----------------------------------------------------------------------
         ## The tree widget
         self.treeWidget = QtWidgets.QTreeWidget()
@@ -141,8 +146,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         scalertitle.setText("Scalers")
         scalertitle.setAlignment(QtCore.Qt.AlignCenter)
 
+        ## The monitor list
+        monitortitle = QtWidgets.QLabel()
+        monitortitle.setText("Monitors")
+        monitortitle.setAlignment(QtCore.Qt.AlignCenter)
+
         self.scalerFramevbox.addWidget(self.runinfogroup)
         self.scalerFramevbox.addWidget(scalertitle)
+        self.scalerFramevbox.addWidget(monitortitle)
         self.scalerFramevbox.setAlignment(QtCore.Qt.AlignTop)
         ## now two vboxes in the gbox
         ##self.scalerlabvbox = QtWidgets.QVBoxLayout()

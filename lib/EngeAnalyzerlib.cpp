@@ -8,6 +8,7 @@
 // Initialize the global variables.
 std::vector<Histogram*> Histograms;
 std::vector<Scaler*> Scalers;
+std::vector<Monitor*> Monitors;
 int nHist1D = 0;
 int nHist2D = 0;
 
