@@ -683,6 +683,32 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.scalerFramevbox.addLayout(hbox)
             isclr = isclr + 1
 
+    def PopulateMonitors(self):
+        SpecColl = self.SpecCanvas.SpecColl
+
+        monitor_vbox = QtWidgets.QVBoxLayout()
+        
+        lmon = len(SpecColl.mon)
+        imon = 0
+        self.monlab = []
+        self.monval = []
+
+        for mon in SpecColl.mon:
+            hbox = QtWidgets.QHBoxLayout()
+            lab = QtWidgets.QLabel()
+            val = QtWidgets.QLabel()
+            val.setAlignment(QtCore.Qt.AlignRight)
+            val.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+            self.monlab.append(lab)
+            self.monval.append(val)
+            self.monlab[imon].setText(mon.Name)
+            self.monval[imon].setText("{}".format(mon.N))
+            hbox.addWidget(self.monlab[imon])
+            hbox.addWidget(self.monval[imon])
+            monitor_vbox.addLayout(hbox)
+            self.monitorgroup.addLayout(monitor_vbox)
+            imon = imon + 1
+            
     ## Update scaler values
     def UpdateScalers(self):
         SpecColl = self.SpecCanvas.SpecColl
@@ -692,6 +718,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.sclrval[isclr].setText("{}".format(sc.N))
             ##self.sclrval[isclr].setText(format(sc.N))
             isclr = isclr + 1
+
+    ## Update the monitors
+    def UpdateMonitors(self):
+        SpecColl = self.SpecCanvas.SpecColl
+        imon = 0
+        for mon in SpecColl.mon:
+            self.monval[imon].setText("{}".format(mon.N))
+            imon = imon+1
 
 
     ## Update run info
