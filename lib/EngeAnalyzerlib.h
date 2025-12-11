@@ -126,7 +126,7 @@ public:
   void Print();
   std::string getName(){return Name;}
   int getIndex(){return Index;}
-  double getRate(){return rate;}
+  int getRate(){return rate;}
   void Clear();
 
 private:
