@@ -25,6 +25,7 @@ class SpectrumCollection:
         self.Name = "Test Collection of Spectra"
 
         self.sclr = [ScalerObject(0)]
+        self.mon  = [MonitorObject(0)]
         self.statusBar = QStatusBar()
 
         ## Load the data library
@@ -122,6 +123,8 @@ class SpectrumCollection:
             i.spec2d_temp.fill(0)
         for i in self.sclr:
             i.N = 0
+        for i in self.mon:
+            i.N = 0
 
         self.dm.ClearData()
 
@@ -196,6 +199,7 @@ class MidasThread(QThread):
         ## First get the list of defined spectra in the datastream
         self.names = self.specColl.dm.getSpectrumNames()
         self.sclrnames = self.specColl.dm.getScalerNames()
+        self.monnames = self.specColl.dm.getMonitorNames()
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.NGates = self.specColl.dm.getNGates()
@@ -207,6 +211,7 @@ class MidasThread(QThread):
 
         ## Delete the old scalers
         self.specColl.sclr = []
+        self.specColl.mon = []
 
         ## Make the empty spectra
         counter1d = 0
@@ -256,6 +261,12 @@ class MidasThread(QThread):
             scObj.Name = self.sclrnames[i]
             self.specColl.sclr.append(scObj)
 
+        ## Make the empty monitors
+        for i in range(len(self.monnames)):
+            monObj = MonitorObject(i)
+            monObj.Name = self.monnames[i]
+            self.specColl.mon.append(monObj)
+
         ## Connect the analyzer to MIDAS
         self.specColl.dm.connectMidasAnalyzer()
 
@@ -297,6 +308,11 @@ class MidasCollectionThread():
         sclrvals = self.specColl.dm.getScalers()
         for i in range(len(self.specColl.sclr)):
             self.specColl.sclr[i].N = sclrvals[i]
+        ## Update the monitors
+        monvals = self.specColl.dm.getMonitors()
+        for i in range(len(self.specColl.mon)):
+            self.specColl.mon[i].N = monvals[i]
+        
 
         ## Go through the names and fill them for the appropriate data
         counter1d = 0
