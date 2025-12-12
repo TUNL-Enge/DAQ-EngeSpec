@@ -267,8 +267,8 @@ void Monitor::Update(int counter) {
   if(oldTime_ms >= 0) deltaTime_ms = newTime_ms - oldTime_ms;
 
   // Finally calculate the rate in Hz
-  rate = 1000.0 *
-          (static_cast<double>(counter) / static_cast<double>(deltaTime_ms));
+  rate = static_cast<int>(1000.0 *
+                          (static_cast<double>(counter) / static_cast<double>(deltaTime_ms)));
   
   oldTime_ms = newTime_ms;
 }

@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "EngeSort.h"
+#include "EngeAnalyzerlib.h"
 #include "TV792Data.hxx"
 
 Messages messages;
@@ -81,6 +82,10 @@ Scaler *sE;
 Scaler *sDE;
 Scaler *sSiPulser;
 Scaler *BCI;
+
+// Monitors
+Monitor *mEventRate;
+Monitor *mBCIRate;
 
 double pSiSlope = 0.0;
 
@@ -174,6 +179,10 @@ void EngeSort::Initialize(){
 	sSiPulser = new Scaler("Si Pulser",11);
   BCI = new Scaler("BCI",15);
 
+  // Build the monitors
+  mEventRate = new Monitor("Event Rate", "Hz", 0);
+  mBCIRate = new Monitor("BCI Rate", "uA", 1);
+  
 }
 
 //======================================================================
@@ -338,7 +347,10 @@ void EngeSort::incScalers(uint32_t *dSCAL){
   sE -> inc(dSCAL);
   sDE -> inc(dSCAL);
 	sSiPulser -> inc(dSCAL);
-  BCI -> inc(dSCAL);
+  BCI->inc(dSCAL);
+
+  mEventRate->Update(dSCAL[0]);
+  mBCIRate->Update(dSCAL[11]);
 }
 
 

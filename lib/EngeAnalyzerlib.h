@@ -135,7 +135,7 @@ private:
   int Index;
   std::uint64_t oldTime_ms = -1;
   std::uint64_t deltaTime_ms = 0;
-  double rate;
+  int rate;
 };
 
 // Global variables that are needed by the sort routine.

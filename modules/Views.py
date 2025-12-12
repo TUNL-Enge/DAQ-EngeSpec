@@ -462,6 +462,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SpecColl.connectmidas()
         self.PopulateTree()
         self.PopulateRuninfo()
+        self.PopulateMonitors()
         self.PopulateScalers()
         self.SpecCanvas.setSpecIndex(0,False)
         self.isOnline = True
@@ -483,6 +484,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def offlinemidas(self):
         self.SpecColl.offlinemidas()
         self.PopulateTree()
+        self.PopulateMonitors()
         self.PopulateScalers()
         self.SpecCanvas.setSpecIndex(0, False)
         ## make a scaler update thread
@@ -703,10 +705,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.monval.append(val)
             self.monlab[imon].setText(mon.Name)
             self.monval[imon].setText("{}".format(mon.N))
+            
             hbox.addWidget(self.monlab[imon])
             hbox.addWidget(self.monval[imon])
             monitor_vbox.addLayout(hbox)
-            self.monitorgroup.addLayout(monitor_vbox)
+            self.monitorgroup.setLayout(monitor_vbox)
             imon = imon + 1
             
     ## Update scaler values
@@ -772,6 +775,11 @@ class ScalerCollectionThread(QtCore.QThread):
             for i in range(len(self.specColl.sclr)):
                 self.specColl.sclr[i].N = sclrvals[i]
             self.view.UpdateScalers()
+
+            monvals = self.specColl.dm.getMonitors()
+            for i in range(len(self.specColl.mon)):
+                self.specColl.mon[i].N = monvals[i]
+            self.view.UpdateMonitors()
             time.sleep(5)
 
 class MidasStatusThread(QtCore.QThread):

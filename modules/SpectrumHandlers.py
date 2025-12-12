@@ -134,6 +134,15 @@ class ScalerObject:
     def __str__(self):
         return "Scaler Name: {}".format(self.Name)
 
+class MonitorObject:
+    def __init__(self, num):
+        self.num = num
+        self.Name = "Test Monitor"
+        self.N = 0
+
+    def __str__(self):
+        return "Monitor Name: {}".format(self.Name)
+
 
 class GateObject:
     def __init__(self):
