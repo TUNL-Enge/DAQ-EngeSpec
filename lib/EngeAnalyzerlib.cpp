@@ -260,7 +260,7 @@ static inline std::int64_t now_ms() {
 
 // Update a monitor value. These should calculated be per unit time so
 // each monitor should keep track of time passed and calculate rate
-void Monitor::Update(int counter) {
+void Monitor::Update(double counter) {
   // Get the new time
   auto newTime_ms = now_ms();
   // Find the change in time (in ms)
@@ -271,8 +271,10 @@ void Monitor::Update(int counter) {
   //          << " deltaTime: " << deltaTime_ms << std::endl;
 
   // Finally calculate the rate in Hz
-  rate = static_cast<int>(1000.0 *
-                          (static_cast<double>(counter) / static_cast<double>(deltaTime_ms)));
+  rate = 0;
+  if(deltaTime_ms > 0)
+    rate = static_cast<int>(1000.0 * (counter /
+                                      static_cast<double>(deltaTime_ms)));
 
   //std::cout << "counter: " << counter << " rate: " << rate << std::endl;
 

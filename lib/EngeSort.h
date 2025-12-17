@@ -58,6 +58,7 @@ class EngeSort {
   StringVector getScalerNames();
   IntVector getScalers();
   StringVector getMonitorNames();
+  StringVector getMonitorUnits();
   IntVector getMonitors();
 
   void setIsRunning(bool isr){isRunning = isr;}

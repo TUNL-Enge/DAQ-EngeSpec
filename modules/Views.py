@@ -694,20 +694,26 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         imon = 0
         self.monlab = []
         self.monval = []
+        self.monunit = []
 
         for mon in SpecColl.mon:
             hbox = QtWidgets.QHBoxLayout()
             lab = QtWidgets.QLabel()
             val = QtWidgets.QLabel()
+            unit = QtWidgets.QLabel()
             val.setAlignment(QtCore.Qt.AlignRight)
             val.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+            unit.setAlignment(QtCore.Qt.AlignRight)
             self.monlab.append(lab)
             self.monval.append(val)
+            self.monunit.append(unit)
             self.monlab[imon].setText(mon.Name)
             self.monval[imon].setText("{}".format(mon.N))
+            self.monunit[imon].setText("{}".format(mon.Unit))
             
             hbox.addWidget(self.monlab[imon])
             hbox.addWidget(self.monval[imon])
+            hbox.addWidget(self.monunit[imon])
             monitor_vbox.addLayout(hbox)
             self.monitorgroup.setLayout(monitor_vbox)
             imon = imon + 1

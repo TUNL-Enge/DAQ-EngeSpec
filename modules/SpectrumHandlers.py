@@ -139,6 +139,7 @@ class MonitorObject:
         self.num = num
         self.Name = "Test Monitor"
         self.N = 0
+        self.Unit = "Hz"
 
     def __str__(self):
         return "Monitor Name: {}".format(self.Name)

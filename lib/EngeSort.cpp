@@ -352,8 +352,10 @@ void EngeSort::incScalers(uint32_t *dSCAL){
 	sSiPulser -> inc(dSCAL);
   BCI->inc(dSCAL);
 
-  mEventRate->Update(dSCAL[0]);
-  mBCIRate->Update(dSCAL[11]);
+  mEventRate->Update(static_cast<double>(dSCAL[0]));
+  // Send in microCoulombs to get beam current in uA
+  double uC = static_cast<double>(dSCAL[15])*1.0e6*1.0e-10;
+  mBCIRate->Update(uC);
 }
 
 
@@ -429,6 +431,16 @@ StringVector EngeSort::getMonitorNames(){
   StringVector s;
   for(auto Mon: Monitors){
     s.push_back(Mon -> getName());
+  }
+
+  return s;
+}
+// Return a vector of monitor names
+StringVector EngeSort::getMonitorUnits(){
+
+  StringVector s;
+  for(auto Mon: Monitors){
+    s.push_back(Mon -> getUnit());
   }
 
   return s;
@@ -767,6 +779,7 @@ BOOST_PYTHON_MODULE(EngeSort)
       .def("getScalerNames", &EngeSort::getScalerNames)     // string vector
       .def("getScalers", &EngeSort::getScalers) // IntVector of scaler values
       .def("getMonitorNames", &EngeSort::getMonitorNames)   // string vector
+      .def("getMonitorUnits", &EngeSort::getMonitorUnits)   // string vector
       .def("getMonitors", &EngeSort::getMonitors)           // IntVector of monitor values
     .def("getGateNames", &EngeSort::getGateNames)             // string vector of gate names
     .def("ClearData", &EngeSort::ClearData)        // void

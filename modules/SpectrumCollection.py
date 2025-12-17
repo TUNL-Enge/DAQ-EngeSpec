@@ -200,6 +200,7 @@ class MidasThread(QThread):
         self.names = self.specColl.dm.getSpectrumNames()
         self.sclrnames = self.specColl.dm.getScalerNames()
         self.monnames = self.specColl.dm.getMonitorNames()
+        self.monunits = self.specColl.dm.getMonitorUnits()
 
         self.is2Ds = self.specColl.dm.getis2Ds()
         self.NGates = self.specColl.dm.getNGates()
@@ -265,6 +266,7 @@ class MidasThread(QThread):
         for i in range(len(self.monnames)):
             monObj = MonitorObject(i)
             monObj.Name = self.monnames[i]
+            monObj.Unit = self.monunits[i]
             self.specColl.mon.append(monObj)
 
         ## Connect the analyzer to MIDAS

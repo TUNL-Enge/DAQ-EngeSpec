@@ -72,7 +72,6 @@ class Histogram{
   void Clear();
   
  private:
-
   std::string Name;
   int nDims;
   int nChannels;
@@ -121,10 +120,11 @@ public:
   
   Monitor(std::string name, std::string u, int index);
 
-  void Update(int counter);
+  void Update(double counter);
 
   void Print();
-  std::string getName(){return Name;}
+  std::string getName() { return Name; }
+  std::string getUnit() { return units; }
   int getIndex(){return Index;}
   int getRate(){return rate;}
   void Clear();
