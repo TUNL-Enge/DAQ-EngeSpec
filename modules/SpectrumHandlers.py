@@ -157,11 +157,21 @@ class GateObject:
         self.y = y
         self.spec_name = spec_name
         cpp_module.putGate(spec_name, self.name, self.x, self.y)
+        self.print_gate()
 
     def load_gate(self, cpp_module):
         if self.spec_name is not None:
             cpp_module.putGate(self.spec_name, self.name, self.x, self.y)
+            self.print_gate()
 
+    def print_gate(self):
+        print("Gate:",self.name)
+        print("x: ",end="")
+        formatted = (['{:.1f},'.format(item) for item in self.x])
+        print(*formatted)
+        print("y: ",end="")
+        formatted = (['{:.1f},'.format(item) for item in self.y])
+        print(*formatted)
 
 if __name__ == "__main__":
     # Spec = SpectrumObject()
