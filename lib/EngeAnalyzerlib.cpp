@@ -264,12 +264,18 @@ void Monitor::Update(int counter) {
   // Get the new time
   auto newTime_ms = now_ms();
   // Find the change in time (in ms)
-  if(oldTime_ms >= 0) deltaTime_ms = newTime_ms - oldTime_ms;
+  if (oldTime_ms >= 0)
+    deltaTime_ms = newTime_ms - oldTime_ms;
+
+  //std::cout << "oldTime: " << oldTime_ms << " newTime: " << newTime_ms
+  //          << " deltaTime: " << deltaTime_ms << std::endl;
 
   // Finally calculate the rate in Hz
   rate = static_cast<int>(1000.0 *
                           (static_cast<double>(counter) / static_cast<double>(deltaTime_ms)));
-  
+
+  //std::cout << "counter: " << counter << " rate: " << rate << std::endl;
+
   oldTime_ms = newTime_ms;
 }
 

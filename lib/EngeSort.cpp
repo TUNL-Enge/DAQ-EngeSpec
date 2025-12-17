@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 #include <vector>
 #include <random>
 #include <chrono>
@@ -189,6 +190,8 @@ void EngeSort::Initialize(){
 // This is the equivalent to the "sort" function in jam
 void EngeSort::sort(uint32_t *dADC, int nADC, uint32_t *dTDC, int nTDC){
 
+  usleep(100);
+  
   totalCounter++;
   EventNo++;
 
