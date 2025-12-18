@@ -172,6 +172,10 @@ Scaler *sBCI;
 Scaler *sTriggers;
 Scaler *sLN2;
 
+// Monitors
+Monitor *mEventRate;
+
+// 
 // -----------------------
 // 1D HISTOGRAMS: UNGATED
 // -----------------------
@@ -350,6 +354,9 @@ void EngeSort::Initialize()
 	sTriggers = new Scaler("Trigger", 2);
 	sLN2 = new Scaler("LN2", 3);
 
+  // Build the monitors
+  mEventRate = new Monitor("Event Rate", "Hz", 0);
+
 	//------------------------------
 	// 1D Histograms: ungated/vetoed
 	//------------------------------
@@ -468,7 +475,10 @@ void EngeSort::incScalers(uint32_t *dSCAL)
 	sPulser->inc(dSCAL);
 	sBCI->inc(dSCAL);
 	sTriggers->inc(dSCAL);
-	sLN2->inc(dSCAL);
+  sLN2->inc(dSCAL);
+
+  mEventRate->Update(static_cast<double>(dSCAL[2]));
+
 }
 
 void EngeSort::sort(MDPPEvent &event_data)
@@ -697,6 +707,26 @@ StringVector EngeSort::getScalerNames()
 	}
 	return s;
 }
+// Return a vector of monitor names
+StringVector EngeSort::getMonitorNames(){
+
+  StringVector s;
+  for(auto Mon: Monitors){
+    s.push_back(Mon -> getName());
+  }
+
+  return s;
+}
+// Return a vector of monitor names
+StringVector EngeSort::getMonitorUnits(){
+
+  StringVector s;
+  for(auto Mon: Monitors){
+    s.push_back(Mon -> getUnit());
+  }
+
+  return s;
+}
 // Return a bool vector of whether the spectra are 2D
 BoolVector EngeSort::getis2Ds()
 {
@@ -735,6 +765,17 @@ IntVector EngeSort::getScalers()
 		sclr.push_back(sc->getValue());
 	}
 	return sclr;
+}
+
+// Return a vector of scalers
+IntVector EngeSort::getMonitors(){
+
+  IntVector d;
+  for(auto Mon: Monitors){
+    d.push_back(Mon -> getRate());
+  }
+
+  return d;
 }
 
 np::ndarray EngeSort::getData()
@@ -856,7 +897,10 @@ void EngeSort::ClearData()
 
 	for (auto Sclr : Scalers) {
 		Sclr->Clear();
-	}
+  }
+  for (auto Mon : Monitors) {
+    Mon->Clear();
+  }
 	totalCounter = 0;
 }
 
@@ -966,28 +1010,26 @@ BOOST_PYTHON_MODULE(EngeSort)
 		.def(vector_indexing_suite<BoolVector>());
 	class_<IntVector>("IntVector").def(vector_indexing_suite<IntVector>());
 
-	class_<EngeSort>("EngeSort")
-		.def("sayhello", &EngeSort::sayhello) // string
-		.def("saygoodbye", &EngeSort::saygoodbye) // string
-		.def("saysomething", &EngeSort::saysomething) // string
-		.def("Initialize", &EngeSort::Initialize) // void
-		.def("connectMidasAnalyzer",
-		     &EngeSort::connectMidasAnalyzer) // int
-		.def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
-		.def("getData", &EngeSort::getData) // 1D histograms
-		.def("getData2D", &EngeSort::getData2D) // 2D histograms
-		.def("getis2Ds", &EngeSort::getis2Ds) // bool vector
-		.def("getNGates", &EngeSort::getNGates) // int vector
-		.def("getNChannels", &EngeSort::getNChannels) // int vector
-		.def("getSpectrumNames",
-		     &EngeSort::getSpectrumNames) // string vector
-		.def("getIsRunning", &EngeSort::getIsRunning) // bool value
-		.def("getScalerNames",
-		     &EngeSort::getScalerNames) // string vector
-		.def("getScalers",
-		     &EngeSort::getScalers) // IntVector of scaler values
-		.def("getGateNames",
-		     &EngeSort::getGateNames) // string vector of gate names
+  class_<EngeSort>("EngeSort")
+    .def("sayhello", &EngeSort::sayhello)         // string
+    .def("saygoodbye", &EngeSort::saygoodbye)     // string
+    .def("saysomething", &EngeSort::saysomething) // string
+    .def("Initialize", &EngeSort::Initialize)     // void
+    .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer)  // int
+    .def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
+    .def("getData", &EngeSort::getData)           // 1D histograms
+    .def("getData2D", &EngeSort::getData2D)       // 2D histograms
+    .def("getis2Ds", &EngeSort::getis2Ds)         // bool vector
+    .def("getNGates", &EngeSort::getNGates)       // int vector
+    .def("getNChannels", &EngeSort::getNChannels) // int vector
+    .def("getSpectrumNames", &EngeSort::getSpectrumNames)          // string vector
+    .def("getIsRunning", &EngeSort::getIsRunning) // bool value
+    .def("getScalerNames", &EngeSort::getScalerNames) // string vector
+    .def("getScalers", &EngeSort::getScalers) // IntVector of scaler values
+    .def("getMonitorNames", &EngeSort::getMonitorNames)   // string vector
+    .def("getMonitorUnits", &EngeSort::getMonitorUnits)   // string vector
+    .def("getMonitors", &EngeSort::getMonitors)           // IntVector of monitor values            
+		.def("getGateNames", &EngeSort::getGateNames) // string vector of gate names
 		.def("ClearData", &EngeSort::ClearData) // void
 		.def("putGate", &EngeSort::putGate) // void
 		.def("data", range(&EngeSort::begin, &EngeSort::end));
