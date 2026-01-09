@@ -173,9 +173,11 @@ Scaler *sTriggers;
 Scaler *sLN2;
 
 // Monitors
+Monitor *mHPGe;
 Monitor *mEventRate;
+Monitor *mPulserRate;
 
-// 
+//
 // -----------------------
 // 1D HISTOGRAMS: UNGATED
 // -----------------------
@@ -354,8 +356,10 @@ void EngeSort::Initialize()
 	sTriggers = new Scaler("Trigger", 2);
 	sLN2 = new Scaler("LN2", 3);
 
-  // Build the monitors
-  mEventRate = new Monitor("Event Rate", "Hz", 0);
+	// Build the monitors
+	mEventRate = new Monitor("Event Rate", "Hz", 0);
+	mHPGe = new Monitor("HPGe Rate", "Hz", 1);
+	mPulserRate = new Monitor("Pulser Rate", "Hz", 2);
 
 	//------------------------------
 	// 1D Histograms: ungated/vetoed
@@ -475,10 +479,12 @@ void EngeSort::incScalers(uint32_t *dSCAL)
 	sPulser->inc(dSCAL);
 	sBCI->inc(dSCAL);
 	sTriggers->inc(dSCAL);
-  sLN2->inc(dSCAL);
-
-  mEventRate->Update(static_cast<double>(dSCAL[2]));
-
+	sLN2->inc(dSCAL);
+	
+	mEventRate->Update(static_cast<double>(dSCAL[2]));
+	mPulserRate->Update(static_cast<double>(dSCAL[1]));
+	// This one counts sorted variables, so use the overloaded update.
+	mHPGe->Update();
 }
 
 void EngeSort::sort(MDPPEvent &event_data)
@@ -501,21 +507,23 @@ void EngeSort::sort(MDPPEvent &event_data)
 	// ref time is the self trigger time stamp of the hpge energy channel
 	// it will be added to time differences latter on to ensure
 	// all timing histograms are positive.
-	int ref_time = scp_tdc[0];
+	// Update 1/6/26: We now avoid the first 4 banks on the MDPP 16.
+	// As a result the HPGe signals, pulser, and tac are in different channels.
+	int ref_time = scp_tdc[0 + 4];
 
 	// Now see if the hpge timing optimized channel fired
-	int cGe_t = scp_tdc[2];
+	int cGe_t = scp_tdc[2 + 4];
 
 	//----------------------------------
 	// Define pulser events
 	//----------------------------------
 
 	// the pulser histogram contains the counts from the HPGe
-	int cpulser = scp_adc[4];
+	int cpulser = scp_adc[4 + 4];
 
 	bool pulser_event = false;
 	if (cpulser > 0) {
-		hPulser->inc(scp_adc[0]);
+		hPulser->inc(scp_adc[0 + 4]);
 		pulser_event = true;
 	}
 
@@ -525,8 +533,9 @@ void EngeSort::sort(MDPPEvent &event_data)
 
 	// HPGe
 	if (!pulser_event) {
-		hGe->inc(scp_adc[0]);
-		hGeE->inc(hpge_cal[0]);
+		hGe->inc(scp_adc[0 + 4]);
+		hGeE->inc(hpge_cal[0 + 4]);
+		mHPGe->inc(scp_adc[0 + 4]);
 	}
 
 	// NaI
@@ -588,11 +597,11 @@ void EngeSort::sort(MDPPEvent &event_data)
 	//----------------------------------------------------------------
 
 	if (!pulser_event && !sci_fire) {
-		hGe_SV->inc(scp_adc[0]);
+		hGe_SV->inc(scp_adc[0 + 4]);
 	}
 
 	if (!pulser_event && !nai_fire) {
-		hGe_NaIV->inc(scp_adc[0]);
+		hGe_NaIV->inc(scp_adc[0 + 4]);
 	}
 
 	//------------------------------------
@@ -612,7 +621,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 	//-----------------------------------------------------
 
 	// compressed variables (energies)
-	int cGeE = (int)std::floor((double)hpge_cal[0] * compressE);
+	int cGeE = (int)std::floor((double)hpge_cal[0 + 4] * compressE);
 	int cSumNaIE = (int)std::floor(SumNaIE * compressE);
 
 	if (nai_fire) {
@@ -636,7 +645,7 @@ void EngeSort::sort(MDPPEvent &event_data)
 		if (!sci_fire && nai_fire && g2d.inGate(cGeE, cSumNaIE) &&
 		    gMulti.inGate(multi)) {
 			hGeTE2dSV[i]->inc(
-				hpge_cal[0]); // Increment HPGe histogram
+				hpge_cal[0 + 4]); // Increment HPGe histogram
 			hNaITE2dSV[i]->inc(SumNaIE); // Increment NaI histogram
 		}
 	}
@@ -708,24 +717,24 @@ StringVector EngeSort::getScalerNames()
 	return s;
 }
 // Return a vector of monitor names
-StringVector EngeSort::getMonitorNames(){
+StringVector EngeSort::getMonitorNames()
+{
+	StringVector s;
+	for (auto Mon : Monitors) {
+		s.push_back(Mon->getName());
+	}
 
-  StringVector s;
-  for(auto Mon: Monitors){
-    s.push_back(Mon -> getName());
-  }
-
-  return s;
+	return s;
 }
 // Return a vector of monitor names
-StringVector EngeSort::getMonitorUnits(){
+StringVector EngeSort::getMonitorUnits()
+{
+	StringVector s;
+	for (auto Mon : Monitors) {
+		s.push_back(Mon->getUnit());
+	}
 
-  StringVector s;
-  for(auto Mon: Monitors){
-    s.push_back(Mon -> getUnit());
-  }
-
-  return s;
+	return s;
 }
 // Return a bool vector of whether the spectra are 2D
 BoolVector EngeSort::getis2Ds()
@@ -768,14 +777,14 @@ IntVector EngeSort::getScalers()
 }
 
 // Return a vector of scalers
-IntVector EngeSort::getMonitors(){
+IntVector EngeSort::getMonitors()
+{
+	IntVector d;
+	for (auto Mon : Monitors) {
+		d.push_back(Mon->getRate());
+	}
 
-  IntVector d;
-  for(auto Mon: Monitors){
-    d.push_back(Mon -> getRate());
-  }
-
-  return d;
+	return d;
 }
 
 np::ndarray EngeSort::getData()
@@ -897,10 +906,10 @@ void EngeSort::ClearData()
 
 	for (auto Sclr : Scalers) {
 		Sclr->Clear();
-  }
-  for (auto Mon : Monitors) {
-    Mon->Clear();
-  }
+	}
+	for (auto Mon : Monitors) {
+		Mon->Clear();
+	}
 	totalCounter = 0;
 }
 
@@ -990,7 +999,7 @@ void MidasAnalyzerRun::EndRun(TARunInfo *runinfo)
 {
 	printf("End run %d\n", runinfo->fRunNo);
 	printf("Counted %d events\n", fRunEventCounter);
-  fModule->eA->setIsRunning(false);
+	fModule->eA->setIsRunning(false);
 }
 
 BOOST_PYTHON_MODULE(EngeSort)
@@ -1010,26 +1019,34 @@ BOOST_PYTHON_MODULE(EngeSort)
 		.def(vector_indexing_suite<BoolVector>());
 	class_<IntVector>("IntVector").def(vector_indexing_suite<IntVector>());
 
-  class_<EngeSort>("EngeSort")
-    .def("sayhello", &EngeSort::sayhello)         // string
-    .def("saygoodbye", &EngeSort::saygoodbye)     // string
-    .def("saysomething", &EngeSort::saysomething) // string
-    .def("Initialize", &EngeSort::Initialize)     // void
-    .def("connectMidasAnalyzer", &EngeSort::connectMidasAnalyzer)  // int
-    .def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
-    .def("getData", &EngeSort::getData)           // 1D histograms
-    .def("getData2D", &EngeSort::getData2D)       // 2D histograms
-    .def("getis2Ds", &EngeSort::getis2Ds)         // bool vector
-    .def("getNGates", &EngeSort::getNGates)       // int vector
-    .def("getNChannels", &EngeSort::getNChannels) // int vector
-    .def("getSpectrumNames", &EngeSort::getSpectrumNames)          // string vector
-    .def("getIsRunning", &EngeSort::getIsRunning) // bool value
-    .def("getScalerNames", &EngeSort::getScalerNames) // string vector
-    .def("getScalers", &EngeSort::getScalers) // IntVector of scaler values
-    .def("getMonitorNames", &EngeSort::getMonitorNames)   // string vector
-    .def("getMonitorUnits", &EngeSort::getMonitorUnits)   // string vector
-    .def("getMonitors", &EngeSort::getMonitors)           // IntVector of monitor values            
-		.def("getGateNames", &EngeSort::getGateNames) // string vector of gate names
+	class_<EngeSort>("EngeSort")
+		.def("sayhello", &EngeSort::sayhello) // string
+		.def("saygoodbye", &EngeSort::saygoodbye) // string
+		.def("saysomething", &EngeSort::saysomething) // string
+		.def("Initialize", &EngeSort::Initialize) // void
+		.def("connectMidasAnalyzer",
+		     &EngeSort::connectMidasAnalyzer) // int
+		.def("runMidasAnalyzer", &EngeSort::runMidasAnalyzer) // int
+		.def("getData", &EngeSort::getData) // 1D histograms
+		.def("getData2D", &EngeSort::getData2D) // 2D histograms
+		.def("getis2Ds", &EngeSort::getis2Ds) // bool vector
+		.def("getNGates", &EngeSort::getNGates) // int vector
+		.def("getNChannels", &EngeSort::getNChannels) // int vector
+		.def("getSpectrumNames",
+		     &EngeSort::getSpectrumNames) // string vector
+		.def("getIsRunning", &EngeSort::getIsRunning) // bool value
+		.def("getScalerNames",
+		     &EngeSort::getScalerNames) // string vector
+		.def("getScalers",
+		     &EngeSort::getScalers) // IntVector of scaler values
+		.def("getMonitorNames",
+		     &EngeSort::getMonitorNames) // string vector
+		.def("getMonitorUnits",
+		     &EngeSort::getMonitorUnits) // string vector
+		.def("getMonitors",
+		     &EngeSort::getMonitors) // IntVector of monitor values
+		.def("getGateNames",
+		     &EngeSort::getGateNames) // string vector of gate names
 		.def("ClearData", &EngeSort::ClearData) // void
 		.def("putGate", &EngeSort::putGate) // void
 		.def("data", range(&EngeSort::begin, &EngeSort::end));

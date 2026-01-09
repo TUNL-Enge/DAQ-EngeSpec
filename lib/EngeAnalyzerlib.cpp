@@ -287,5 +287,31 @@ void Monitor::Print() {
 
   std::cout << "Monitor " << Index << ": " << Name << " = " << rate << " " <<
     units << std::endl;
+}
 
+// There are actually two types of rates. Those derived from a
+// vme scaler/counter and those from sort code variables.
+// This inc function is for the latter.
+void Monitor::inc(int c) {
+  if (c > 0)
+    current_count += 1;
+}
+
+/// This overloaded update calculates the rate for the sort code variable monitors.
+void Monitor::Update() {
+  // Get the new time
+  auto newTime_ms = now_ms();
+  // Find the change in time (in ms)
+  if (oldTime_ms >= 0)
+    deltaTime_ms = newTime_ms - oldTime_ms;
+
+  // Finally calculate the rate in Hz
+  rate = 0;
+  if(deltaTime_ms > 0)
+    rate = static_cast<int>(1000.0 * (current_count /
+                                      static_cast<double>(deltaTime_ms)));
+
+  // reset for next time
+  current_count = 0;
+  oldTime_ms = newTime_ms;
 }

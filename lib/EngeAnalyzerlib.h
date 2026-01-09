@@ -121,7 +121,9 @@ public:
   Monitor(std::string name, std::string u, int index);
 
   void Update(double counter);
-
+  void Update();
+  void inc(int c);
+  
   void Print();
   std::string getName() { return Name; }
   std::string getUnit() { return units; }
@@ -136,6 +138,7 @@ private:
   std::uint64_t oldTime_ms = -1;
   std::uint64_t deltaTime_ms = 0;
   int rate;
+  int current_count = 0;
 };
 
 // Global variables that are needed by the sort routine.
