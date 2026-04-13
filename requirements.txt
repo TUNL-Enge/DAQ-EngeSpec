@@ -1,0 +1,6 @@
+PySide6
+matplotlib>=3.10
+scipy>=1.15
+lmfit
+pandas
+PyQt5

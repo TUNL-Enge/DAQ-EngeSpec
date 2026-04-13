@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/daq/venv/bin/python
 
 from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication
