@@ -4,6 +4,17 @@
   - Installation
     - Linux
     - Mac
+* How to install on linux
+** Prerequisites
+   Ensure the following are installed
+   - Boost and dependencies
+     #+begin_src sh
+         sudo apt install libboost-python-dev libboost-numpy-dev
+     #+end_src
+   - Install the required python libraries (I do this in a virtual environment)
+     #+begin_src sh
+         python3 -m pip install -r requirements.txt 
+     #+end_src
 * How to install on a mac
   These are the updated instructions to install and configure EngeSpec
   on macOS, including steps for building dependencies and making
